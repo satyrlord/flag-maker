@@ -1,0 +1,11 @@
+{
+  "config": {
+    "line-length": false
+  },
+  "ignores": [
+    "node_modules/",
+    ".github/skills/",
+    ".github/agents/",
+    "dist/"
+  ]
+}
