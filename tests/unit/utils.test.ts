@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { clamp, uid, starPath, download, svgToPng } from "@/utils";
+import { clamp, uid, starPath, download, svgToPng, svgToRaster, downloadDataUrl } from "@/utils";
 
 describe("clamp", () => {
   it("returns value when within range", () => {
@@ -150,7 +150,7 @@ describe("svgToPng", () => {
     const result = await svgToPng(svgEl, 2);
     expect(result).toBe(fakeDataUrl);
     expect(drawImageFn).toHaveBeenCalledOnce();
-    expect(toDataURLFn).toHaveBeenCalledWith("image/png");
+    expect(toDataURLFn).toHaveBeenCalledWith("image/png", undefined);
 
     globalThis.Image = origImage;
   });
@@ -185,5 +185,156 @@ describe("svgToPng", () => {
     expect(result).toBe("");
 
     globalThis.Image = origImage;
+  });
+});
+
+describe("svgToRaster", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("fills white background for JPEG format", async () => {
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    Object.defineProperty(svgEl, "viewBox", {
+      value: { baseVal: { width: 100, height: 50 } },
+    });
+
+    const fakeDataUrl = "data:image/jpeg;base64,jpg123";
+    const drawImageFn = vi.fn();
+    const fillRectFn = vi.fn();
+    const toDataURLFn = vi.fn().mockReturnValue(fakeDataUrl);
+    const ctxMock = {
+      fillStyle: "",
+      fillRect: fillRectFn,
+      drawImage: drawImageFn,
+    };
+
+    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+      if (tag === "canvas") {
+        return {
+          width: 0,
+          height: 0,
+          getContext: () => ctxMock,
+          toDataURL: toDataURLFn,
+        } as unknown as HTMLCanvasElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const origImage = globalThis.Image;
+    globalThis.Image = class MockImage {
+      src = "";
+      onload: (() => void) | null = null;
+      constructor() {
+        setTimeout(() => this.onload?.(), 0);
+      }
+    } as unknown as typeof Image;
+
+    const result = await svgToRaster(svgEl, "image/jpeg", 1, 0.92);
+    expect(result).toBe(fakeDataUrl);
+    expect(ctxMock.fillStyle).toBe("#ffffff");
+    expect(fillRectFn).toHaveBeenCalledWith(0, 0, 100, 50);
+    expect(drawImageFn).toHaveBeenCalledOnce();
+    expect(toDataURLFn).toHaveBeenCalledWith("image/jpeg", 0.92);
+
+    globalThis.Image = origImage;
+  });
+
+  it("does not fill background for PNG format", async () => {
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    Object.defineProperty(svgEl, "viewBox", {
+      value: { baseVal: { width: 100, height: 50 } },
+    });
+
+    const fakeDataUrl = "data:image/png;base64,png123";
+    const drawImageFn = vi.fn();
+    const fillRectFn = vi.fn();
+    const toDataURLFn = vi.fn().mockReturnValue(fakeDataUrl);
+
+    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+      if (tag === "canvas") {
+        return {
+          width: 0,
+          height: 0,
+          getContext: () => ({
+            fillStyle: "",
+            fillRect: fillRectFn,
+            drawImage: drawImageFn,
+          }),
+          toDataURL: toDataURLFn,
+        } as unknown as HTMLCanvasElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const origImage = globalThis.Image;
+    globalThis.Image = class MockImage {
+      src = "";
+      onload: (() => void) | null = null;
+      constructor() {
+        setTimeout(() => this.onload?.(), 0);
+      }
+    } as unknown as typeof Image;
+
+    const result = await svgToRaster(svgEl, "image/png", 2);
+    expect(result).toBe(fakeDataUrl);
+    expect(fillRectFn).not.toHaveBeenCalled();
+    expect(toDataURLFn).toHaveBeenCalledWith("image/png", undefined);
+
+    globalThis.Image = origImage;
+  });
+});
+
+describe("svgToRaster error handling", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("rejects when the image fails to load", async () => {
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    Object.defineProperty(svgEl, "viewBox", {
+      value: { baseVal: { width: 100, height: 50 } },
+    });
+
+    const origImage = globalThis.Image;
+    globalThis.Image = class MockImage {
+      src = "";
+      onerror: (() => void) | null = null;
+      onload: (() => void) | null = null;
+      constructor() {
+        setTimeout(() => this.onerror?.(), 0);
+      }
+    } as unknown as typeof Image;
+
+    await expect(svgToRaster(svgEl, "image/png")).rejects.toThrow(
+      "Failed to load SVG as image",
+    );
+
+    globalThis.Image = origImage;
+  });
+});
+
+describe("downloadDataUrl", () => {
+  let appendSpy: ReturnType<typeof vi.spyOn>;
+  let removeSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    appendSpy = vi.spyOn(document.body, "appendChild").mockReturnValue(null as unknown as Node);
+    removeSpy = vi.spyOn(document.body, "removeChild").mockReturnValue(null as unknown as Node);
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("creates and clicks a download link with the data URL", () => {
+    downloadDataUrl("data:image/png;base64,abc", "flag.png");
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce();
+    expect(appendSpy).toHaveBeenCalledOnce();
+    expect(removeSpy).toHaveBeenCalledOnce();
+    const link = appendSpy.mock.calls[0][0] as HTMLAnchorElement;
+    expect(link.href).toBe("data:image/png;base64,abc");
+    expect(link.download).toBe("flag.png");
   });
 });

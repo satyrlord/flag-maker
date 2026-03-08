@@ -21,12 +21,13 @@ test.describe("App shell loads", () => {
   });
 });
 
-test.describe("Canvas placeholder", () => {
-  test("shows canvas area with placeholder text", async ({ page }) => {
+test.describe("Canvas rendering", () => {
+  test("shows a rendered flag and zoom controls", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
     const main = page.locator("main");
     await expect(main).toBeVisible();
-    await expect(main).toContainText("Flag canvas");
+    await expect(main.locator("svg.flag-svg")).toBeVisible();
+    await expect(page.getByRole("toolbar", { name: "Zoom Level" })).toBeVisible();
   });
 });

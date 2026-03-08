@@ -9,6 +9,7 @@ import { BUILTIN_SYMBOLS } from "../symbols";
 import { starPath } from "../utils";
 import { VIEW_W, computeViewH } from "../geometry";
 import { svg } from "./icons";
+import { validateLeftbarConfig } from "./leftbarConfig";
 import {
   type TemplateCfg,
   templatePerPale,
@@ -29,6 +30,7 @@ import {
   templateUK,
   templateSouthAfrica,
 } from "../templates";
+import config from "./leftbar-config.json";
 
 /* ── Constants ── */
 
@@ -36,7 +38,9 @@ const NS = "http://www.w3.org/2000/svg";
 
 /* ── Tab Icons (Lucide-style) ── */
 
-const TabIcons = {
+type TabId = "ratio" | "stripes" | "overlays" | "templates" | "symbols";
+
+const TabIcons: Record<TabId, string> = {
   ratio: svg(
     '<rect x="3" y="3" width="18" height="18" rx="2"/>' +
       '<line x1="3" y1="12" x2="21" y2="12"/>' +
@@ -65,7 +69,7 @@ const TabIcons = {
   ),
 };
 
-/* ── Tab Definitions ── */
+/* ── Tab Definitions (derived from config keys + icons) ── */
 
 interface TabDef {
   id: string;
@@ -73,15 +77,13 @@ interface TabDef {
   icon: string;
 }
 
-const TABS: TabDef[] = [
-  { id: "ratio", label: "Ratio", icon: TabIcons.ratio },
-  { id: "stripes", label: "Stripes", icon: TabIcons.stripes },
-  { id: "overlays", label: "Overlays", icon: TabIcons.overlays },
-  { id: "templates", label: "Templates", icon: TabIcons.templates },
-  { id: "symbols", label: "Symbols", icon: TabIcons.symbols },
-];
+const TABS: TabDef[] = (Object.keys(TabIcons) as TabId[]).map((id) => ({
+  id,
+  label: id.charAt(0).toUpperCase() + id.slice(1),
+  icon: TabIcons[id],
+}));
 
-/* ── Template Catalog ── */
+/* ── Template Registry (maps config IDs to factory functions) ── */
 
 interface TemplateEntry {
   id: string;
@@ -90,55 +92,51 @@ interface TemplateEntry {
   create: () => TemplateCfg;
 }
 
-const TEMPLATE_CATALOG: TemplateEntry[] = [
-  { id: "perPale", name: "Per Pale", group: "Division", create: templatePerPale },
-  { id: "perFess", name: "Per Fess", group: "Division", create: templatePerFess },
-  { id: "triV", name: "Tricolor V", group: "Division", create: templateTricolorVertical },
-  { id: "triH", name: "Tricolor H", group: "Division", create: templateTricolorHorizontal },
-  { id: "quartered", name: "Quartered", group: "Division", create: templateQuartered },
-  { id: "perBend", name: "Per Bend", group: "Division", create: templatePerBend },
-  {
-    id: "perBendSin",
-    name: "Per Bend Sin.",
-    group: "Division",
-    create: templatePerBendSinister,
+const TEMPLATE_FACTORIES: Record<string, () => TemplateCfg> = {
+  perPale: templatePerPale,
+  perFess: templatePerFess,
+  triV: templateTricolorVertical,
+  triH: templateTricolorHorizontal,
+  quartered: templateQuartered,
+  perBend: templatePerBend,
+  perBendSin: templatePerBendSinister,
+  saltire: templatePerSaltire,
+  chevron: templatePerChevron,
+  centCross: templateCenteredCross,
+  nordic: templateNordicCross,
+  us: () => {
+    const r: [number, number] = [10, 19];
+    return templateUS(VIEW_W, computeViewH(r));
   },
-  { id: "saltire", name: "Saltire", group: "Division", create: templatePerSaltire },
-  { id: "chevron", name: "Chevron", group: "Division", create: templatePerChevron },
-  {
-    id: "centCross",
-    name: "Centered Cross",
-    group: "Division",
-    create: templateCenteredCross,
-  },
-  { id: "nordic", name: "Nordic Cross", group: "Division", create: templateNordicCross },
-  {
-    id: "us",
-    name: "USA",
-    group: "National",
-    create: () => {
-      const r: [number, number] = [10, 19];
-      return templateUS(VIEW_W, computeViewH(r));
-    },
-  },
-  { id: "iceland", name: "Iceland", group: "National", create: templateIceland },
-  { id: "uruguay", name: "Uruguay", group: "National", create: templateUruguay },
-  { id: "drc", name: "DR Congo", group: "National", create: templateDRC },
-  { id: "uk", name: "United Kingdom", group: "National", create: templateUK },
-  { id: "sa", name: "South Africa", group: "National", create: templateSouthAfrica },
-];
+  iceland: templateIceland,
+  uruguay: templateUruguay,
+  drc: templateDRC,
+  uk: templateUK,
+  sa: templateSouthAfrica,
+};
 
-/* ── Common Aspect Ratios ── */
+const TEMPLATE_CATALOG: TemplateEntry[] = config.templates.map((t) => ({
+  ...t,
+  create: TEMPLATE_FACTORIES[t.id],
+}));
 
-const RATIOS: { label: string; ratio: [number, number] }[] = [
-  { label: "1:1", ratio: [1, 1] },
-  { label: "1:2", ratio: [1, 2] },
-  { label: "2:3", ratio: [2, 3] },
-  { label: "3:5", ratio: [3, 5] },
-  { label: "10:19", ratio: [10, 19] },
-  { label: "18:25", ratio: [18, 25] },
-  { label: "3:4", ratio: [3, 4] },
-];
+/* ── Common Aspect Ratios (from config) ── */
+
+const RATIOS: { label: string; ratio: [number, number]; commonality: number }[] = config.ratios.map((r) => ({
+  label: r.label,
+  ratio: r.ratio as [number, number],
+  commonality: r.commonality,
+}));
+
+type RatioEntry = (typeof RATIOS)[number];
+
+function compareByAspectValue(a: RatioEntry, b: RatioEntry): number {
+  return a.ratio[0] / a.ratio[1] - b.ratio[0] / b.ratio[1];
+}
+
+function compareByCommonality(a: RatioEntry, b: RatioEntry): number {
+  return b.commonality - a.commonality;
+}
 
 /* ── Event Helper ── */
 
@@ -159,10 +157,61 @@ function h<K extends keyof HTMLElementTagNameMap>(
   return e;
 }
 
+/* ── Panel Header Icons (decorative, one per tab panel) ── */
+
+const PanelIcons: Record<TabId, string> = {
+  ratio: svg(
+    '<rect x="4" y="6" width="16" height="12" rx="1" fill="none"/>' +
+      '<line x1="4" y1="18" x2="20" y2="18"/>' +
+      '<line x1="4" y1="6" x2="4" y2="18"/>' +
+      '<path d="M6 20 L12 20" stroke-dasharray="1 1.5"/>' +
+      '<path d="M2 8 L2 16" stroke-dasharray="1 1.5"/>',
+    20,
+  ),
+  stripes: svg(
+    '<rect x="3" y="4" width="18" height="3" rx="0.5" fill="currentColor" stroke="none"/>' +
+      '<rect x="3" y="10" width="18" height="3" rx="0.5" fill="currentColor" stroke="none" opacity="0.6"/>' +
+      '<rect x="3" y="16" width="18" height="3" rx="0.5" fill="currentColor" stroke="none" opacity="0.3"/>',
+    20,
+  ),
+  overlays: svg(
+    '<rect x="3" y="6" width="10" height="10" rx="1"/>' +
+      '<circle cx="16" cy="11" r="5"/>' +
+      '<polygon points="12 3 14 7 10 7"/>',
+    20,
+  ),
+  templates: svg(
+    '<rect x="3" y="3" width="8" height="18" rx="1"/>' +
+      '<rect x="13" y="3" width="8" height="18" rx="1"/>' +
+      '<line x1="13" y1="12" x2="21" y2="12"/>',
+    20,
+  ),
+  symbols: svg(
+    '<circle cx="12" cy="10" r="4"/>' +
+      '<path d="M12 2 L13.5 6.5 L18 6.5 L14.5 9.5 L16 14 L12 11 L8 14 L9.5 9.5 L6 6.5 L10.5 6.5 Z" fill="currentColor" stroke="none"/>' +
+      '<path d="M7 18 C7 15 17 15 17 18" fill="none"/>',
+    20,
+  ),
+};
+
 function sectionTitle(text: string): HTMLElement {
   const t = h("h3", "toolbar-section-title", text);
   t.style.color = "var(--text-secondary)";
   return t;
+}
+
+function panelHeader(text: string, tabId: TabId): HTMLElement {
+  const row = h("div", "toolbar-panel-header");
+  const title = sectionTitle(text);
+  title.style.margin = "0";
+  row.appendChild(title);
+  const iconMarkup = PanelIcons[tabId];
+  if (iconMarkup) {
+    const span = h("span", "toolbar-panel-icon");
+    span.innerHTML = iconMarkup;
+    row.appendChild(span);
+  }
+  return row;
 }
 
 /* ── Template Thumbnail ── */
@@ -271,29 +320,66 @@ function symbolPreview(sym: SymbolDef, size = 32): SVGSVGElement {
 
 function createRatioPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(sectionTitle("Aspect Ratio"));
+  panel.appendChild(panelHeader("Aspect Ratio", "ratio"));
+
+  // Sort control
+  const sortRow = h("div", "toolbar-sort-row");
+  const sortLabel = h("label", "toolbar-sort-label text-xs", "Sort by");
+  sortLabel.style.color = "var(--text-secondary)";
+  const sortSelect = document.createElement("select");
+  sortSelect.className = "toolbar-sort-select";
+  sortSelect.setAttribute("aria-label", "Sort aspect ratios");
+  for (const opt of [
+    { value: "value", text: "Value" },
+    { value: "commonality", text: "Commonality" },
+  ]) {
+    const o = document.createElement("option");
+    o.value = opt.value;
+    o.textContent = opt.text;
+    sortSelect.appendChild(o);
+  }
+  sortRow.append(sortLabel, sortSelect);
+  panel.appendChild(sortRow);
 
   const grid = h("div", "toolbar-ratio-grid");
-  for (const r of RATIOS) {
-    const btn = h("button", "toolbar-ratio-btn", r.label);
-    btn.type = "button";
-    btn.setAttribute("aria-label", `Set ratio to ${r.label}`);
-    btn.addEventListener("click", () => {
-      grid
-        .querySelectorAll(".toolbar-ratio-btn")
-        .forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      emit(root, "toolbar:ratio", { ratio: r.ratio });
-    });
-    if (r.label === "2:3") btn.classList.add("active");
-    grid.appendChild(btn);
+  let activeLabel = config.defaultRatio;
+
+  function sortedRatios(): typeof RATIOS {
+    const sorted = [...RATIOS];
+    sorted.sort(
+      sortSelect.value === "commonality" ? compareByCommonality : compareByAspectValue,
+    );
+    return sorted;
   }
+
+  function rebuildGrid(): void {
+    grid.innerHTML = "";
+    for (const r of sortedRatios()) {
+      const btn = h("button", "toolbar-ratio-btn", r.label);
+      btn.type = "button";
+      btn.setAttribute("aria-label", `Set ratio to ${r.label}`);
+      btn.addEventListener("click", () => {
+        activeLabel = r.label;
+        grid
+          .querySelectorAll(".toolbar-ratio-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        emit(root, "toolbar:ratio", { ratio: r.ratio });
+      });
+      if (r.label === activeLabel) btn.classList.add("active");
+      grid.appendChild(btn);
+    }
+  }
+
+  sortSelect.addEventListener("change", rebuildGrid);
+  rebuildGrid();
   panel.appendChild(grid);
   return panel;
 }
 
 function createStripesPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
+  panel.appendChild(panelHeader("Stripes", "stripes"));
 
   // Orientation toggle
   panel.appendChild(sectionTitle("Orientation"));
@@ -316,7 +402,7 @@ function createStripesPanel(root: HTMLElement): HTMLElement {
   // Stripe count
   panel.appendChild(sectionTitle("Stripe Count"));
   const countRow = h("div", "toolbar-count-row");
-  let count = 3;
+  let count = config.stripes.defaultCount;
   const countLabel = h("span", "toolbar-count-label", String(count));
   countLabel.style.color = "var(--text-primary)";
   const btnMinus = h("button", "toolbar-count-btn", "\u2212");
@@ -326,11 +412,7 @@ function createStripesPanel(root: HTMLElement): HTMLElement {
   btnPlus.type = "button";
   btnPlus.setAttribute("aria-label", "Increase stripe count");
 
-  const DEFAULT_COLORS = [
-    "#CE1126", "#FFFFFF", "#002395", "#FFD500", "#000000",
-    "#009246", "#CE2B37", "#B22234", "#3C3B6E", "#0038A8",
-    "#FCD116", "#00A3DD", "#F7D618",
-  ];
+  const DEFAULT_COLORS = config.stripes.defaultColors;
 
   const colorContainer = h("div", "toolbar-color-list");
   const currentColors: string[] = DEFAULT_COLORS.slice(0, count);
@@ -356,7 +438,7 @@ function createStripesPanel(root: HTMLElement): HTMLElement {
   }
 
   function updateCount(n: number): void {
-    count = Math.max(1, Math.min(13, n));
+    count = Math.max(config.stripes.minCount, Math.min(config.stripes.maxCount, n));
     countLabel.textContent = String(count);
     emit(root, "toolbar:stripes", { count });
     rebuildColorPickers();
@@ -386,15 +468,11 @@ function createStripesPanel(root: HTMLElement): HTMLElement {
 
 function createOverlaysPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
+  panel.appendChild(panelHeader("Overlays", "overlays"));
   panel.appendChild(sectionTitle("Add Overlay"));
 
   const addRow = h("div", "toolbar-add-row");
-  const types = [
-    { id: "rectangle", label: "Rectangle" },
-    { id: "circle", label: "Circle" },
-    { id: "star", label: "Star" },
-  ];
-  for (const t of types) {
+  for (const t of config.overlayTypes) {
     const btn = h("button", "toolbar-add-btn", t.label);
     btn.type = "button";
     btn.setAttribute("aria-label", `Add ${t.label} overlay`);
@@ -417,7 +495,8 @@ function createOverlaysPanel(root: HTMLElement): HTMLElement {
 
 function createTemplatesPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  const groups = ["Division", "National"];
+  panel.appendChild(panelHeader("Templates", "templates"));
+  const groups = config.templateGroups;
 
   for (const group of groups) {
     panel.appendChild(sectionTitle(group));
@@ -445,7 +524,7 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
 
 function createSymbolsPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(sectionTitle("Symbols"));
+  panel.appendChild(panelHeader("Symbols", "symbols"));
 
   // Search input
   const search = document.createElement("input");
@@ -519,6 +598,7 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
    ────────────────────────────────────────────── */
 
 export function createLeftbar(): HTMLElement {
+  validateLeftbarConfig(config, TEMPLATE_FACTORIES);
   const aside = document.createElement("aside");
   aside.className = "toolbar relative flex";
   aside.style.backgroundColor = "var(--toolbar-bg)";

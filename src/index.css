@@ -16,7 +16,9 @@
   --topbar-bg: #1e1e2e;
   --toolbar-bg: #252535;
   --canvas-bg: #2a2a2a;
-  --zoom-bg: rgba(30, 30, 46, 0.85);
+  --floating-bar-bg: rgba(30, 30, 46, 0.85);
+  --botbar-bg: var(--floating-bar-bg);
+  --rightbar-bg: var(--floating-bar-bg);
   --text-primary: #e0e0e0;
   --text-secondary: #888;
   --accent: #4a9eff;
@@ -28,7 +30,9 @@
   --topbar-bg: #fff;
   --toolbar-bg: #f5f5f5;
   --canvas-bg: #d0d0d0;
-  --zoom-bg: rgba(255, 255, 255, 0.85);
+  --floating-bar-bg: rgba(255, 255, 255, 0.85);
+  --botbar-bg: var(--floating-bar-bg);
+  --rightbar-bg: var(--floating-bar-bg);
   --text-primary: #1a1a1a;
   --text-secondary: #666;
   --accent: #0066cc;
@@ -184,7 +188,54 @@ body {
   margin-top: 0;
 }
 
+/* Panel header (title + decorative icon) */
+
+.toolbar-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.toolbar-panel-icon {
+  opacity: 0.25;
+  color: var(--text-secondary);
+  line-height: 0;
+}
+
 /* Ratio grid */
+
+.toolbar-sort-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.toolbar-sort-label {
+  flex-shrink: 0;
+}
+
+.toolbar-sort-select {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--divider);
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+
+.toolbar-sort-select:focus {
+  border-color: var(--accent);
+}
+
+.toolbar-sort-select option {
+  background-color: var(--toolbar-bg);
+  color: var(--text-primary);
+}
 
 .toolbar-ratio-grid {
   display: grid;
@@ -454,8 +505,10 @@ body {
 
 .flag-canvas {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   overflow: hidden;
   background-color: var(--canvas-bg);
 }
@@ -465,9 +518,123 @@ body {
   width: auto;
   height: auto;
   max-width: calc(100% - 48px);
-  max-height: calc(100% - 48px);
+  max-height: calc(100% - 96px);
   display: block;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+
+/* ──── Zoom Level (botbar) ──── */
+
+.botbar {
+  flex-shrink: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--botbar-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  font-size: 12px;
+  user-select: none;
+}
+
+.botbar-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+}
+
+.botbar-btn:hover {
+  background-color: var(--btn-hover);
+}
+
+.botbar-level {
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ──── Dynamic Tools (rightbar) ──── */
+
+.rightbar {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%) translateX(calc(100% + 16px));
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--rightbar-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  user-select: none;
+  transition: transform 0.15s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rightbar.rightbar-visible {
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.rightbar-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+}
+
+.rightbar-btn:hover {
+  background-color: var(--btn-hover);
+}
+
+@media (max-width: 767px) {
+  .rightbar {
+    display: none;
+  }
+
+  .botbar {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+
+  .botbar-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .botbar-level {
+    min-width: 28px;
+  }
 }
 
 /* ──── Portrait-Mode Overlay ──── */

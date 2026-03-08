@@ -30,7 +30,7 @@ Domain logic is separated into pure TypeScript modules. The UI is built with dir
 - **Overlay model:** Each overlay (`rect`, `circle`, `star`, `path`, `symbol`) has position/size in `%`, plus fill/stroke/opacity/rotation. Overlays support lock, z-order, and drag repositioning.
 - **Symbol system:** Built-in symbols (stars, crescents, crosses) plus loaded emblems from `symbols.json` (national coats of arms/emblems with full inner SVG markup and viewBox). Users can also import custom symbol JSON.
 - **Template system:** Heraldic division templates (Per Pale, Per Fess, Per Bend, Saltire, Chevron, Nordic Cross, etc.) and national flag presets.
-- **History:** Undo/redo via JSON snapshot stacks.
+- **History:** Undo/redo (planned -- not yet implemented).
 - **Export:** SVG download and SVG-to-PNG via canvas rasterization.
 - **Emblem rendering:** Uses `innerHTML` for complex SVG emblem markup — be cautious and sanitize any user-provided SVG content.
 
@@ -39,7 +39,7 @@ Domain logic is separated into pure TypeScript modules. The UI is built with dir
 - The UI must be **fully responsive** and fit the screen on both desktop and mobile devices.
 - **Landscape only:** Only landscape orientation is supported on mobile/tablet. Most real-world flags are wider than tall, so the UI and flags would be too small in portrait mode. Portrait support is out of scope.
 - Use Tailwind responsive utilities (`sm:`, `md:`, `lg:`) to adapt layouts across breakpoints.
-- Panels (leftbar, layer panel, property inspector) should collapse or reflow on small screens — never cause horizontal overflow.
+- Panels (leftbar, botbar, rightbar, layer panel, property inspector) should collapse or reflow on small screens — never cause horizontal overflow.
 - The flag canvas should scale fluidly to fill available space without requiring horizontal scrolling.
 - Test layouts at common breakpoints: mobile (375px), tablet (768px), desktop (1280px+).
 
@@ -59,7 +59,7 @@ Domain logic is separated into pure TypeScript modules. The UI is built with dir
 
 This fork is actively adding features to match and exceed professional flag makers. Priority areas include:
 
-- **UI modernization:** Build a proper UI with a topbar (application settings), leftbar (flag editor), layer panel, property inspector, and canvas using direct DOM manipulation.
+- **UI modernization:** Build a proper UI with a topbar (application settings), leftbar (flag editor), botbar (zoom level), rightbar (dynamic tools), layer panel, property inspector, and canvas using direct DOM manipulation.
 - **New features to build toward:** gradient fills, pattern fills, text overlays, multi-flag projects, save/load projects (JSON), share URLs, more templates, custom aspect ratios, grid/snap, alignment tools, group/ungroup overlays, copy/paste overlays, keyboard shortcuts.
 - **Symbol library expansion:** More emblem categories (heraldic charges, geometric shapes, cultural symbols), search/filter, favorites.
 - **Accessibility:** Keyboard navigation, screen reader labels, contrast-safe UI colors.
@@ -118,8 +118,11 @@ Also check the VSCode **Problems** tab for any remaining diagnostics.
 | `src/symbols.ts` | Built-in symbol definitions |
 | `src/symbolLoader.ts` | Fetch and merge symbols from `symbols.json` |
 | `src/templates.ts` | Division templates and national flag presets |
+| `src/vite-env.d.ts` | Vite client type declarations (`/// <reference types="vite/client" />`) |
 | `src/ui/topbar.ts` | Application settings bar (topbar) |
 | `src/ui/leftbar.ts` | Flag editor sidebar (leftbar) |
+| `src/ui/botbar.ts` | Zoom level floating bar (botbar) |
+| `src/ui/rightbar.ts` | Dynamic tools floating bar (rightbar) |
 | `src/index.css` | Tailwind CSS import |
 | `public/symbols.json` | Generated symbol/emblem catalog |
 | `public/emblems/` | Raw SVG emblem source files (193 files) |

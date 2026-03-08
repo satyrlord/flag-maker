@@ -37,10 +37,10 @@ test.describe("Flag editor (leftbar)", () => {
     if (viewport && viewport.width < 1280) {
       await page.getByRole("button", { name: "Ratio", exact: true }).click();
     }
-    const btn = page.locator(".toolbar-ratio-btn", { hasText: "1:1" });
+    const btn = page.getByRole("button", { name: "Set ratio to 1:1" });
     await btn.click();
     await expect(btn).toHaveClass(/active/);
-    const prev = page.locator(".toolbar-ratio-btn", { hasText: "2:3" });
+    const prev = page.getByRole("button", { name: "Set ratio to 2:3" });
     await expect(prev).not.toHaveClass(/active/);
   });
 });

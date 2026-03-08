@@ -10,6 +10,9 @@
  * Pure domain-logic files (geometry.ts, utils.ts) are excluded
  * because their functions are not exercisable through the UI.
  * Those files are fully covered by vitest unit tests instead.
+ * leftbarConfig.ts is also excluded: it contains pure validation logic that
+ * is fully covered by vitest integration tests and does not execute through
+ * the Playwright UI, so it would appear uncovered in any e2e report.
  */
 
 import * as fs from "node:fs";
@@ -17,7 +20,7 @@ import * as path from "node:path";
 import { CoverageReport } from "monocart-coverage-reports";
 
 /** Files excluded from e2e coverage (pure domain logic, tested by vitest). */
-const E2E_EXCLUDE = ["geometry.ts", "utils.ts"];
+const E2E_EXCLUDE = ["geometry.ts", "utils.ts", "leftbarConfig.ts"];
 const COVERAGE_THRESHOLD = 82;
 
 const COVERAGE_DIR = path.resolve(".temp/e2e-coverage");

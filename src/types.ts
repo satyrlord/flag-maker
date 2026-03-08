@@ -5,6 +5,13 @@
 export type Orientation = "horizontal" | "vertical";
 export type OverlayType = "rectangle" | "circle" | "star" | "custom" | "symbol";
 
+/** Overlay types that can be added by the user via the leftbar UI. */
+export const UI_OVERLAY_TYPE_IDS: ReadonlySet<string> = new Set<OverlayType>([
+  "rectangle",
+  "circle",
+  "star",
+]);
+
 export interface Overlay {
   id: string;
   type: OverlayType;

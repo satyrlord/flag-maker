@@ -5,10 +5,12 @@
 import "./index.css";
 import { createTopbar } from "./ui/topbar";
 import { createLeftbar } from "./ui/leftbar";
-import { renderFlag } from "./flagRenderer";
+import { createBotbar, ZOOM_MIN, ZOOM_MAX } from "./ui/botbar";
+import { createRightbar, setRightbarVisible } from "./ui/rightbar";
+import { renderFlag, registerSymbols } from "./flagRenderer";
 import { rectOverlay, circleOverlay, starOverlay } from "./overlays";
 import { uid } from "./utils";
-import type { FlagDesign, Overlay, Orientation } from "./types";
+import type { FlagDesign, Overlay, Orientation, SymbolDef } from "./types";
 import type { TemplateCfg } from "./templates";
 
 const root = document.querySelector<HTMLDivElement>("#root")!;
@@ -18,25 +20,51 @@ root.className = "app-shell";
 root.appendChild(createTopbar());
 
 // ── Flag Editor (leftbar) ──
-root.appendChild(createLeftbar());
+const leftbar = createLeftbar();
+root.appendChild(leftbar);
 
 // ── Canvas area ──
 const canvas = document.createElement("main");
 canvas.className = "flag-canvas";
 root.appendChild(canvas);
 
+// ── Zoom Level (botbar) – inside canvas, below the flag ──
+const { element: botbar, setZoom: setBotbarZoom } = createBotbar();
+canvas.appendChild(botbar);
+
+// ── Dynamic Tools (rightbar) ──
+const rightbar = createRightbar();
+setRightbarVisible(rightbar, false);
+root.appendChild(rightbar);
+
 // ── Default flag design ──
-const design: FlagDesign = {
-  orientation: "horizontal",
-  ratio: [2, 3],
+const DEFAULT_DESIGN = {
+  orientation: "horizontal" as const,
+  ratio: [2, 3] as const,
   sections: 3,
   weights: [1, 1, 1],
   colors: ["#CE1126", "#FFFFFF", "#002395"],
-  overlays: [],
+  overlays: [] as Overlay[],
+} satisfies FlagDesign;
+
+const design: FlagDesign = {
+  orientation: DEFAULT_DESIGN.orientation,
+  ratio: [...DEFAULT_DESIGN.ratio],
+  sections: DEFAULT_DESIGN.sections,
+  weights: [...DEFAULT_DESIGN.weights],
+  colors: [...DEFAULT_DESIGN.colors],
+  overlays: [...DEFAULT_DESIGN.overlays],
 };
 
 // ── Live flag rendering ──
 let flagEl: SVGSVGElement | null = null;
+let currentZoom = 100;
+
+function applyZoom(): void {
+  if (!flagEl) return;
+  const scale = currentZoom / 100;
+  flagEl.style.transform = scale < 1 ? `scale(${scale})` : "";
+}
 
 function redraw(): void {
   const next = renderFlag(design);
@@ -44,12 +72,33 @@ function redraw(): void {
   if (flagEl && canvas.contains(flagEl)) {
     canvas.replaceChild(next, flagEl);
   } else {
-    canvas.appendChild(next);
+    canvas.insertBefore(next, botbar);
   }
   flagEl = next;
+  applyZoom();
 }
 
 redraw();
+
+root.addEventListener("symbols:register", (e) => {
+  registerSymbols((e as CustomEvent<{ defs: SymbolDef[] }>).detail.defs);
+});
+
+root.addEventListener("topbar:reset", () => {
+  design.orientation = DEFAULT_DESIGN.orientation;
+  design.ratio = [...DEFAULT_DESIGN.ratio];
+  design.sections = DEFAULT_DESIGN.sections;
+  design.weights = [...DEFAULT_DESIGN.weights];
+  design.colors = [...DEFAULT_DESIGN.colors];
+  design.overlays = [];
+  redraw();
+  leftbar.dispatchEvent(
+    new CustomEvent("toolbar:sync-colors", {
+      detail: { colors: design.colors },
+      bubbles: false,
+    }),
+  );
+});
 
 // ── Leftbar event handlers ──
 root.addEventListener("toolbar:ratio", (e) => {
@@ -115,10 +164,12 @@ root.addEventListener("toolbar:template", (e) => {
     : Array.from<number>({ length: config.sections }).fill(1);
   design.overlays = [...config.overlays];
   redraw();
-  root.dispatchEvent(
+  // Dispatch on leftbar directly: sync-colors must reach the aside listener,
+  // which is a child of root — events don't bubble downward.
+  leftbar.dispatchEvent(
     new CustomEvent("toolbar:sync-colors", {
       detail: { colors: design.colors },
-      bubbles: true,
+      bubbles: false,
     }),
   );
 });
@@ -139,6 +190,47 @@ root.addEventListener("toolbar:symbol", (e) => {
   design.overlays.push(ov);
   redraw();
 });
+
+// ── Botbar zoom handler ──
+root.addEventListener("botbar:zoom", (e) => {
+  currentZoom = (e as CustomEvent<{ zoom: number }>).detail.zoom;
+  applyZoom();
+});
+
+root.addEventListener("rightbar:visibility", (e) => {
+  setRightbarVisible(
+    rightbar,
+    (e as CustomEvent<{ visible: boolean }>).detail.visible,
+  );
+});
+
+// ── Mouse-wheel zoom (scales with scroll magnitude for trackpad support) ──
+//
+// WHEEL_DELTA_DIVISOR controls how many pixels of scroll delta equal one zoom
+// step.  Approximate typical |deltaY| values (platform- and device-dependent):
+//   - Mouse wheel click  ~100
+//   - Trackpad flick     ~3-20  (varies by OS / sensitivity setting)
+//
+// With a divisor of 50 a single mouse-wheel notch (~100px) yields a 2% zoom
+// change, while a gentle trackpad swipe (~10px) yields 1%.  Lower values make
+// zoom more sensitive; higher values make it smoother.
+const WHEEL_DELTA_DIVISOR = 50;
+canvas.addEventListener(
+  "wheel",
+  (e) => {
+    e.preventDefault();
+    const direction = -Math.sign(e.deltaY);
+    const magnitude = Math.max(1, Math.ceil(Math.abs(e.deltaY) / WHEEL_DELTA_DIVISOR));
+    const delta = direction * magnitude;
+    const next = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, currentZoom + delta));
+    if (next !== currentZoom) {
+      currentZoom = next;
+      applyZoom();
+      setBotbarZoom(currentZoom);
+    }
+  },
+  { passive: false },
+);
 
 // ── Portrait-mode overlay ──
 const portraitOverlay = document.createElement("div");

@@ -4,8 +4,11 @@ dist/
 .vite/
 .venv/
 .vscode/
+!.vscode/settings.json
 .DS_Store
 .env
 test-results/
 coverage/
 .temp/
+# Windows shell error artifact (NUL device redirection)
+nul

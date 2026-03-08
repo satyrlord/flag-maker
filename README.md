@@ -2,7 +2,7 @@
 
 Design flags with adjustable stripes and overlays (rectangles, circles, stars,
 **national emblems**).
-Supports drag, edit, undo/redo, and export to **SVG/PNG**. Loads a
+Supports drag, edit, and export to **SVG/PNG**. Loads a
 `public/symbols.json` library (built-ins + your own) including **full
 multi-shape SVG emblems**.
 
@@ -65,6 +65,7 @@ npm run quality:full
 │  ├─ symbols.ts            # Built-in symbol definitions
 │  ├─ symbolLoader.ts       # Fetch and merge symbols from symbols.json
 │  ├─ templates.ts          # Division templates and national flag presets
+│  ├─ vite-env.d.ts        # Vite client type declarations (CSS imports, env)
 │  └─ index.css             # Tailwind CSS import
 ├─ tools/
 │  ├─ fetch_emblems.py      # fetch official emblems from Wikimedia
@@ -89,6 +90,8 @@ npm run quality:full
   - Includes a small built-in starter set (star, crescent, crosses, etc.).
   - Auto-loads `public/symbols.json` if present.
   - Supports **full multi-shape SVG** emblems via `{ svg, viewBox }`.
+- **Reset**: the Reset button in the topbar restores the flag to the default
+  three-stripe design and clears all overlays.
 - **Export**: download as SVG or PNG.
 
 > **Note:** The app is fully responsive but only supports **landscape

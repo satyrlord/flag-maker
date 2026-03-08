@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createTopbar } from "@/ui/topbar";
+import * as flagRenderer from "@/flagRenderer";
+import * as utils from "@/utils";
 
 describe("createTopbar", () => {
   beforeEach(() => {
@@ -77,12 +79,13 @@ describe("createTopbar", () => {
     document.body.removeChild(bar);
   });
 
-  it("export menu has SVG and PNG options", () => {
+  it("export menu has SVG, PNG, and JPG options", () => {
     const bar = createTopbar();
     const menuItems = bar.querySelectorAll('[role="menuitem"]');
-    expect(menuItems.length).toBe(2);
+    expect(menuItems.length).toBe(3);
     expect(menuItems[0].textContent).toBe("Export SVG");
     expect(menuItems[1].textContent).toBe("Export PNG");
+    expect(menuItems[2].textContent).toBe("Export JPG");
   });
 
   it("spans full grid width via gridColumn style", () => {
@@ -141,11 +144,135 @@ describe("createTopbar", () => {
     document.body.removeChild(bar);
   });
 
+  it("reset button dispatches topbar:reset event that bubbles", () => {
+    const bar = createTopbar();
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(bar);
+    document.body.appendChild(wrapper);
+    const handler = vi.fn();
+    wrapper.addEventListener("topbar:reset", handler);
+    const reset = bar.querySelector<HTMLButtonElement>('button[aria-label="Reset flag"]')!;
+    reset.click();
+    expect(handler).toHaveBeenCalledOnce();
+    document.body.removeChild(wrapper);
+  });
+
   it("save button is clickable", () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
     const save = bar.querySelector<HTMLButtonElement>('button[aria-label="Save project"]')!;
     expect(() => save.click()).not.toThrow();
+    document.body.removeChild(bar);
+  });
+
+  it("Export SVG calls download with serialized SVG", () => {
+    const bar = createTopbar();
+    document.body.appendChild(bar);
+
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    const downloadSpy = vi.spyOn(utils, "download").mockImplementation(() => {});
+
+    // Open menu and click Export SVG
+    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+    items[0].click();
+
+    expect(downloadSpy).toHaveBeenCalledOnce();
+    expect(downloadSpy.mock.calls[0][0]).toBe("flag.svg");
+    expect(downloadSpy.mock.calls[0][1]).toContain("<svg");
+    expect(downloadSpy.mock.calls[0][2]).toBe("image/svg+xml;charset=utf-8");
+
+    vi.restoreAllMocks();
+    document.body.removeChild(bar);
+  });
+
+  it("Export PNG calls svgToRaster with image/png", async () => {
+    const bar = createTopbar();
+    document.body.appendChild(bar);
+
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/png;base64,x");
+    const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+    items[1].click();
+
+    // Wait for promise chain
+    await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
+    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/png", 2);
+    // PNG is lossless -- quality must not be forwarded.
+    expect(rasterSpy.mock.calls[0][3]).toBeUndefined();
+    expect(dlSpy).toHaveBeenCalledWith("data:image/png;base64,x", "flag.png");
+
+    vi.restoreAllMocks();
+    document.body.removeChild(bar);
+  });
+
+  it("Export JPG calls svgToRaster with image/jpeg and quality", async () => {
+    const bar = createTopbar();
+    document.body.appendChild(bar);
+
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/jpeg;base64,y");
+    const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+    items[2].click();
+
+    await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
+    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/jpeg", 2, 0.92);
+    expect(dlSpy).toHaveBeenCalledWith("data:image/jpeg;base64,y", "flag.jpg");
+
+    vi.restoreAllMocks();
+    document.body.removeChild(bar);
+  });
+
+  it("Export PNG handles rasterization failure without downloading", async () => {
+    const bar = createTopbar();
+    document.body.appendChild(bar);
+
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    vi.spyOn(utils, "svgToRaster").mockRejectedValue(new Error("PNG failed"));
+    const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+
+    await expect(async () => {
+      items[1].click();
+      await Promise.resolve();
+    }).not.toThrow();
+    await vi.waitFor(() => expect(dlSpy).not.toHaveBeenCalled());
+
+    vi.restoreAllMocks();
+    document.body.removeChild(bar);
+  });
+
+  it("Export JPG handles rasterization failure without downloading", async () => {
+    const bar = createTopbar();
+    document.body.appendChild(bar);
+
+    const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    vi.spyOn(utils, "svgToRaster").mockRejectedValue(new Error("JPG failed"));
+    const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+
+    await expect(async () => {
+      items[2].click();
+      await Promise.resolve();
+    }).not.toThrow();
+    await vi.waitFor(() => expect(dlSpy).not.toHaveBeenCalled());
+
+    vi.restoreAllMocks();
     document.body.removeChild(bar);
   });
 });

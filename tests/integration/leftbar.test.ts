@@ -1,5 +1,50 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createLeftbar } from "@/ui/leftbar";
+import config from "@/ui/leftbar-config.json";
+import { validateLeftbarConfig } from "@/ui/leftbarConfig";
+import {
+  templatePerPale,
+  templatePerFess,
+  templateTricolorVertical,
+  templateTricolorHorizontal,
+  templateQuartered,
+  templatePerBend,
+  templatePerBendSinister,
+  templatePerSaltire,
+  templatePerChevron,
+  templateCenteredCross,
+  templateNordicCross,
+  templateUS,
+  templateIceland,
+  templateUruguay,
+  templateDRC,
+  templateUK,
+  templateSouthAfrica,
+} from "@/templates";
+import { VIEW_W, computeViewH } from "@/geometry";
+
+const TEMPLATE_FACTORIES = {
+  perPale: templatePerPale,
+  perFess: templatePerFess,
+  triV: templateTricolorVertical,
+  triH: templateTricolorHorizontal,
+  quartered: templateQuartered,
+  perBend: templatePerBend,
+  perBendSin: templatePerBendSinister,
+  saltire: templatePerSaltire,
+  chevron: templatePerChevron,
+  centCross: templateCenteredCross,
+  nordic: templateNordicCross,
+  us: () => {
+    const r: [number, number] = [10, 19];
+    return templateUS(VIEW_W, computeViewH(r));
+  },
+  iceland: templateIceland,
+  uruguay: templateUruguay,
+  drc: templateDRC,
+  uk: templateUK,
+  sa: templateSouthAfrica,
+};
 
 /* Mock matchMedia (not implemented in jsdom) */
 beforeEach(() => {
@@ -52,9 +97,150 @@ describe("createLeftbar", () => {
     expect(heading?.textContent).toMatch(/Aspect Ratio/i);
   });
 
-  it("shows 7 aspect ratio buttons", () => {
+  it("shows all configured aspect ratio buttons", () => {
     const ratioBtns = toolbar.querySelectorAll(".toolbar-ratio-btn");
-    expect(ratioBtns.length).toBe(7);
+    expect(ratioBtns.length).toBe(config.ratios.length);
+  });
+
+  it("has a sort select with value and commonality options", () => {
+    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select");
+    expect(select).not.toBeNull();
+    const options = select!.querySelectorAll("option");
+    expect(options.length).toBe(2);
+    expect(options[0].value).toBe("value");
+    expect(options[1].value).toBe("commonality");
+  });
+
+  it("sorts ratios by value (ascending h/w) by default", () => {
+    const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
+    expect(btns[0].textContent).toBe("11:28");
+    expect(btns[btns.length - 1].textContent).toBe("4:3");
+  });
+
+  it("re-sorts ratios by commonality when select changes", () => {
+    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
+    select.value = "commonality";
+    select.dispatchEvent(new Event("change"));
+    const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
+    // Most common first (2:3 = 84), least common last
+    expect(btns[0].textContent).toBe("2:3");
+  });
+
+  it("accepts the current leftbar config", () => {
+    expect(() => validateLeftbarConfig(config, TEMPLATE_FACTORIES)).not.toThrow();
+  });
+
+  it("rejects a config with an unknown template id", () => {
+    const invalid = {
+      ...config,
+      templates: [...config.templates, { id: "missing", name: "Missing", group: "Division" }],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/missing template factories/i);
+  });
+
+  it("rejects a config with an invalid default ratio", () => {
+    const invalid = {
+      ...config,
+      defaultRatio: "9:99",
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultRatio/i);
+  });
+
+  it("rejects a config with no ratios", () => {
+    const invalid = {
+      ...config,
+      ratios: [],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/ratios must not be empty/i);
+  });
+
+  it("rejects duplicate ratio labels", () => {
+    const invalid = {
+      ...config,
+      ratios: [config.ratios[0], config.ratios[0]],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/ratio labels must be unique/i);
+  });
+
+  it("rejects a ratio with the wrong number of values", () => {
+    const invalid = {
+      ...config,
+      ratios: [{ ...config.ratios[0], ratio: [1] }],
+      defaultRatio: config.ratios[0].label,
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/exactly two values/i);
+  });
+
+  it("rejects a non-positive ratio", () => {
+    const invalid = {
+      ...config,
+      ratios: [{ ...config.ratios[0], ratio: [0, 1] }],
+      defaultRatio: config.ratios[0].label,
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/must be positive/i);
+  });
+
+  it("rejects an invalid stripe default count range", () => {
+    const invalid = {
+      ...config,
+      stripes: {
+        ...config.stripes,
+        minCount: 4,
+        defaultCount: 3,
+      },
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultCount must be within/i);
+  });
+
+  it("rejects default colors shorter than the stripe max count", () => {
+    const invalid = {
+      ...config,
+      stripes: {
+        ...config.stripes,
+        defaultColors: ["#ffffff"],
+      },
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultColors must cover maxCount/i);
+  });
+
+  it("rejects a config with an invalid overlay type", () => {
+    const invalid = {
+      ...config,
+      overlayTypes: [...config.overlayTypes, { id: "diamond", label: "Diamond" }],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/unknown overlay type/i);
+  });
+
+  it("rejects duplicate overlay type ids", () => {
+    const invalid = {
+      ...config,
+      overlayTypes: [config.overlayTypes[0], config.overlayTypes[0]],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/overlay type IDs must be unique/i);
+  });
+
+  it("rejects a config with a template group missing from templateGroups", () => {
+    const invalid = {
+      ...config,
+      templates: [...config.templates, { id: "perPale", name: "Per Pale Copy", group: "Historic" }],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/template groups missing/i);
+  });
+
+  it("rejects a config with an empty declared template group", () => {
+    const invalid = {
+      ...config,
+      templateGroups: [...config.templateGroups, "Unused"],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/has no templates/i);
+  });
+
+  it("rejects duplicate template groups", () => {
+    const invalid = {
+      ...config,
+      templateGroups: [config.templateGroups[0], config.templateGroups[0]],
+    };
+    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/templateGroups must be unique/i);
   });
 
   it("2:3 ratio is active by default", () => {
@@ -462,5 +648,71 @@ describe("Mobile panel behavior", () => {
     changeHandler!({ matches: true } as MediaQueryListEvent);
     const backdrop = toolbar.querySelector(".toolbar-backdrop");
     expect(backdrop).toBeNull();
+  });
+
+  it("handleResize to desktop does not throw when backdrop is not in DOM", () => {
+    // Switch to desktop mode without ever opening the panel (backdrop never mounted)
+    expect(changeHandler).not.toBeNull();
+    mqMock.matches = true;
+    expect(() => changeHandler!({ matches: true } as MediaQueryListEvent)).not.toThrow();
+    const backdrop = toolbar.querySelector(".toolbar-backdrop");
+    expect(backdrop).toBeNull();
+  });
+
+  it("closePanel is safe when backdrop is not in DOM", () => {
+    // Call handleResize to mobile mode without opening the panel first.
+    // handleResize calls closePanel(), which has a guard on backdrop.parentElement.
+    expect(changeHandler).not.toBeNull();
+    expect(() => changeHandler!({ matches: false } as MediaQueryListEvent)).not.toThrow();
+    const panel = toolbar.querySelector(".toolbar-panel");
+    expect(panel?.classList.contains("panel-open")).toBe(false);
+  });
+});
+
+describe("Symbols panel - symbolPreview fallthrough", () => {
+  it("symbolPreview renders an empty SVG for a symbol with no path and no generator", async () => {
+    // Store real symbols before reset
+    const { BUILTIN_SYMBOLS: realSymbols } = await import("@/symbols");
+
+    vi.resetModules();
+
+    vi.doMock("@/symbols", () => ({
+      BUILTIN_SYMBOLS: [
+        ...realSymbols,
+        { id: "no_path_no_gen", name: "No Path No Gen", category: "Geometric" },
+      ],
+    }));
+
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(min-width: 1280px)",
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    const { createLeftbar: createLeftbarFresh } = await import("@/ui/leftbar");
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    const toolbar = createLeftbarFresh();
+    document.body.appendChild(toolbar);
+
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[4].click(); // Symbols
+
+    // 11 symbols: 10 built-in + 1 injected with no path/generator
+    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+    expect(items.length).toBe(11);
+
+    vi.doUnmock("@/symbols");
+    vi.resetModules();
   });
 });

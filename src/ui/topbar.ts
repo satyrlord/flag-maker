@@ -6,7 +6,7 @@
 
 import { svg } from "./icons";
 import { getCurrentSvg } from "../flagRenderer";
-import { download, svgToPng } from "../utils";
+import { download, svgToRaster, downloadDataUrl } from "../utils";
 
 const Icons = {
   flag: svg(
@@ -91,6 +91,53 @@ function createThemeToggle(): HTMLButtonElement {
   return btn;
 }
 
+/* ── Export Error Notification ── */
+
+// Populated by createTopbar() -- must exist in the DOM before content is
+// injected so screen readers register the aria-live contract on page load.
+let _exportLiveRegion: HTMLDivElement | null = null;
+
+function ensureExportLiveRegion(): HTMLDivElement {
+  if (!_exportLiveRegion) {
+    throw new Error("Export live region not initialized -- call createTopbar() first");
+  }
+  return _exportLiveRegion;
+}
+
+let _exportToast: HTMLElement | null = null;
+let _exportToastTimer = 0;
+
+function showExportError(format: string): void {
+  const msg = `${format} export failed. Please try again.`;
+  const liveRegion = ensureExportLiveRegion();
+
+  // Announce to screen readers via the persistent live region.
+  // Clear first so re-announcement fires if the same message appears twice.
+  liveRegion.textContent = "";
+  requestAnimationFrame(() => {
+    liveRegion.textContent = msg;
+  });
+
+  // Show visible toast, replacing any existing one.
+  if (_exportToast) {
+    clearTimeout(_exportToastTimer);
+    _exportToast.remove();
+  }
+  _exportToast = document.createElement("div");
+  _exportToast.textContent = msg;
+  _exportToast.setAttribute("aria-hidden", "true");
+  _exportToast.style.cssText =
+    "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);" +
+    "background:#c0392b;color:#fff;padding:8px 16px;border-radius:6px;" +
+    "font-size:13px;z-index:110;pointer-events:none;white-space:nowrap;";
+  document.body.appendChild(_exportToast);
+  _exportToastTimer = window.setTimeout(() => {
+    _exportToast?.remove();
+    _exportToast = null;
+    ensureExportLiveRegion().textContent = "";
+  }, 4000);
+}
+
 /* ── Export Dropdown ── */
 
 function createExportButton(): HTMLElement {
@@ -104,6 +151,7 @@ function createExportButton(): HTMLElement {
   btn.setAttribute("aria-label", "Export flag");
   btn.setAttribute("aria-haspopup", "menu");
   btn.setAttribute("aria-expanded", "false");
+  btn.setAttribute("aria-describedby", "export-live-status");
   btn.className =
     "topbar-btn flex items-center gap-1 h-8 px-2.5 rounded-md " +
     "text-sm transition-colors cursor-pointer";
@@ -144,16 +192,22 @@ function createExportButton(): HTMLElement {
     menuItem("Export PNG", () => {
       const svgEl = getCurrentSvg();
       if (!svgEl) return;
-      svgToPng(svgEl, 2).then((dataUrl) => {
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "flag.png";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }).catch(() => {
-        /* PNG export failed (e.g. canvas tainted or unsupported) */
-      });
+      svgToRaster(svgEl, "image/png", 2)
+        .then((dataUrl) => downloadDataUrl(dataUrl, "flag.png"))
+        .catch((err: unknown) => {
+          console.error("PNG export failed:", err);
+          showExportError("PNG");
+        });
+    }),
+    menuItem("Export JPG", () => {
+      const svgEl = getCurrentSvg();
+      if (!svgEl) return;
+      svgToRaster(svgEl, "image/jpeg", 2, 0.92)
+        .then((dataUrl) => downloadDataUrl(dataUrl, "flag.jpg"))
+        .catch((err: unknown) => {
+          console.error("JPG export failed:", err);
+          showExportError("JPG");
+        });
     }),
   );
 
@@ -226,7 +280,7 @@ export function createTopbar(): HTMLElement {
   divider.style.backgroundColor = "var(--divider)";
 
   const resetBtn = iconButton(Icons.reset, "Reset flag", () => {
-    /* TODO: wire to flag state reset */
+    resetBtn.dispatchEvent(new CustomEvent("topbar:reset", { bubbles: true }));
   });
 
   const saveBtn = iconButton(Icons.save, "Save project", () => {
@@ -236,6 +290,17 @@ export function createTopbar(): HTMLElement {
   const exportBtn = createExportButton();
 
   right.append(themeBtn, divider, resetBtn, saveBtn, exportBtn);
+
+  // Create the screen-reader live region for export error announcements.
+  // It must exist in the DOM before any error content is injected so
+  // assistive technologies register the aria-live contract.
+  _exportLiveRegion = document.createElement("div");
+  _exportLiveRegion.id = "export-live-status";
+  _exportLiveRegion.setAttribute("aria-live", "assertive");
+  _exportLiveRegion.setAttribute("aria-atomic", "true");
+  _exportLiveRegion.style.cssText =
+    "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;";
+  header.appendChild(_exportLiveRegion);
 
   header.append(left, spacer, right);
   return header;

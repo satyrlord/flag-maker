@@ -9,21 +9,22 @@ This document defines the visual layout, interaction rules, and design constrain
 The app uses a **fixed full-viewport layout** with four sections arranged in a single screen — no scrolling, no overflow, no content extending beyond the viewport on any axis.
 
 ```text
-┌──────────────────────────────────────────────────┐
-│                  Application Settings (topbar)           │
-├─────────┬────────────────────────────────────────┤
-│         │                                        │
-│  Flag   │           Flag Canvas                  │
-│ Editor  │        (centered, dynamic)             │
-│(leftbar)│                                        │
-│         │                                        │
-│         │              ┌──────────┐              │
-│         │              │ Zoom Bar │              │
-│         │              └──────────┘              │
-├─────────┴────────────────────────────────────────┤
+┌──────────────────────────────────────────────────────┐
+│               Application Settings (topbar)          │
+├─────────┬─────────────────────────────────────┬──────┤
+│         │                                     │ Dyn. │
+│  Flag   │           Flag Canvas               │Tools │
+│ Editor  │        (centered, dynamic)          │(right│
+│(leftbar)│                                     │ bar) │
+│         │                                     │      │
+│         │           ┌──────────────┐          │      │
+│         │           │ Zoom Level   │          │      │
+│         │           │  (botbar)    │          │      │
+│         │           └──────────────┘          │      │
+├─────────┴─────────────────────────────────────┴──────┤
 ```
 
-All four sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, and Zoom Bar — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls. The Zoom Bar floats over the canvas area near the bottom center.
+All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, Zoom Level (botbar), and Dynamic Tools (rightbar) — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls. The Zoom Level (botbar) floats over the canvas area near the bottom center. The Dynamic Tools (rightbar) floats at the right edge and is invisible by default.
 
 ---
 
@@ -71,9 +72,12 @@ All four sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 
 ---
 
-## 4. Zoom Bar
+## 4. Zoom Level (botbar)
 
-- **Position:** Floating, centered horizontally at the bottom of the canvas area. Overlays the canvas, does not push layout. ~32–40px from the bottom edge.
+- **Shorthand:** botbar (use in code identifiers, filenames, and Copilot chat).
+- **Official name:** Zoom Level (use in UI labels and user-facing text).
+- **Naming in attributes:** Accessibility attributes (`aria-label`, `role` descriptions) and any other user-facing/screen-reader-visible text must always use the **official name**, never the shorthand. For example, use `aria-label="Zoom Level"`, not `aria-label="botbar"`. The same rule applies to all named sections (topbar, leftbar, rightbar).
+- **Position:** In-flow inside the canvas area, centered horizontally below the flag. Does not overlay the flag -- sits beneath it with a small gap (~12px). The botbar and flag are stacked vertically as a centered group within the canvas.
 - **Style:** Small pill-shaped container with rounded corners, semi-transparent dark background with backdrop blur (like a macOS/Windows 11 floating toolbar).
 - **Contents:** Three small elements in a row:
   - **Zoom Out button** (−) — decreases zoom level by 10% per click.
@@ -81,6 +85,25 @@ All four sections — Application Settings (topbar), Flag Editor (leftbar), Flag
   - **Zoom In button** (+) — increases zoom level by 10% per click.
 - **Zoom range:** Minimum 10%, **maximum 100%**. The flag must never be zoomed beyond its natural rendered size. Default zoom should be "fit to canvas" (auto-calculated so the flag fills the available space).
 - **Behavior:** When zoom < 100%, the flag appears smaller within the canvas. The flag always remains centered. No scroll-to-pan behavior.
+
+---
+
+## 5. Dynamic Tools (rightbar)
+
+- **Shorthand:** rightbar (use in code identifiers, filenames, and Copilot chat).
+- **Official name:** Dynamic Tools (use in UI labels and user-facing text).
+- **Default state:** Invisible (hidden). The rightbar only appears when triggered by a user action (e.g. selecting an overlay, entering a mode that requires contextual tools).
+- **Position:** Floating bar at the right edge of the screen, vertically centered. Does not push layout -- overlays the canvas area.
+- **Style:** Same pill/floating aesthetic as the botbar -- semi-transparent background with backdrop blur, rounded corners, slight drop shadow.
+- **Width:** Narrow (~48--56px), icon-based tool buttons stacked vertically.
+- **Contents:** Context-dependent tool buttons. When no context is active, the bar is hidden. Examples of future tools:
+  - Alignment tools (align overlay left/center/right/top/middle/bottom).
+  - Flip/mirror controls.
+  - Duplicate / delete overlay shortcuts.
+  - Color eyedropper.
+- **Animation:** Slides in from the right edge with a brief CSS transition (~150ms ease) when activated, slides out when deactivated.
+- **Responsive:** Hidden on mobile (< 768px). On tablet (768--1279px), same floating behavior as desktop.
+- **Accessibility:** All tool buttons must have `aria-label` attributes. The bar container should have `role="toolbar"` and `aria-label="Dynamic Tools"`.
 
 ---
 
@@ -146,7 +169,8 @@ All four sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 | Topbar bg        | `#1e1e2e`                |
 | Leftbar bg       | `#252535`                |
 | Canvas bg        | `#2a2a2a`                |
-| Zoom Bar bg      | `rgba(30,30,46,0.85)`    |
+| Botbar bg        | `rgba(30,30,46,0.85)`    |
+| Rightbar bg      | `rgba(30,30,46,0.85)`    |
 | Text (primary)   | `#e0e0e0`                |
 | Text (secondary) | `#888`                   |
 | Accent           | `#4a9eff`                |
@@ -160,7 +184,8 @@ All four sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 | Topbar bg        | `#ffffff`                |
 | Leftbar bg       | `#f5f5f5`                |
 | Canvas bg        | `#d0d0d0`                |
-| Zoom Bar bg      | `rgba(255,255,255,0.85)` |
+| Botbar bg        | `rgba(255,255,255,0.85)` |
+| Rightbar bg      | `rgba(255,255,255,0.85)` |
 | Text (primary)   | `#1a1a1a`                |
 | Text (secondary) | `#666`                   |
 | Accent           | `#0066cc`                |
@@ -193,7 +218,7 @@ Theme toggling applies a class (`dark` / `light`) on `<html>` and all colors are
 | --- | --- |
 | **≥ 1280px** (desktop) | Full layout — expanded leftbar with labels, spacious canvas. |
 | **768–1279px** (tablet landscape) | Leftbar collapses to icon strip (~48px). Tap to expand panel as overlay. |
-| **< 768px** (mobile landscape) | Icon-only leftbar. Zoom bar shrinks. Flag canvas maximized. Minimal chrome. |
+| **< 768px** (mobile landscape) | Icon-only leftbar. Botbar shrinks. Rightbar hidden. Flag canvas maximized. Minimal chrome. |
 
 Portrait orientation is **not supported**. Show a "Please rotate your device" overlay in portrait mode.
 
@@ -205,7 +230,8 @@ Portrait orientation is **not supported**. Show a "Please rotate your device" ov
 | --- | --- | --- |
 | Base | 0 | Canvas background |
 | Flag | 10 | Flag SVG |
-| Zoom Bar | 50 | Floating zoom controls |
+| Botbar | 50 | Floating zoom level controls |
+| Rightbar | 45 | Dynamic tools (floating, right edge) |
 | Leftbar Panel | 40 | Flag editor leftbar (and slide-out on mobile) |
 | Topbar | 60 | Application settings bar |
 | Modals/Dialogs | 100 | Confirm dialogs, export modals |
