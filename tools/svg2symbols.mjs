@@ -3,7 +3,7 @@
  * Convert a folder of SVGs into symbols.json for Flag Maker.
  *
  * Features:
- * - SVGO v3 config that preserves viewBox + inlines styles
+ * - SVGO v4 config that preserves viewBox + inlines styles
  * - Robust extraction of viewBox + inner SVG (supports nested <svg>)
  * - Modes:
  *    • keep (default)      – keep official colors
@@ -43,7 +43,7 @@ if (!files.length) {
   process.exit(1);
 }
 
-// ----- SVGO v3 config -----
+// ----- SVGO v4 config -----
 const svgoConfig = {
   multipass: true,
   plugins: [
@@ -51,16 +51,13 @@ const svgoConfig = {
       name: "preset-default",
       params: {
         overrides: {
-          removeViewBox: false,                 // keep viewBox
           inlineStyles: { onlyMatchedOnce: false },
           removeUnknownsAndDefaults: false,     // some emblems rely on these
           cleanupIds: KEEP_IDS ? false : true,  // clean ids unless requested
         },
       },
     },
-    // extra safety plugins
-    { name: "removeViewBox", active: false },   // ensure viewBox remains
-    { name: "convertPathData", active: true },
+    "convertPathData",
     "removeDoctype",
     "removeXMLProcInst",
     "removeComments",

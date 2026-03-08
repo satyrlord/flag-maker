@@ -19,6 +19,20 @@ export function rectOverlay({
   };
 }
 
+export function circleOverlay({
+  xPct, yPct, sizePct, fill,
+  stroke = "#0000", strokeWidth = 0, opacity = 1,
+}: {
+  xPct: number; yPct: number; sizePct: number;
+  fill: string; stroke?: string; strokeWidth?: number; opacity?: number;
+}): Overlay {
+  return {
+    id: uid(), type: "circle",
+    x: xPct, y: yPct, w: sizePct, h: sizePct,
+    rotation: 0, fill, stroke, strokeWidth, opacity,
+  };
+}
+
 export function polyOverlay(
   points: Array<[number, number]>,
   fill: string,

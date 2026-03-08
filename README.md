@@ -12,9 +12,9 @@ multi-shape SVG emblems**.
 
 ### Requirements
 
-- **Node.js 18+** (recommend 20+).
+- **Node.js 20+**.
   Check: `node -v`
-- **npm** 8+ (comes with Node 18+)
+- **npm** 10+ (comes with Node 20+)
 - (Optional) **Python 3.9+** if you'll use the Wikimedia fetcher.
 
 ### 1) Install
@@ -37,6 +37,17 @@ npm run build
 npm run preview
 ```
 
+### 4) Run quality gates
+
+```bash
+npm run quality
+npm run quality:full
+```
+
+- `npm run quality` runs typecheck, ESLint, markdown lint, and Vitest coverage.
+- `npm run quality:full` runs the quick gate plus headless Playwright coverage on desktop and mobile projects.
+- Both Vitest and Playwright coverage enforce a minimum of **82% per file** for statements, branches, functions, and lines.
+
 ---
 
 ## Project Structure (key files)
@@ -58,7 +69,7 @@ npm run preview
 ├─ tools/
 │  ├─ fetch_emblems.py      # fetch official emblems from Wikimedia
 │  └─ svg2symbols.mjs       # convert a folder of SVGs → public/symbols.json
-├─ tailwind.config.js       # Tailwind v4
+├─ tailwind.config.js       # Tailwind config (legacy v3 format; v4 uses CSS-based config)
 ├─ postcss.config.js        # Tailwind v4 (using @tailwindcss/postcss)
 ├─ package.json
 └─ README.md
@@ -79,6 +90,11 @@ npm run preview
   - Auto-loads `public/symbols.json` if present.
   - Supports **full multi-shape SVG** emblems via `{ svg, viewBox }`.
 - **Export**: download as SVG or PNG.
+
+> **Note:** The app is fully responsive but only supports **landscape
+> orientation** on mobile and tablet. Most real-world flags are wider than
+> tall, so the UI and flags would be too small in portrait mode. There are no
+> current plans to add portrait support.
 
 **Tip:** The app reads `symbols.json` at `/symbols.json`. With Vite, place it
 in **`public/`**.
@@ -140,8 +156,11 @@ Reads a folder of SVGs, **preserves viewBox**, inlines styles, and emits a
 
 #### Install dependencies
 
+Both `svgo` and `fast-xml-parser` are already in `devDependencies`; just run
+`npm install`. If you need to reinstall manually:
+
 ```bash
-npm i -D svgo@^3 fast-xml-parser
+npm i -D svgo@^4 fast-xml-parser
 ```
 
 #### Usage
@@ -269,10 +288,10 @@ The app merges this with built-in symbols.
 
 ### SVGO plugin errors
 
-- Use **SVGO v3**.
-  `npm i -D svgo@^3 fast-xml-parser`
-- The script already uses a v3-safe config with `preset-default` and
-  `removeViewBox: false`.
+- Use **SVGO v4**.
+  `npm i -D svgo@^4 fast-xml-parser`
+- The script already uses a v4-safe config with `preset-default` and
+  viewBox preservation.
 
 ### Tailwind / PostCSS warnings
 
@@ -282,12 +301,13 @@ The app merges this with built-in symbols.
 
 ### TypeScript path alias for imports like `@/…`
 
-Make sure your `tsconfig.json` has:
+Make sure your `tsconfig.json` has the `paths` alias (with `moduleResolution:
+"bundler"`, `baseUrl` is not required):
 
 ```json
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "moduleResolution": "bundler",
     "paths": { "@/*": ["./src/*"] }
   }
 }
