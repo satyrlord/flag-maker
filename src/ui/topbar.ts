@@ -93,13 +93,18 @@ function createThemeToggle(): HTMLButtonElement {
 
 /* ── Export Error Notification ── */
 
-// Populated by createTopbar() -- must exist in the DOM before content is
-// injected so screen readers register the aria-live contract on page load.
+// Populated lazily on first call -- either by createTopbar() (normal path)
+// or on first showExportError() call (defensive fallback).
 let _exportLiveRegion: HTMLDivElement | null = null;
 
 function ensureExportLiveRegion(): HTMLDivElement {
   if (!_exportLiveRegion) {
-    throw new Error("Export live region not initialized -- call createTopbar() first");
+    _exportLiveRegion = document.createElement("div");
+    _exportLiveRegion.id = "export-live-status";
+    _exportLiveRegion.setAttribute("aria-live", "assertive");
+    _exportLiveRegion.setAttribute("aria-atomic", "true");
+    _exportLiveRegion.style.cssText =
+      "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;";
   }
   return _exportLiveRegion;
 }
@@ -294,13 +299,8 @@ export function createTopbar(): HTMLElement {
   // Create the screen-reader live region for export error announcements.
   // It must exist in the DOM before any error content is injected so
   // assistive technologies register the aria-live contract.
-  _exportLiveRegion = document.createElement("div");
-  _exportLiveRegion.id = "export-live-status";
-  _exportLiveRegion.setAttribute("aria-live", "assertive");
-  _exportLiveRegion.setAttribute("aria-atomic", "true");
-  _exportLiveRegion.style.cssText =
-    "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;";
-  header.appendChild(_exportLiveRegion);
+  const liveRegion = ensureExportLiveRegion();
+  header.appendChild(liveRegion);
 
   header.append(left, spacer, right);
   return header;

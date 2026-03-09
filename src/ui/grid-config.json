@@ -1,0 +1,11 @@
+{
+  "defaultSize": "5x5",
+  "sizes": [
+    { "label": "2x2", "width": 2, "height": 2 },
+    { "label": "5x5", "width": 5, "height": 5 },
+    { "label": "10x10", "width": 10, "height": 10 },
+    { "label": "20x20", "width": 20, "height": 20 },
+    { "label": "50x50", "width": 50, "height": 50 },
+    { "label": "100x100", "width": 100, "height": 100 }
+  ]
+}

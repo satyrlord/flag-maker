@@ -22,6 +22,7 @@ describe("loadSymbolsJson", () => {
   });
 
   it("returns empty symbols and status on fetch failure", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network error"));
     const result = await loadSymbolsJson("/");
     expect(result.symbols).toEqual([]);

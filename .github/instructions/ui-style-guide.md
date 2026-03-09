@@ -24,7 +24,7 @@ The app uses a **fixed full-viewport layout** with four sections arranged in a s
 ├─────────┴─────────────────────────────────────┴──────┤
 ```
 
-All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, Zoom Level (botbar), and Dynamic Tools (rightbar) — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls. The Zoom Level (botbar) floats over the canvas area near the bottom center. The Dynamic Tools (rightbar) floats at the right edge and is invisible by default.
+All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, Zoom Level (botbar), and Dynamic Tools (rightbar) — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls. The Zoom Level (botbar) floats over the canvas area near the bottom center. The Dynamic Tools (rightbar) is always visible, floating at the right edge. Its contents are dynamic and contextual -- tool buttons appear and change based on the current editing context.
 
 ---
 
@@ -92,11 +92,12 @@ All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 
 - **Shorthand:** rightbar (use in code identifiers, filenames, and Copilot chat).
 - **Official name:** Dynamic Tools (use in UI labels and user-facing text).
-- **Default state:** Invisible (hidden). The rightbar only appears when triggered by a user action (e.g. selecting an overlay, entering a mode that requires contextual tools).
-- **Position:** Floating bar at the right edge of the screen, vertically centered. Does not push layout -- overlays the canvas area.
+- **Default state:** Always visible. The rightbar is permanently shown as a floating toolbar. It includes a drag handle so the user can reposition it anywhere on screen.
+- **Position:** Floating bar, initially at the right edge of the screen, vertically centered. Does not push layout -- overlays the canvas area. User-draggable to any position within the viewport.
 - **Style:** Same pill/floating aesthetic as the botbar -- semi-transparent background with backdrop blur, rounded corners, slight drop shadow.
 - **Width:** Narrow (~48--56px), icon-based tool buttons stacked vertically.
-- **Contents:** Context-dependent tool buttons. When no context is active, the bar is hidden. Examples of future tools:
+- **Behavior:** The rightbar is dynamic and contextual -- its tool buttons change based on the current editing context (e.g. grid overlay tools are always present; alignment tools appear when an overlay is selected). Even when no overlay is selected, the bar remains visible with its base tools (e.g. grid toggle).
+- **Contents:** Context-dependent tool buttons. Examples of current and future tools:
   - Alignment tools (align overlay left/center/right/top/middle/bottom).
   - Flip/mirror controls.
   - Duplicate / delete overlay shortcuts.

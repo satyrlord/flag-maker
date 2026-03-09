@@ -7,7 +7,10 @@ import { createTopbar } from "./ui/topbar";
 import { createLeftbar } from "./ui/leftbar";
 import { createBotbar, ZOOM_MIN, ZOOM_MAX } from "./ui/botbar";
 import { createRightbar, setRightbarVisible } from "./ui/rightbar";
+import { createGridSvg } from "./ui/gridOverlay";
+import type { GridSize } from "./ui/gridOverlay";
 import { renderFlag, registerSymbols } from "./flagRenderer";
+import { VIEW_W } from "./geometry";
 import { rectOverlay, circleOverlay, starOverlay } from "./overlays";
 import { uid } from "./utils";
 import type { FlagDesign, Overlay, Orientation, SymbolDef } from "./types";
@@ -28,13 +31,18 @@ const canvas = document.createElement("main");
 canvas.className = "flag-canvas";
 root.appendChild(canvas);
 
+// ── Flag wrapper (stacks flag + grid overlay) ──
+const flagWrap = document.createElement("div");
+flagWrap.className = "flag-wrap";
+canvas.appendChild(flagWrap);
+
 // ── Zoom Level (botbar) – inside canvas, below the flag ──
 const { element: botbar, setZoom: setBotbarZoom } = createBotbar();
 canvas.appendChild(botbar);
 
 // ── Dynamic Tools (rightbar) ──
-const rightbar = createRightbar();
-setRightbarVisible(rightbar, false);
+const { element: rightbar, gridState } = createRightbar();
+setRightbarVisible(rightbar, true);
 root.appendChild(rightbar);
 
 // ── Default flag design ──
@@ -60,22 +68,64 @@ const design: FlagDesign = {
 let flagEl: SVGSVGElement | null = null;
 let currentZoom = 100;
 
+// The grid overlay uses the same viewBox width and ratio-derived height as the
+// exported flag SVG so both layers scale together inside flagWrap.
+let gridEl: SVGSVGElement | null = null;
+let gridSignature = "";
+
+function getFlagViewHeight(): number {
+  return Math.round((VIEW_W * design.ratio[0]) / design.ratio[1]);
+}
+
+function getGridSignature(size: GridSize, color: string): string {
+  return `${getFlagViewHeight()}:${size.width}x${size.height}:${color}`;
+}
+
 function applyZoom(): void {
   if (!flagEl) return;
   const scale = currentZoom / 100;
-  flagEl.style.transform = scale < 1 ? `scale(${scale})` : "";
+  flagWrap.style.transform = scale < 1 ? `scale(${scale})` : "";
 }
 
 function redraw(): void {
   const next = renderFlag(design);
   next.setAttribute("class", "flag-svg");
-  if (flagEl && canvas.contains(flagEl)) {
-    canvas.replaceChild(next, flagEl);
+  if (flagEl && flagWrap.contains(flagEl)) {
+    flagWrap.replaceChild(next, flagEl);
   } else {
-    canvas.insertBefore(next, botbar);
+    flagWrap.insertBefore(next, flagWrap.firstChild);
   }
   flagEl = next;
   applyZoom();
+  if (gridState.active) {
+    updateGridOverlay(gridState.size, gridState.color);
+  } else {
+    removeGridOverlay();
+  }
+}
+
+// ── Grid overlay (visual only) ──
+function updateGridOverlay(size: GridSize, color: string): void {
+  if (!flagEl) return;
+  const nextSignature = getGridSignature(size, color);
+  if (gridEl && gridSignature === nextSignature) {
+    applyZoom();
+    return;
+  }
+
+  removeGridOverlay();
+  gridEl = createGridSvg(VIEW_W, getFlagViewHeight(), size.width, size.height, color);
+  flagWrap.appendChild(gridEl);
+  gridSignature = nextSignature;
+  applyZoom();
+}
+
+function removeGridOverlay(): void {
+  if (gridEl && flagWrap.contains(gridEl)) {
+    flagWrap.removeChild(gridEl);
+  }
+  gridEl = null;
+  gridSignature = "";
 }
 
 redraw();
@@ -202,6 +252,18 @@ root.addEventListener("rightbar:visibility", (e) => {
     rightbar,
     (e as CustomEvent<{ visible: boolean }>).detail.visible,
   );
+});
+
+// ── Grid overlay toggle ──
+root.addEventListener("rightbar:grid-toggle", (e) => {
+  const { active, color, size } = (e as CustomEvent<{
+    active: boolean; color: string; size: GridSize;
+  }>).detail;
+  if (active) {
+    updateGridOverlay(size, color);
+  } else {
+    removeGridOverlay();
+  }
 });
 
 // ── Mouse-wheel zoom (scales with scroll magnitude for trackpad support) ──

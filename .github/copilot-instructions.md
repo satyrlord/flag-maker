@@ -122,7 +122,7 @@ Also check the VSCode **Problems** tab for any remaining diagnostics.
 | `src/ui/topbar.ts` | Application settings bar (topbar) |
 | `src/ui/leftbar.ts` | Flag editor sidebar (leftbar) |
 | `src/ui/botbar.ts` | Zoom level floating bar (botbar) |
-| `src/ui/rightbar.ts` | Dynamic tools floating bar (rightbar) |
+| `src/ui/rightbar.ts` | Dynamic tools floating bar (rightbar) -- always visible, contextual, draggable |
 | `src/index.css` | Tailwind CSS import |
 | `public/symbols.json` | Generated symbol/emblem catalog |
 | `public/emblems/` | Raw SVG emblem source files (193 files) |
@@ -134,9 +134,9 @@ Also check the VSCode **Problems** tab for any remaining diagnostics.
 - When testing or debugging the app, open it in the **VSCode Simple Browser** (built-in). Do not launch an external browser unless the Simple Browser cannot reproduce the issue.
 - Use `npm run dev` to start the Vite dev server, then open the local URL in the Simple Browser panel.
 - **Unit & integration tests:** Vitest with jsdom environment. Tests live in `tests/unit/` and `tests/integration/`.
-- **Code coverage:** `@vitest/coverage-v8` generates coverage reports. Run `npm run test:coverage` to see a text summary and produce an `lcov` report in `coverage/`. A minimum of **82% coverage is enforced per cell** (statements, branches, functions, lines) for every source file. The build will fail if any file drops below this threshold. This is configured in `vite.config.ts` under `test.coverage.thresholds`.
+- **Code coverage:** `@vitest/coverage-v8` generates coverage reports. Run `npm run test:coverage` to see a text summary and produce an `lcov` report in `coverage/`. A minimum of **80% coverage is enforced per cell** (statements, branches, functions, lines) for every source file. The build will fail if any file drops below this threshold. This is configured in `vite.config.ts` under `test.coverage.thresholds`.
 - **E2e regression tests:** Playwright tests live in `tests/e2e/`. They always run in **headless mode** -- no headed/UI mode is allowed (use Chrome DevTools MCP for headed debugging instead).
-- **E2e code coverage:** Run `npm run test:e2e:coverage` to collect coverage during Playwright runs. The same **82% per-cell minimum** (statements, branches, functions, lines) applies per file in the e2e coverage report. Pure domain-logic files (`geometry.ts`, `utils.ts`) are excluded from e2e coverage because their functions are not exercisable through the UI -- they are fully covered by vitest unit tests instead. The e2e coverage pipeline uses two components:
+- **E2e code coverage:** Run `npm run test:e2e:coverage` to collect coverage during Playwright runs. The same **80% per-cell minimum** (statements, branches, functions, lines) applies per file in the e2e coverage report. Pure domain-logic files (`geometry.ts`, `utils.ts`) are excluded from e2e coverage because their functions are not exercisable through the UI -- they are fully covered by vitest unit tests instead. The e2e coverage pipeline uses two components:
   1. **Istanbul instrumentation** -- `vite-plugin-istanbul` instruments the build when `E2E_COVERAGE=true`, exposing `window.__coverage__` for the fixture (`tests/e2e/coverage-fixture.ts`) to collect after each test.
   2. **monocart-coverage-reports** -- Global teardown (`tests/e2e/coverage-teardown.ts`) merges Istanbul data into console-details + lcov reports in `coverage/e2e/`.
 - **Playwright browser targets:** Tests run on exactly two projects:

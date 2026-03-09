@@ -11,6 +11,12 @@
 
 /* ──── Theme Colors ──── */
 
+:root {
+  /* Height consumed by fixed chrome (topbar + botbar area + gaps).
+     Used to constrain flag-svg inside the visible canvas area. */
+  --flag-chrome-h: 140px;
+}
+
 :root,
 .dark {
   --topbar-bg: #1e1e2e;
@@ -513,16 +519,34 @@ body {
   background-color: var(--canvas-bg);
 }
 
+.flag-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: calc(100% - 48px);
+  max-height: calc(100% - 96px);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+
 .flag-svg {
   /* Override SVG intrinsic width/height so CSS controls display size */
   width: auto;
   height: auto;
-  max-width: calc(100% - 48px);
-  max-height: calc(100% - 96px);
+  max-width: 100%;
+  max-height: calc(100dvh - var(--flag-chrome-h));
   display: block;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
-  transform-origin: center;
-  transition: transform 0.15s ease;
+}
+
+/* Grid overlay (visual only, not exported) */
+
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* ──── Zoom Level (botbar) ──── */
@@ -598,6 +622,54 @@ body {
   opacity: 1;
 }
 
+/* When the user has dragged the bar, switch to absolute left/top positioning */
+.rightbar.rightbar-custom-pos {
+  right: auto;
+  transform: none;
+}
+
+.rightbar.rightbar-custom-pos.rightbar-visible {
+  transform: none;
+}
+
+.rightbar.rightbar-dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+/* Drag handle (grip dots at the top of the rightbar) */
+.rightbar-drag-handle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 2px;
+  touch-action: none;
+}
+
+.rightbar-drag-handle:hover {
+  opacity: 1;
+}
+
+.rightbar-dragging .rightbar-drag-handle {
+  cursor: grabbing;
+  opacity: 1;
+}
+
+.rightbar-btn:focus-visible,
+.rightbar-drag-handle:focus-visible,
+.rightbar-grid-menu-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .rightbar-btn {
   width: 36px;
   height: 36px;
@@ -616,9 +688,88 @@ body {
   background-color: var(--btn-hover);
 }
 
+.rightbar-btn-active {
+  background-color: var(--btn-hover);
+}
+
+.rightbar-btn-cyan {
+  color: #00ffff;
+  outline: 1.5px solid #00ffff;
+  outline-offset: -1.5px;
+}
+
+.rightbar-btn-magenta {
+  color: #ff00ff;
+  outline: 1.5px solid #ff00ff;
+  outline-offset: -1.5px;
+}
+
+/* Grid size context menu */
+
+.rightbar-grid-wrap {
+  position: relative;
+}
+
+.rightbar-grid-menu {
+  display: none;
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 0;
+  background: var(--rightbar-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  z-index: 46;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.rightbar-grid-menu.menu-open {
+  display: flex;
+}
+
+.rightbar-grid-menu-item {
+  padding: 4px 8px;
+  font-size: 11px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.rightbar-grid-menu-item:hover {
+  background-color: var(--btn-hover);
+}
+
+.rightbar-grid-menu-item.active {
+  color: var(--accent);
+}
+
 @media (max-width: 767px) {
   .rightbar {
-    display: none;
+    right: 8px;
+    gap: 3px;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .rightbar-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rightbar-drag-handle {
+    padding: 1px 0;
+  }
+
+  .rightbar-grid-menu {
+    right: calc(100% + 6px);
   }
 
   .botbar {

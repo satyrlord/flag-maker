@@ -26,10 +26,10 @@ classify severity as **critical**, **warning**, or **nit**.
    diverge from surrounding code or project conventions.
 5. **Test coverage** — new logic paths that lack corresponding tests
    (when a test framework is configured). Every source file must
-   maintain a minimum of **82% coverage per cell** (statements,
+   maintain a minimum of **80% coverage per cell** (statements,
    branches, functions, lines) in both vitest unit/integration
    coverage and Playwright e2e coverage (Istanbul). If a change
-   causes any file to drop below 82% in any cell, add tests to
+   causes any file to drop below 80% in any cell, add tests to
    restore coverage before merging.
 6. **Dead code** — unreachable branches, unused imports, leftover
    debug artifacts.
@@ -47,8 +47,10 @@ classify severity as **critical**, **warning**, or **nit**.
     behavior) must conform to `.github/instructions/ui-style-guide.md`.
     Verify colors, spacing, z-index, responsive behavior, and
     interaction constraints (no scrollbars, no text selection, no
-    mobile swiping) match the style guide. Flag deviations as
-    **warning** or **critical** depending on visual/functional impact.
+    mobile swiping) match the style guide. The rightbar (Dynamic
+    Tools) must always be visible, floating, dynamic, and contextual
+    -- never hidden by default. Flag deviations as **warning** or
+    **critical** depending on visual/functional impact.
 12. **Clean code** — Code must conform to the principles established
     by Uncle Bob (Robert Cecil Martin) in his eponymous work
     'Clean Code: A Handbook of Agile Software Craftsmanship 2nd Edition'

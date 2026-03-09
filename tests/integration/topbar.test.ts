@@ -240,6 +240,7 @@ describe("createTopbar", () => {
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
     vi.spyOn(utils, "svgToRaster").mockRejectedValue(new Error("PNG failed"));
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
@@ -262,6 +263,7 @@ describe("createTopbar", () => {
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
     vi.spyOn(utils, "svgToRaster").mockRejectedValue(new Error("JPG failed"));
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');

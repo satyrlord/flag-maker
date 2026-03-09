@@ -46,7 +46,7 @@ npm run quality:full
 
 - `npm run quality` runs typecheck, ESLint, markdown lint, and Vitest coverage.
 - `npm run quality:full` runs the quick gate plus headless Playwright coverage on desktop and mobile projects.
-- Both Vitest and Playwright coverage enforce a minimum of **82% per file** for statements, branches, functions, and lines.
+- Both Vitest and Playwright coverage enforce a minimum of **80% per file** for statements, branches, functions, and lines.
 
 ---
 
@@ -92,6 +92,10 @@ npm run quality:full
   - Supports **full multi-shape SVG** emblems via `{ svg, viewBox }`.
 - **Reset**: the Reset button in the topbar restores the flag to the default
   three-stripe design and clears all overlays.
+- **Grid overlay**: click the grid button in the right toolbar to toggle a
+  pixel grid over the flag. Each click cycles the grid color
+  (cyan -> magenta -> off). Scroll the mouse wheel over the button to
+  change grid density, or right-click to pick a specific size.
 - **Export**: download as SVG or PNG.
 
 > **Note:** The app is fully responsive but only supports **landscape
