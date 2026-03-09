@@ -130,6 +130,33 @@ const RATIOS: { label: string; ratio: [number, number]; commonality: number }[] 
 
 type RatioEntry = (typeof RATIOS)[number];
 
+export type RatioDisplayMode = "hw" | "wh" | "decimal";
+
+const RATIO_MODES: RatioDisplayMode[] = ["hw", "wh", "decimal"];
+const RATIO_MODE_LABELS: Record<RatioDisplayMode, string> = { hw: "H:W", wh: "W:H", decimal: "W/H" };
+const TRAILING_ZEROS_PATTERN = /\.?0+$/;
+
+/**
+ * Formats an aspect ratio for display according to the given mode.
+ * @param ratio - Tuple [height, width] representing the aspect ratio. Both values must be non-negative; callers must validate before passing (the config validator enforces this).
+ * @param mode - Display mode: "hw" (H:W), "wh" (W:H), or "decimal" (W/H as a decimal number).
+ * @returns A formatted string representing the ratio in the chosen mode.
+ * @example
+ * formatRatioDisplay([2, 3], "hw")      // "2:3"
+ * formatRatioDisplay([2, 3], "wh")      // "3:2"
+ * formatRatioDisplay([2, 3], "decimal") // "1.5"  (not "1.50" -- trailing zeros are stripped)
+ * formatRatioDisplay([1, 2], "decimal") // "2"    (not "2.00")
+ * formatRatioDisplay([0, 5], "decimal") // "\u221e"  (height=0 means W/H = Infinity)
+ */
+export function formatRatioDisplay(ratio: [number, number], mode: RatioDisplayMode): string {
+  const [rh, rw] = ratio;
+  if (mode === "hw") return `${rh}:${rw}`;
+  if (mode === "wh") return `${rw}:${rh}`;
+  if (rh === 0) return "\u221e"; // guard: rw / 0 = Infinity; display the infinity symbol
+  const decimal = rw / rh;
+  return Number.isInteger(decimal) ? String(decimal) : decimal.toFixed(2).replace(TRAILING_ZEROS_PATTERN, "");
+}
+
 function compareByAspectValue(a: RatioEntry, b: RatioEntry): number {
   return a.ratio[0] / a.ratio[1] - b.ratio[0] / b.ratio[1];
 }
@@ -320,7 +347,20 @@ function symbolPreview(sym: SymbolDef, size = 32): SVGSVGElement {
 
 function createRatioPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Aspect Ratio", "ratio"));
+
+  // Build panel header manually to inject the mode toggle between title and icon
+  let ratioDisplayMode: RatioDisplayMode = "hw";
+  const header = h("div", "toolbar-panel-header");
+  const headerTitle = sectionTitle("Aspect Ratio");
+  headerTitle.style.margin = "0";
+  const modeBtn = h("button", "toolbar-ratio-mode-btn", RATIO_MODE_LABELS[ratioDisplayMode]);
+  modeBtn.type = "button";
+  modeBtn.setAttribute("aria-label", "Toggle aspect ratio display mode");
+  modeBtn.title = "Toggle display: H/W, W/H, decimal";
+  const panelIconSpan = h("span", "toolbar-panel-icon");
+  panelIconSpan.innerHTML = PanelIcons.ratio;
+  header.append(headerTitle, modeBtn, panelIconSpan);
+  panel.appendChild(header);
 
   // Sort control
   const sortRow = h("div", "toolbar-sort-row");
@@ -330,8 +370,8 @@ function createRatioPanel(root: HTMLElement): HTMLElement {
   sortSelect.className = "toolbar-sort-select";
   sortSelect.setAttribute("aria-label", "Sort aspect ratios");
   for (const opt of [
-    { value: "value", text: "Value" },
     { value: "commonality", text: "Commonality" },
+    { value: "value", text: "Value" },
   ]) {
     const o = document.createElement("option");
     o.value = opt.value;
@@ -355,7 +395,8 @@ function createRatioPanel(root: HTMLElement): HTMLElement {
   function rebuildGrid(): void {
     grid.innerHTML = "";
     for (const r of sortedRatios()) {
-      const btn = h("button", "toolbar-ratio-btn", r.label);
+      const displayText = formatRatioDisplay(r.ratio, ratioDisplayMode);
+      const btn = h("button", "toolbar-ratio-btn", displayText);
       btn.type = "button";
       btn.setAttribute("aria-label", `Set ratio to ${r.label}`);
       btn.addEventListener("click", () => {
@@ -370,6 +411,13 @@ function createRatioPanel(root: HTMLElement): HTMLElement {
       grid.appendChild(btn);
     }
   }
+
+  modeBtn.addEventListener("click", () => {
+    const idx = RATIO_MODES.indexOf(ratioDisplayMode);
+    ratioDisplayMode = RATIO_MODES[(idx + 1) % RATIO_MODES.length];
+    modeBtn.textContent = RATIO_MODE_LABELS[ratioDisplayMode];
+    rebuildGrid();
+  });
 
   sortSelect.addEventListener("change", rebuildGrid);
   rebuildGrid();

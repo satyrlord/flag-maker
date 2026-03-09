@@ -102,28 +102,30 @@ describe("createLeftbar", () => {
     expect(ratioBtns.length).toBe(config.ratios.length);
   });
 
-  it("has a sort select with value and commonality options", () => {
+  it("has a sort select with commonality and value options", () => {
     const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select");
     expect(select).not.toBeNull();
     const options = select!.querySelectorAll("option");
     expect(options.length).toBe(2);
-    expect(options[0].value).toBe("value");
-    expect(options[1].value).toBe("commonality");
+    const values = Array.from(options).map((o) => o.value);
+    expect(values).toContain("commonality");
+    expect(values).toContain("value");
   });
 
-  it("sorts ratios by value (ascending h/w) by default", () => {
+  it("sorts ratios by commonality (most common first) by default", () => {
     const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
-    expect(btns[0].textContent).toBe("11:28");
+    // Most common first (2:3 = commonality 84), least common last (4:3 = commonality 1, last in config)
+    expect(btns[0].textContent).toBe("2:3");
     expect(btns[btns.length - 1].textContent).toBe("4:3");
   });
 
-  it("re-sorts ratios by commonality when select changes", () => {
+  it("re-sorts ratios by value (ascending h/w) when select changes", () => {
     const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
-    select.value = "commonality";
+    select.value = "value";
     select.dispatchEvent(new Event("change"));
     const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
-    // Most common first (2:3 = 84), least common last
-    expect(btns[0].textContent).toBe("2:3");
+    expect(btns[0].textContent).toBe("11:28");
+    expect(btns[btns.length - 1].textContent).toBe("4:3");
   });
 
   it("accepts the current leftbar config", () => {
@@ -714,5 +716,127 @@ describe("Symbols panel - symbolPreview fallthrough", () => {
 
     vi.doUnmock("@/symbols");
     vi.resetModules();
+  });
+});
+
+describe("Ratio display mode toggle", () => {
+  let toolbar: HTMLElement;
+
+  beforeEach(() => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(min-width: 1280px)",
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    toolbar = createLeftbar();
+    document.body.appendChild(toolbar);
+  });
+
+  function modeBtn(): HTMLButtonElement {
+    const button = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-mode-btn");
+    if (!button) {
+      throw new Error("Ratio mode toggle button not found in leftbar toolbar.");
+    }
+    return button;
+  }
+
+  it("mode button is present in the ratio panel header", () => {
+    expect(modeBtn()).not.toBeNull();
+  });
+
+  it("mode button is positioned between title and icon in the header", () => {
+    const button = modeBtn();
+    const header = button.parentElement;
+    expect(header).not.toBeNull();
+    if (!header) {
+      return;
+    }
+    const children = Array.from(header.children);
+    expect(children.length).toBeGreaterThanOrEqual(3);
+    // Expect the button to be the middle child: [title, modeBtn, icon]
+    expect(children[1]).toBe(button);
+    expect(children[0]).not.toBeNull();
+    expect(children[2]).not.toBeNull();
+  });
+  it("mode button starts in H:W mode", () => {
+    expect(modeBtn().textContent).toBe("H:W");
+  });
+
+  it("default ratio buttons show H:W format", () => {
+    // 2:3 is the default active ratio
+    const activeBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-btn.active");
+    expect(activeBtn?.textContent).toBe("2:3");
+  });
+
+  it("first click switches to W:H mode", () => {
+    modeBtn().click();
+    expect(modeBtn().textContent).toBe("W:H");
+  });
+
+  it("W/H mode flips ratio button text", () => {
+    modeBtn().click();
+    const activeBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-btn.active");
+    // default active is 2:3 (H=2,W=3) → W/H = 3:2
+    expect(activeBtn?.textContent).toBe("3:2");
+  });
+
+  it("second click switches to decimal mode", () => {
+    modeBtn().click();
+    modeBtn().click();
+    expect(modeBtn().textContent).toBe("W/H");
+  });
+
+  it("decimal mode shows W/H as a decimal number", () => {
+    modeBtn().click();
+    modeBtn().click();
+    const activeBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-btn.active");
+    // 2:3 (H=2,W=3) → 3/2 = 1.5
+    expect(activeBtn?.textContent).toBe("1.5");
+  });
+
+  it("third click cycles back to H:W mode", () => {
+    modeBtn().click();
+    modeBtn().click();
+    modeBtn().click();
+    expect(modeBtn().textContent).toBe("H:W");
+  });
+
+  it("cycling back to H/W restores original ratio text", () => {
+    modeBtn().click();
+    modeBtn().click();
+    modeBtn().click();
+    const activeBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-btn.active");
+    expect(activeBtn?.textContent).toBe("2:3");
+  });
+
+  it("mode change updates all ratio buttons, not just the active one", () => {
+    modeBtn().click(); // switch to W:H mode
+    // Re-query after rebuild: aria-label is stable, textContent reflects the new mode
+    const btns = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-ratio-btn");
+    // 1:2 (H=1,W=2) should display as 2:1 in W:H mode
+    const btn = Array.from(btns).find((b) => b.getAttribute("aria-label") === "Set ratio to 1:2");
+    expect(btn).not.toBeUndefined();
+    expect(btn).not.toBeNull();
+    expect(btn?.textContent).toBe("2:1");
+  });
+
+  it("mode persists after re-sorting", () => {
+    modeBtn().click(); // W:H mode
+    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
+    select.value = "commonality";
+    select.dispatchEvent(new Event("change"));
+    // Most common ratio 2:3 (H=2,W=3) → W/H = 3:2
+    const firstBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-ratio-btn");
+    expect(firstBtn?.textContent).toBe("3:2");
   });
 });
