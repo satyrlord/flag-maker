@@ -8,9 +8,9 @@ import { createLeftbar } from "./ui/leftbar";
 import { createBotbar, ZOOM_MIN, ZOOM_MAX } from "./ui/botbar";
 import { createRightbar, setRightbarVisible } from "./ui/rightbar";
 import { createGridSvg } from "./ui/gridOverlay";
-import type { GridSize } from "./ui/gridOverlay";
+import type { GridSize } from "./ui/gridConfig";
 import { renderFlag, registerSymbols } from "./flagRenderer";
-import { VIEW_W } from "./geometry";
+import { VIEW_W, DEFAULT_RATIO } from "./geometry";
 import { rectOverlay, circleOverlay, starOverlay } from "./overlays";
 import { uid } from "./utils";
 import type { FlagDesign, Overlay, Orientation, SymbolDef } from "./types";
@@ -48,7 +48,7 @@ root.appendChild(rightbar);
 // ── Default flag design ──
 const DEFAULT_DESIGN = {
   orientation: "horizontal" as const,
-  ratio: [2, 3] as const,
+  ratio: DEFAULT_RATIO,
   sections: 3,
   weights: [1, 1, 1],
   colors: ["#CE1126", "#FFFFFF", "#002395"],

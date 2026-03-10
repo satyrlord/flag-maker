@@ -11,37 +11,72 @@ test.describe("Flag editor (leftbar)", () => {
     await expect(aside).toBeVisible();
   });
 
-  test("has 5 tab buttons", async ({ page }) => {
+  test("has 6 tab buttons", async ({ page }) => {
     const tabs = page.locator('nav[aria-label="Toolbar tabs"] button');
-    await expect(tabs).toHaveCount(5);
+    await expect(tabs).toHaveCount(6);
   });
 
   test("tab buttons have aria labels", async ({ page }) => {
-    const labels = ["Ratio", "Stripes", "Overlays", "Templates", "Symbols"];
+    const labels = ["Templates", "Aspect Ratio", "Stripes", "Overlays", "Symbols", "Saved"];
     for (const label of labels) {
       const btn = page.getByRole("button", { name: label, exact: true });
       await expect(btn).toBeVisible();
     }
   });
 
-  test("shows Ratio panel by default with ratio buttons", async ({ page, viewport }) => {
+  test("shows Templates panel by default with template items", async ({ page, viewport }) => {
     if (viewport && viewport.width < 1280) {
-      // On mobile, the panel is collapsed; click the Ratio tab to open it
-      await page.getByRole("button", { name: "Ratio", exact: true }).click();
+      // On mobile, the panel is collapsed; click the Templates tab to open it
+      await page.getByRole("button", { name: "Templates", exact: true }).click();
     }
-    const ratioBtn = page.locator(".toolbar-ratio-btn").first();
-    await expect(ratioBtn).toBeVisible();
+    const templateItem = page.locator(".toolbar-template-item").first();
+    await expect(templateItem).toBeVisible();
   });
 
-  test("clicking 1:1 ratio highlights it", async ({ page, viewport }) => {
-    if (viewport && viewport.width < 1280) {
-      await page.getByRole("button", { name: "Ratio", exact: true }).click();
-    }
+  test("clicking 1:1 ratio highlights it", async ({ page }) => {
+    await page.getByRole("button", { name: "Aspect Ratio", exact: true }).click();
     const btn = page.getByRole("button", { name: "Set ratio to 1:1" });
     await btn.click();
     await expect(btn).toHaveClass(/active/);
     const prev = page.getByRole("button", { name: "Set ratio to 2:3" });
     await expect(prev).not.toHaveClass(/active/);
+  });
+});
+
+test.describe("Aspect Ratio panel", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+    await page.getByRole("button", { name: "Aspect Ratio", exact: true }).click();
+  });
+
+  test("mode button cycles display from H:W to W:H to W/H and back", async ({ page }) => {
+    const modeBtn = page.locator(".toolbar-ratio-mode-btn");
+    await expect(modeBtn).toHaveText("H:W");
+    await modeBtn.click();
+    await expect(modeBtn).toHaveText("W:H");
+    await modeBtn.click();
+    await expect(modeBtn).toHaveText("W/H");
+    await modeBtn.click();
+    await expect(modeBtn).toHaveText("H:W");
+  });
+
+  test("decimal mode shows numeric ratio values", async ({ page }) => {
+    const modeBtn = page.locator(".toolbar-ratio-mode-btn");
+    // Advance to decimal mode (two clicks from default H:W)
+    await modeBtn.click();
+    await modeBtn.click();
+    // At least one ratio button should show a numeric value (e.g. "2" for 1:2)
+    const ratioBtn = page.locator(".toolbar-ratio-btn", { hasText: "2" });
+    await expect(ratioBtn.first()).toBeVisible();
+  });
+
+  test("sort select changes ratio ordering", async ({ page }) => {
+    const sortSelect = page.getByLabel("Sort aspect ratios");
+    await sortSelect.selectOption("value");
+    // Grid still has ratio buttons after re-sort
+    const btns = page.locator(".toolbar-ratio-btn");
+    await expect(btns.first()).toBeVisible();
   });
 });
 
@@ -73,6 +108,12 @@ test.describe("Flag editor tab switching", () => {
     await page.getByRole("button", { name: "Symbols", exact: true }).click();
     const item = page.locator(".toolbar-symbol-item").first();
     await expect(item).toBeVisible();
+  });
+
+  test("switching to Saved tab shows empty-state placeholder", async ({ page, viewport }) => {
+    await page.getByRole("button", { name: "Saved", exact: true }).click();
+    const panel = page.locator(".toolbar-panel-content");
+    await expect(panel).toContainText("No saved designs yet");
   });
 
   test("clicking same tab on mobile toggles panel closed", async ({ page, viewport }) => {

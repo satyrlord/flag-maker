@@ -1,0 +1,10 @@
+{
+  "defaultSize": "standard",
+  "sizes": [
+    { "id": "small",    "label": "Small",   "pxPerRatio": 100  },
+    { "id": "medium",   "label": "Medium",  "pxPerRatio": 200  },
+    { "id": "standard", "label": "Default", "pxPerRatio": 500  },
+    { "id": "large",    "label": "Large",   "pxPerRatio": 1000 },
+    { "id": "huge",     "label": "Huge",    "pxPerRatio": 2000 }
+  ]
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { renderFlag, registerSymbols, getCurrentSvg } from "@/flagRenderer";
+import { renderFlag, registerSymbols, getCurrentSvg, getCurrentRatio } from "@/flagRenderer";
 import type { FlagDesign, Overlay } from "@/types";
 
 const baseDesign: FlagDesign = {
@@ -12,6 +12,10 @@ const baseDesign: FlagDesign = {
 };
 
 describe("renderFlag", () => {
+  it("getCurrentRatio returns default [2, 3] before any render", () => {
+    expect(getCurrentRatio()).toEqual([2, 3]);
+  });
+
   it("returns an SVGSVGElement", () => {
     const el = renderFlag(baseDesign);
     expect(el.tagName.toLowerCase()).toBe("svg");
@@ -69,6 +73,21 @@ describe("renderFlag", () => {
     expect(getCurrentSvg()).toBe(el);
     const el2 = renderFlag({ ...baseDesign, sections: 2, weights: [1, 1], colors: ["#C", "#D"] });
     expect(getCurrentSvg()).toBe(el2);
+  });
+
+  it("updates getCurrentRatio after render", () => {
+    renderFlag({ ...baseDesign, ratio: [1, 2] });
+    expect(getCurrentRatio()).toEqual([1, 2]);
+    renderFlag({ ...baseDesign, ratio: [3, 5] });
+    expect(getCurrentRatio()).toEqual([3, 5]);
+  });
+
+  it("getCurrentRatio returns a defensive copy", () => {
+    renderFlag({ ...baseDesign, ratio: [2, 3] });
+    const copy = getCurrentRatio();
+    copy[0] = 99;
+    copy[1] = 99;
+    expect(getCurrentRatio()).toEqual([2, 3]);
   });
 });
 

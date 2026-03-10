@@ -12,7 +12,7 @@ import {
   GRID_COLOR_MAGENTA,
   pickGridColor,
 } from "./gridOverlay";
-import type { GridSize } from "./gridOverlay";
+import type { GridSize } from "./gridConfig";
 import { getCurrentSvg } from "../flagRenderer";
 
 /** Show/hide the rightbar. */

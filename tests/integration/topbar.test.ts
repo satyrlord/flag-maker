@@ -1,11 +1,19 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createTopbar } from "@/ui/topbar";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { createTopbar, getSelectedPxPerRatio, resetExportSizeState, APP_VERSION, computeExportScale } from "@/ui/topbar";
 import * as flagRenderer from "@/flagRenderer";
 import * as utils from "@/utils";
+
+/** Width component of the [2, 3] ratio used in getCurrentRatio mocks below. */
+const MOCK_RATIO_W = 3;
 
 describe("createTopbar", () => {
   beforeEach(() => {
     document.documentElement.className = "dark";
+  });
+
+  afterEach(() => {
+    // Reset module-level size state so all tests see the default.
+    resetExportSizeState();
   });
 
   it("returns a header element", () => {
@@ -18,6 +26,11 @@ describe("createTopbar", () => {
     expect(bar.textContent).toContain("Flag Maker");
   });
 
+  it("displays the version number", () => {
+    const bar = createTopbar();
+    expect(bar.textContent).toContain(`v${APP_VERSION}`);
+  });
+
   it("has a theme toggle button", () => {
     const bar = createTopbar();
     const themeBtn = bar.querySelector<HTMLButtonElement>(
@@ -26,13 +39,15 @@ describe("createTopbar", () => {
     expect(themeBtn).not.toBeNull();
   });
 
-  it("has reset, save, and export buttons", () => {
+  it("has reset, save, export size, and export buttons", () => {
     const bar = createTopbar();
     const reset = bar.querySelector('button[aria-label="Reset flag"]');
     const save = bar.querySelector('button[aria-label="Save project"]');
+    const sizeSelect = bar.querySelector('select[aria-label="Export size"]');
     const exp = bar.querySelector('button[aria-label="Export flag"]');
     expect(reset).not.toBeNull();
     expect(save).not.toBeNull();
+    expect(sizeSelect).not.toBeNull();
     expect(exp).not.toBeNull();
   });
 
@@ -187,12 +202,13 @@ describe("createTopbar", () => {
     document.body.removeChild(bar);
   });
 
-  it("Export PNG calls svgToRaster with image/png", async () => {
+  it("Export PNG calls svgToRaster with computed scale from export size", async () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
 
     const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    const getCurrentRatioSpy = vi.spyOn(flagRenderer, "getCurrentRatio").mockReturnValue([2, 3]);
     const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/png;base64,x");
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
@@ -200,9 +216,11 @@ describe("createTopbar", () => {
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     items[1].click();
 
+    const expectedScale = computeExportScale(getSelectedPxPerRatio(), MOCK_RATIO_W);
     // Wait for promise chain
     await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
-    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/png", 2);
+    expect(getCurrentRatioSpy).toHaveBeenCalled();
+    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/png", expectedScale);
     // PNG is lossless -- quality must not be forwarded.
     expect(rasterSpy.mock.calls[0][3]).toBeUndefined();
     expect(dlSpy).toHaveBeenCalledWith("data:image/png;base64,x", "flag.png");
@@ -211,12 +229,13 @@ describe("createTopbar", () => {
     document.body.removeChild(bar);
   });
 
-  it("Export JPG calls svgToRaster with image/jpeg and quality", async () => {
+  it("Export JPG calls svgToRaster with computed scale and quality", async () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
 
     const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+    const getCurrentRatioSpy = vi.spyOn(flagRenderer, "getCurrentRatio").mockReturnValue([2, 3]);
     const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/jpeg;base64,y");
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
@@ -224,8 +243,10 @@ describe("createTopbar", () => {
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     items[2].click();
 
+    const expectedScale = computeExportScale(getSelectedPxPerRatio(), MOCK_RATIO_W);
     await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
-    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/jpeg", 2, 0.92);
+    expect(getCurrentRatioSpy).toHaveBeenCalled();
+    expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/jpeg", expectedScale, 0.92);
     expect(dlSpy).toHaveBeenCalledWith("data:image/jpeg;base64,y", "flag.jpg");
 
     vi.restoreAllMocks();
@@ -276,5 +297,117 @@ describe("createTopbar", () => {
 
     vi.restoreAllMocks();
     document.body.removeChild(bar);
+  });
+
+  it("export size select defaults to 'Default' (500 pxPerRatio)", () => {
+    const bar = createTopbar();
+    const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+    expect(select.value).toBe("500");
+    expect(select.options[select.selectedIndex].textContent).toBe("Default");
+  });
+
+  it("export size select contains all five options", () => {
+    const bar = createTopbar();
+    const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+    const labels = Array.from(select.options).map((o) => o.textContent);
+    expect(labels).toEqual(["Small", "Medium", "Default", "Large", "Huge"]);
+  });
+
+  it("getSelectedPxPerRatio returns default value", () => {
+    expect(getSelectedPxPerRatio()).toBe(500);
+  });
+
+  it("changing export size select updates getSelectedPxPerRatio", () => {
+    const bar = createTopbar();
+    const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+    select.value = "1000";
+    select.dispatchEvent(new Event("change"));
+    expect(getSelectedPxPerRatio()).toBe(1000);
+  });
+
+  describe("export at each size", () => {
+    const sizes = [
+      { label: "Small",   pxPerRatio: 100  },
+      { label: "Medium",  pxPerRatio: 200  },
+      { label: "Default", pxPerRatio: 500  },
+      { label: "Large",   pxPerRatio: 1000 },
+      { label: "Huge",    pxPerRatio: 2000 },
+    ] as const;
+
+    it.each(sizes)("SVG export at $label size downloads SVG regardless of size", ({ pxPerRatio }) => {
+      const bar = createTopbar();
+      document.body.appendChild(bar);
+
+      const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+      select.value = String(pxPerRatio);
+      select.dispatchEvent(new Event("change"));
+
+      const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+      const downloadSpy = vi.spyOn(utils, "download").mockImplementation(() => {});
+
+      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[0].click();
+
+      expect(downloadSpy).toHaveBeenCalledOnce();
+      expect(downloadSpy.mock.calls[0][0]).toBe("flag.svg");
+      expect(downloadSpy.mock.calls[0][2]).toBe("image/svg+xml;charset=utf-8");
+
+      vi.restoreAllMocks();
+      document.body.removeChild(bar);
+    });
+
+    it.each(sizes)("PNG export at $label size uses correct scale", async ({ pxPerRatio }) => {
+      const bar = createTopbar();
+      document.body.appendChild(bar);
+
+      const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+      select.value = String(pxPerRatio);
+      select.dispatchEvent(new Event("change"));
+
+      const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+      vi.spyOn(flagRenderer, "getCurrentRatio").mockReturnValue([2, 3]);
+      const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/png;base64,x");
+      const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[1].click();
+
+      const expectedScale = computeExportScale(pxPerRatio, 3);
+      await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
+      expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/png", expectedScale);
+      expect(rasterSpy.mock.calls[0][3]).toBeUndefined();
+      expect(dlSpy).toHaveBeenCalledWith("data:image/png;base64,x", "flag.png");
+
+      vi.restoreAllMocks();
+      document.body.removeChild(bar);
+    });
+
+    it.each(sizes)("JPG export at $label size uses correct scale and quality", async ({ pxPerRatio }) => {
+      const bar = createTopbar();
+      document.body.appendChild(bar);
+
+      const select = bar.querySelector<HTMLSelectElement>('select[aria-label="Export size"]')!;
+      select.value = String(pxPerRatio);
+      select.dispatchEvent(new Event("change"));
+
+      const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
+      vi.spyOn(flagRenderer, "getCurrentRatio").mockReturnValue([2, 3]);
+      const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/jpeg;base64,y");
+      const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
+
+      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[2].click();
+
+      const expectedScale = computeExportScale(pxPerRatio, 3);
+      await vi.waitFor(() => expect(dlSpy).toHaveBeenCalledOnce());
+      expect(rasterSpy).toHaveBeenCalledWith(svgEl, "image/jpeg", expectedScale, 0.92);
+      expect(dlSpy).toHaveBeenCalledWith("data:image/jpeg;base64,y", "flag.jpg");
+
+      vi.restoreAllMocks();
+      document.body.removeChild(bar);
+    });
   });
 });

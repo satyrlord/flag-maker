@@ -5,7 +5,7 @@
    ────────────────────────────────────────────── */
 
 import type { FlagDesign, Overlay, SymbolDef } from "./types";
-import { VIEW_W, computeViewH, computeStripeRects } from "./geometry";
+import { VIEW_W, computeViewH, computeStripeRects, DEFAULT_RATIO } from "./geometry";
 import { starPath } from "./utils";
 import { BUILTIN_SYMBOLS } from "./symbols";
 
@@ -27,8 +27,20 @@ export function registerSymbols(defs: SymbolDef[]): void {
 
 let currentSvg: SVGSVGElement | null = null;
 
+let currentRatio: [number, number] = [...DEFAULT_RATIO];
+
 export function getCurrentSvg(): SVGSVGElement | null {
   return currentSvg;
+}
+
+/**
+ * Returns the aspect ratio used in the most recent renderFlag() call as a
+ * [height, width] tuple.  A defensive copy is returned so callers cannot
+ * mutate the internal state -- mutating it would corrupt ratio tracking
+ * across subsequent renders and produce incorrect export scales.
+ */
+export function getCurrentRatio(): [number, number] {
+  return [...currentRatio] as [number, number];
 }
 
 /* ── Overlay Renderer ── */
@@ -162,5 +174,6 @@ export function renderFlag(design: FlagDesign): SVGSVGElement {
   }
 
   currentSvg = svgEl;
+  currentRatio = [...design.ratio];
   return svgEl;
 }

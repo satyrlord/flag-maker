@@ -434,9 +434,8 @@ body {
 }
 
 .toolbar-template-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
+  overflow-wrap: break-word;
   max-width: 100%;
 }
 

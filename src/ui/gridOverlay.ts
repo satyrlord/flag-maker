@@ -5,13 +5,8 @@
    repeating grid using an SVG <pattern> element.
    ────────────────────────────────────────────── */
 
-import gridConfig from "./grid-config.json";
-
-export interface GridSize {
-  label: string;
-  width: number;
-  height: number;
-}
+import gridConfig from "@/config/grid-config.json";
+import type { GridSize } from "@/ui/gridConfig";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 

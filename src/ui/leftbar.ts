@@ -1,7 +1,7 @@
 /* ──────────────────────────────────────────────
    Flag Maker – Flag Editor (leftbar)
    Tabbed sidebar with flag editing controls:
-   Ratio, Stripes, Overlays, Templates, Symbols.
+   Templates, Aspect Ratio, Stripes, Overlays, Symbols, Saved.
    ────────────────────────────────────────────── */
 
 import type { SymbolDef } from "../types";
@@ -30,7 +30,7 @@ import {
   templateUK,
   templateSouthAfrica,
 } from "../templates";
-import config from "./leftbar-config.json";
+import config from "@/config/leftbar-config.json";
 
 /* ── Constants ── */
 
@@ -38,9 +38,17 @@ const NS = "http://www.w3.org/2000/svg";
 
 /* ── Tab Icons (Lucide-style) ── */
 
-type TabId = "ratio" | "stripes" | "overlays" | "templates" | "symbols";
+type TabId = "ratio" | "stripes" | "overlays" | "templates" | "symbols" | "saved";
+
+const DEFAULT_ACTIVE_TAB: TabId = "templates";
 
 const TabIcons: Record<TabId, string> = {
+  templates: svg(
+    '<rect x="3" y="3" width="7" height="7"/>' +
+      '<rect x="14" y="3" width="7" height="7"/>' +
+      '<rect x="14" y="14" width="7" height="7"/>' +
+      '<rect x="3" y="14" width="7" height="7"/>',
+  ),
   ratio: svg(
     '<rect x="3" y="3" width="18" height="18" rx="2"/>' +
       '<line x1="3" y1="12" x2="21" y2="12"/>' +
@@ -57,31 +65,39 @@ const TabIcons: Record<TabId, string> = {
       '<line x1="12" y1="22" x2="12" y2="15.5"/>' +
       '<polyline points="22 8.5 12 15.5 2 8.5"/>',
   ),
-  templates: svg(
-    '<rect x="3" y="3" width="7" height="7"/>' +
-      '<rect x="14" y="3" width="7" height="7"/>' +
-      '<rect x="14" y="14" width="7" height="7"/>' +
-      '<rect x="3" y="14" width="7" height="7"/>',
-  ),
   symbols: svg(
     '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 ' +
       '18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
   ),
+  saved: svg(
+    '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  ),
 };
 
-/* ── Tab Definitions (derived from config keys + icons) ── */
+/* ── Tab Strip (ordered tabs + separators) ── */
 
 interface TabDef {
-  id: string;
+  id: TabId;
   label: string;
   icon: string;
 }
 
-const TABS: TabDef[] = (Object.keys(TabIcons) as TabId[]).map((id) => ({
-  id,
-  label: id.charAt(0).toUpperCase() + id.slice(1),
-  icon: TabIcons[id],
-}));
+interface TabSeparator {
+  separator: true;
+}
+
+type TabStripItem = TabDef | TabSeparator;
+
+const TAB_STRIP: TabStripItem[] = [
+  { id: "templates", label: "Templates", icon: TabIcons.templates },
+  { id: "ratio", label: "Aspect Ratio", icon: TabIcons.ratio },
+  { separator: true },
+  { id: "stripes", label: "Stripes", icon: TabIcons.stripes },
+  { id: "overlays", label: "Overlays", icon: TabIcons.overlays },
+  { id: "symbols", label: "Symbols", icon: TabIcons.symbols },
+  { separator: true },
+  { id: "saved", label: "Saved", icon: TabIcons.saved },
+];
 
 /* ── Template Registry (maps config IDs to factory functions) ── */
 
@@ -217,6 +233,11 @@ const PanelIcons: Record<TabId, string> = {
     '<circle cx="12" cy="10" r="4"/>' +
       '<path d="M12 2 L13.5 6.5 L18 6.5 L14.5 9.5 L16 14 L12 11 L8 14 L9.5 9.5 L6 6.5 L10.5 6.5 Z" fill="currentColor" stroke="none"/>' +
       '<path d="M7 18 C7 15 17 15 17 18" fill="none"/>',
+    20,
+  ),
+  saved: svg(
+    '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>' +
+      '<line x1="15" y1="8" x2="9" y2="8"/>',
     20,
   ),
 };
@@ -641,6 +662,26 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
   return panel;
 }
 
+/* ── Saved Panel ── */
+
+function createSavedPanel(): HTMLElement {
+  const panel = h("div", "toolbar-panel-content");
+  panel.appendChild(panelHeader("Saved", "saved"));
+
+  const empty = h("div", "flex flex-col items-center justify-center gap-2 py-8");
+  const icon = h("span", "toolbar-panel-icon");
+  icon.innerHTML = TabIcons.saved;
+  icon.style.opacity = "0.4";
+  empty.appendChild(icon);
+
+  const msg = h("p", "toolbar-empty-text text-xs", "No saved designs yet");
+  msg.style.color = "var(--text-secondary)";
+  empty.appendChild(msg);
+
+  panel.appendChild(empty);
+  return panel;
+}
+
 /* ──────────────────────────────────────────────
    Main Flag Editor (leftbar)
    ────────────────────────────────────────────── */
@@ -669,16 +710,25 @@ export function createLeftbar(): HTMLElement {
     overlays: createOverlaysPanel(aside),
     templates: createTemplatesPanel(aside),
     symbols: createSymbolsPanel(aside),
+    saved: createSavedPanel(),
   };
 
   // ── State ──
-  let activeTab = "ratio";
+  let activeTab: TabId = DEFAULT_ACTIVE_TAB;
   let panelOpen = false;
   const desktopMQ = window.matchMedia("(min-width: 1280px)");
 
   // ── Tab buttons ──
   const tabButtons: Record<string, HTMLButtonElement> = {};
-  for (const tab of TABS) {
+  for (const item of TAB_STRIP) {
+    if ("separator" in item) {
+      const sep = h("div", "w-6 h-px mx-auto my-1");
+      sep.style.backgroundColor = "var(--divider)";
+      sep.setAttribute("aria-hidden", "true");
+      strip.appendChild(sep);
+      continue;
+    }
+    const tab = item;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.title = tab.label;
@@ -707,13 +757,13 @@ export function createLeftbar(): HTMLElement {
   backdrop.addEventListener("click", closePanel);
 
   // ── Panel switching ──
-  function switchTab(id: string): void {
-    activeTab = id;
-    for (const [tabId, btn] of Object.entries(tabButtons)) {
-      btn.classList.toggle("active", tabId === id);
+  function switchTab(tabId: TabId): void {
+    activeTab = tabId;
+    for (const [key, btn] of Object.entries(tabButtons)) {
+      btn.classList.toggle("active", key === tabId);
     }
     panelContainer.innerHTML = "";
-    const p = panels[id];
+    const p = panels[tabId];
     if (p) panelContainer.appendChild(p);
   }
 

@@ -44,7 +44,7 @@ npm run quality
 npm run quality:full
 ```
 
-- `npm run quality` runs typecheck, ESLint, markdown lint, and Vitest coverage.
+- `npm run quality` runs typecheck, ESLint, markdown lint, and Vitest coverage (no build step). The build is handled by Playwright's `webServer` when running `quality:full`.
 - `npm run quality:full` runs the quick gate plus headless Playwright coverage on desktop and mobile projects.
 - Both Vitest and Playwright coverage enforce a minimum of **80% per file** for statements, branches, functions, and lines.
 

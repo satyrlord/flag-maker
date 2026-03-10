@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createLeftbar } from "@/ui/leftbar";
-import config from "@/ui/leftbar-config.json";
+import config from "@/config/leftbar-config.json";
 import { validateLeftbarConfig } from "@/ui/leftbarConfig";
 import {
   templatePerPale,
@@ -77,11 +77,11 @@ describe("createLeftbar", () => {
     expect(toolbar.tagName).toBe("ASIDE");
   });
 
-  it("contains 5 tab buttons", () => {
+  it("contains 6 tab buttons", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    expect(tabs.length).toBe(5);
+    expect(tabs.length).toBe(6);
   });
 
   it("tab buttons have correct labels", () => {
@@ -89,20 +89,45 @@ describe("createLeftbar", () => {
       'nav[aria-label="Toolbar tabs"] button',
     );
     const labels = Array.from(tabs).map((b) => b.getAttribute("aria-label"));
-    expect(labels).toEqual(["Ratio", "Stripes", "Overlays", "Templates", "Symbols"]);
+    expect(labels).toEqual(["Templates", "Aspect Ratio", "Stripes", "Overlays", "Symbols", "Saved"]);
   });
 
-  it("shows Ratio panel by default", () => {
+  it("shows Templates panel by default", () => {
     const heading = toolbar.querySelector("h3");
-    expect(heading?.textContent).toMatch(/Aspect Ratio/i);
+    expect(heading?.textContent).toMatch(/Templates/i);
   });
+
+  it("Templates tab is active by default", () => {
+    const activeBtn = toolbar.querySelector('nav[aria-label="Toolbar tabs"] button.active');
+    expect(activeBtn?.getAttribute("aria-label")).toBe("Templates");
+  });
+
+  it("Saved tab shows 'No saved designs yet' placeholder", () => {
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    // Saved is the last tab (index 5)
+    tabs[5].click();
+    const panel = toolbar.querySelector(".toolbar-panel-content");
+    expect(panel).not.toBeNull();
+    expect(panel!.textContent).toContain("No saved designs yet");
+  });
+
+  function switchToRatioTab(): void {
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[1].click();
+  }
 
   it("shows all configured aspect ratio buttons", () => {
+    switchToRatioTab();
     const ratioBtns = toolbar.querySelectorAll(".toolbar-ratio-btn");
     expect(ratioBtns.length).toBe(config.ratios.length);
   });
 
   it("has a sort select with commonality and value options", () => {
+    switchToRatioTab();
     const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select");
     expect(select).not.toBeNull();
     const options = select!.querySelectorAll("option");
@@ -113,6 +138,7 @@ describe("createLeftbar", () => {
   });
 
   it("sorts ratios by commonality (most common first) by default", () => {
+    switchToRatioTab();
     const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
     // Most common first (2:3 = commonality 84), least common last (4:3 = commonality 1, last in config)
     expect(btns[0].textContent).toBe("2:3");
@@ -120,6 +146,7 @@ describe("createLeftbar", () => {
   });
 
   it("re-sorts ratios by value (ascending h/w) when select changes", () => {
+    switchToRatioTab();
     const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
     select.value = "value";
     select.dispatchEvent(new Event("change"));
@@ -246,11 +273,13 @@ describe("createLeftbar", () => {
   });
 
   it("2:3 ratio is active by default", () => {
+    switchToRatioTab();
     const activeBtn = toolbar.querySelector(".toolbar-ratio-btn.active");
     expect(activeBtn?.textContent).toBe("2:3");
   });
 
   it("clicking a ratio button updates active state", () => {
+    switchToRatioTab();
     const btns = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-ratio-btn");
     const btn1x1 = Array.from(btns).find((b) => b.textContent === "1:1")!;
     btn1x1.click();
@@ -260,6 +289,7 @@ describe("createLeftbar", () => {
   });
 
   it("clicking ratio button emits toolbar:ratio event", () => {
+    switchToRatioTab();
     let receivedDetail: unknown = null;
     toolbar.addEventListener("toolbar:ratio", ((e: CustomEvent) => {
       receivedDetail = e.detail;
@@ -285,7 +315,7 @@ describe("Stripes tab", () => {
       'nav[aria-label="Toolbar tabs"] button',
     );
     // Simulate desktop width for immediate tab switch
-    tabs[1].click();
+    tabs[2].click();
   });
 
   it("shows orientation controls", () => {
@@ -324,11 +354,11 @@ describe("Stripes tab", () => {
     expect(label?.textContent).toBe("1");
   });
 
-  it("stripe count does not exceed 13", () => {
+  it("stripe count does not exceed 14", () => {
     const plusBtn = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-count-btn")[1];
-    for (let i = 0; i < 15; i++) plusBtn.click();
+    for (let i = 0; i < 20; i++) plusBtn.click();
     const label = toolbar.querySelector(".toolbar-count-label");
-    expect(label?.textContent).toBe("13");
+    expect(label?.textContent).toBe("14");
   });
 
   it("shows color pickers matching stripe count", () => {
@@ -368,7 +398,7 @@ describe("Templates tab", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[3].click(); // Templates
+    tabs[0].click(); // Templates
   });
 
   it("shows Division and National section titles", () => {
@@ -465,7 +495,7 @@ describe("Overlays tab", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[2].click(); // Overlays
+    tabs[3].click(); // Overlays
   });
 
   it("shows add overlay buttons for rectangle, circle, star", () => {
@@ -503,7 +533,7 @@ describe("Stripes tab - color and orientation events", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[1].click(); // Stripes
+    tabs[2].click(); // Stripes
   });
 
   it("color picker input emits toolbar:color event", () => {
@@ -740,6 +770,11 @@ describe("Ratio display mode toggle", () => {
     document.body.innerHTML = "";
     toolbar = createLeftbar();
     document.body.appendChild(toolbar);
+    // Switch to Ratio tab (default is now Templates)
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[1].click();
   });
 
   function modeBtn(): HTMLButtonElement {

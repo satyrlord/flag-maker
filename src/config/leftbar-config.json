@@ -27,11 +27,11 @@
   "stripes": {
     "defaultCount": 3,
     "minCount": 1,
-    "maxCount": 13,
+    "maxCount": 14,
     "defaultColors": [
       "#CE1126", "#FFFFFF", "#002395", "#FFD500", "#000000",
       "#009246", "#CE2B37", "#B22234", "#3C3B6E", "#0038A8",
-      "#FCD116", "#00A3DD", "#F7D618"
+      "#FCD116", "#00A3DD", "#F7D618", "#CC0001"
     ]
   },
   "overlayTypes": [

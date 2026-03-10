@@ -70,8 +70,10 @@ test.describe("Flag rendering", () => {
   });
 
   test("updates the SVG viewBox when the ratio changes", async ({ page, viewport }) => {
+    // Open the Aspect Ratio tab; on mobile this also opens the panel.
+    await page.getByRole("button", { name: "Aspect Ratio", exact: true }).click();
     if (viewport && viewport.width < 1280) {
-      await page.getByRole("button", { name: "Ratio", exact: true }).click();
+      await expect(page.locator(".toolbar-panel")).toHaveClass(/panel-open/);
     }
     await page.getByRole("button", { name: "Set ratio to 1:1" }).click();
     await expect(page.locator("svg.flag-svg")).toHaveAttribute("viewBox", "0 0 1200 1200");

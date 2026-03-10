@@ -5,8 +5,25 @@
    ────────────────────────────────────────────── */
 
 import { svg } from "./icons";
-import { getCurrentSvg } from "../flagRenderer";
+import { getCurrentSvg, getCurrentRatio } from "../flagRenderer";
+import { VIEW_W } from "../geometry";
 import { download, svgToRaster, downloadDataUrl } from "../utils";
+import exportSizesConfig from "@/config/export-sizes.json";
+
+const cfg = exportSizesConfig;
+
+const MAJOR_VERSION = 0;
+/** Digits reserved for the commit counter: supports up to 999 commits per major; version format: `<major>.NNN`. */
+const VERSION_PADDING_WIDTH = 3;
+/**
+ * App version string displayed in the topbar.
+ * Format: `<major>.<commits>` where commits is the fork-local git commit
+ * count, zero-padded to `VERSION_PADDING_WIDTH` digits (e.g. `0.007`).
+ * `__COMMIT_COUNT__` is a compile-time constant injected by Vite `define`
+ * at build time -- see `vite.config.ts`. Falls back to `0` in environments
+ * where Vite substitution does not run (e.g. plain `tsc`).
+ */
+export const APP_VERSION = `${MAJOR_VERSION}.${String(__COMMIT_COUNT__ ?? 0).padStart(VERSION_PADDING_WIDTH, "0")}`;
 
 const Icons = {
   flag: svg(
@@ -143,6 +160,62 @@ function showExportError(format: string): void {
   }, 4000);
 }
 
+/* ── Export Size Selector ── */
+
+const defaultSizeEntry = cfg.sizes.find((s) => s.id === cfg.defaultSize);
+if (!defaultSizeEntry) {
+  throw new Error(
+    `Export size configuration error: defaultSize "${cfg.defaultSize}" does not match any entry in sizes[].id. Check src/config/export-sizes.json.`,
+  );
+}
+const DEFAULT_PX_PER_RATIO: number = defaultSizeEntry.pxPerRatio;
+
+let selectedPxPerRatio: number = DEFAULT_PX_PER_RATIO;
+
+/** Reset export size to the config default. Intended for use in tests only. */
+export function resetExportSizeState(): void {
+  selectedPxPerRatio = DEFAULT_PX_PER_RATIO;
+}
+
+export function getSelectedPxPerRatio(): number {
+  return selectedPxPerRatio;
+}
+
+/**
+ * Computes the SVG-to-raster scale factor for a given export configuration.
+ * Formula: (pxPerRatio * ratioWidth) / VIEW_W
+ * Converts the user's desired pixels-per-ratio-unit into a scale factor
+ * relative to the fixed viewBox width (VIEW_W).
+ *
+ * The exported image width equals `pxPerRatio * ratioWidth` pixels.
+ * For example, `pxPerRatio=500` with a 2:3 flag (ratioWidth=3) yields
+ * scale=1.25 and produces a 1500px-wide exported image.
+ */
+export function computeExportScale(pxPerRatio: number, ratioWidth: number): number {
+  return (pxPerRatio * ratioWidth) / VIEW_W;
+}
+
+function createExportSizeSelect(): HTMLSelectElement {
+  const select = document.createElement("select");
+  select.title = "Export size";
+  select.setAttribute("aria-label", "Export size");
+  select.className = "toolbar-sort-select h-8 text-sm";
+
+  for (const size of cfg.sizes) {
+    const opt = document.createElement("option");
+    opt.value = String(size.pxPerRatio);
+    opt.textContent = size.label;
+    if (size.id === cfg.defaultSize) opt.selected = true;
+    select.appendChild(opt);
+  }
+
+  select.addEventListener("change", () => {
+    selectedPxPerRatio = Number(select.value);
+  });
+
+  return select;
+}
+
 /* ── Export Dropdown ── */
 
 function createExportButton(): HTMLElement {
@@ -197,7 +270,8 @@ function createExportButton(): HTMLElement {
     menuItem("Export PNG", () => {
       const svgEl = getCurrentSvg();
       if (!svgEl) return;
-      svgToRaster(svgEl, "image/png", 2)
+      const [, ratioWidth] = getCurrentRatio();
+      svgToRaster(svgEl, "image/png", computeExportScale(selectedPxPerRatio, ratioWidth))
         .then((dataUrl) => downloadDataUrl(dataUrl, "flag.png"))
         .catch((err: unknown) => {
           console.error("PNG export failed:", err);
@@ -207,7 +281,8 @@ function createExportButton(): HTMLElement {
     menuItem("Export JPG", () => {
       const svgEl = getCurrentSvg();
       if (!svgEl) return;
-      svgToRaster(svgEl, "image/jpeg", 2, 0.92)
+      const [, ratioWidth] = getCurrentRatio();
+      svgToRaster(svgEl, "image/jpeg", computeExportScale(selectedPxPerRatio, ratioWidth), 0.92)
         .then((dataUrl) => downloadDataUrl(dataUrl, "flag.jpg"))
         .catch((err: unknown) => {
           console.error("JPG export failed:", err);
@@ -267,7 +342,13 @@ export function createTopbar(): HTMLElement {
   title.style.color = "var(--text-primary)";
   title.textContent = "Flag Maker";
 
-  left.append(logo, title);
+  const version = document.createElement("span");
+  version.className = "text-[10px] hidden sm:inline";
+  version.style.color = "var(--text-secondary)";
+  version.style.opacity = "0.6";
+  version.textContent = `v${APP_VERSION}`;
+
+  left.append(logo, title, version);
 
   // ── Spacer ──
   const spacer = document.createElement("div");
@@ -292,9 +373,10 @@ export function createTopbar(): HTMLElement {
     /* TODO: wire to save */
   });
 
+  const exportSizeSelect = createExportSizeSelect();
   const exportBtn = createExportButton();
 
-  right.append(themeBtn, divider, resetBtn, saveBtn, exportBtn);
+  right.append(themeBtn, divider, resetBtn, saveBtn, exportSizeSelect, exportBtn);
 
   // Create the screen-reader live region for export error announcements.
   // It must exist in the DOM before any error content is injected so

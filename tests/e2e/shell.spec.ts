@@ -31,3 +31,20 @@ test.describe("Canvas rendering", () => {
     await expect(page.getByRole("toolbar", { name: "Zoom Level" })).toBeVisible();
   });
 });
+
+test.describe("UI compliance", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+  });
+
+  test("all select elements carry the toolbar-sort-select class", async ({ page }) => {
+    // The UI style guide mandates toolbar-sort-select on every <select>.
+    const selects = page.locator("select");
+    const count = await selects.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      await expect(selects.nth(i)).toHaveClass(/toolbar-sort-select/);
+    }
+  });
+});

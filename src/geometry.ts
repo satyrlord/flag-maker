@@ -6,6 +6,9 @@ import type { Orientation, StripeRect } from "./types";
 
 export const VIEW_W = 1200;
 
+/** Default flag aspect ratio [height, width]. Shared by the renderer initial state and the default flag design. */
+export const DEFAULT_RATIO: [number, number] = [2, 3];
+
 export function computeViewH(ratio: [number, number]): number {
   return Math.round((VIEW_W * ratio[0]) / ratio[1]);
 }

@@ -213,6 +213,12 @@ Theme toggling applies a class (`dark` / `light`) on `<html>` and all colors are
 
 ---
 
+## Dropdowns (`<select>`)
+
+All `<select>` dropdown elements throughout the app must use the `toolbar-sort-select` CSS class (defined in `src/index.css`). This class provides theme-aware text color, transparent background, proper border styling, focus ring, and correctly themed `<option>` elements in both dark and light mode. Additional sizing classes (e.g. `h-8 text-sm`) may be combined as needed, but `toolbar-sort-select` is the required base class for every `<select>`.
+
+---
+
 ## Responsive Breakpoints
 
 | Breakpoint | Behavior |
