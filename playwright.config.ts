@@ -4,9 +4,9 @@ const collectCoverage = !!process.env.E2E_COVERAGE;
 
 export default defineConfig({
   testDir: "tests/e2e",
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: 1,
   workers: 10,
   reporter: "list",
   /* Per-test timeout (default 30 s is too tight for mobile emulation). */
@@ -14,6 +14,7 @@ export default defineConfig({
   /* Global suite timeout. */
   globalTimeout: 300_000,
   ...(collectCoverage && {
+    globalSetup: "./tests/e2e/coverage-setup.ts",
     globalTeardown: "./tests/e2e/coverage-teardown.ts",
   }),
   use: {

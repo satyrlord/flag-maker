@@ -3,7 +3,10 @@
    ────────────────────────────────────────────── */
 
 import type { Overlay } from "./types";
+import { RENDERABLE_OVERLAY_TYPE_IDS } from "./overlayTypeConfig";
 import { uid } from "./utils";
+
+export const SUPPORTED_OVERLAY_TYPES = RENDERABLE_OVERLAY_TYPE_IDS;
 
 export function rectOverlay({
   xPct, yPct, wPct, hPct, fill,
@@ -46,20 +49,6 @@ export function polyOverlay(
   };
 }
 
-export function starOverlay({
-  xPct, yPct, sizePct, fill,
-  stroke = "#0000", strokeWidth = 0, opacity = 1,
-}: {
-  xPct: number; yPct: number; sizePct: number;
-  fill: string; stroke?: string; strokeWidth?: number; opacity?: number;
-}): Overlay {
-  return {
-    id: uid(), type: "star",
-    x: xPct, y: yPct, w: sizePct, h: sizePct,
-    rotation: 0, fill, stroke, strokeWidth, opacity,
-  };
-}
-
 /**
  * A rotated band (rectangle) from point A → B.
  * Thickness is % of flag HEIGHT. Rotation compensates for aspect ratio.
@@ -82,5 +71,28 @@ export function makeBandSegment(
     x: (x1Pct + x2Pct) / 2, y: (y1Pct + y2Pct) / 2,
     w: lengthPct, h: thicknessPct,
     rotation: angle, fill, stroke: "#0000", strokeWidth: 0, opacity: 1,
+  };
+}
+
+export function starfieldOverlay({
+  xPct, yPct, wPct, hPct, fill,
+  starCount = 12, starPoints = 5, starPointLength = 0.38,
+  starSize = 50, starDistribution = "ring",
+  starRotateWithPosition = false, starCols = 6,
+  opacity = 1,
+}: {
+  xPct: number; yPct: number; wPct: number; hPct: number;
+  fill: string;
+  starCount?: number; starPoints?: number; starPointLength?: number;
+  starSize?: number; starDistribution?: string;
+  starRotateWithPosition?: boolean; starCols?: number;
+  opacity?: number;
+}): Overlay {
+  return {
+    id: uid(), type: "starfield",
+    x: xPct, y: yPct, w: wPct, h: hPct,
+    rotation: 0, fill, stroke: "#0000", strokeWidth: 0, opacity,
+    starCount, starPoints, starPointLength, starSize,
+    starDistribution, starRotateWithPosition, starCols,
   };
 }

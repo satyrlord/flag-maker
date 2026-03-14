@@ -16,7 +16,7 @@
  * Usage:
  *   node tools/svg2symbols.mjs --in downloads/emblems --out public/symbols.json
  *   node tools/svg2symbols.mjs --in svgs --out public/symbols.json --mode currentColor --strip
- *   node tools/svg2symbols.mjs --in svgs --out public/symbols.json --mode mono:#222 --strip --category "National Emblems"
+ *   node tools/svg2symbols.mjs --in svgs --out public/symbols.json --mode mono:#222 --strip --category "Coat of Arms"
  */
 
 import { promises as fs } from "node:fs";
@@ -29,7 +29,7 @@ import { XMLParser } from "fast-xml-parser";
 const args = parseArgs(process.argv.slice(2));
 const INPUT_DIR = must(args["in"], "--in <dir> is required");
 const OUTPUT = args["out"] || "public/symbols.json";
-const CATEGORY = args["category"] || "National Emblems";
+const CATEGORY = args["category"] || "Coat of Arms";
 const PREFIX = args["prefix"] || ""; // e.g. "un_"
 const MODE = (args["mode"] || "keep").toLowerCase(); // keep | currentColor | mono:#hex
 const STRIP = Boolean(args["strip"]);

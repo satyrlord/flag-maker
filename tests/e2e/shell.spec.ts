@@ -38,13 +38,13 @@ test.describe("UI compliance", () => {
     await page.waitForLoadState("domcontentloaded");
   });
 
-  test("all select elements carry the toolbar-sort-select class", async ({ page }) => {
-    // The UI style guide mandates toolbar-sort-select on every <select>.
+  test("all select elements use DaisyUI select component class", async ({ page }) => {
+    // DaisyUI select components carry the 'select' class.
     const selects = page.locator("select");
     const count = await selects.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
-      await expect(selects.nth(i)).toHaveClass(/toolbar-sort-select/);
+      await expect(selects.nth(i)).toHaveClass(/\bselect\b/);
     }
   });
 });

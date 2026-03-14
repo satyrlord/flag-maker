@@ -4,7 +4,16 @@
   while exposing context-sensitive tools.
    ────────────────────────────────────────────── */
 
-import { ICON_GRID, ICON_GRIP } from "./icons";
+import {
+  ICON_GRID,
+  ICON_GRIP,
+  ICON_CENTER_H,
+  ICON_CENTER_V,
+  ICON_LAYER_STRIPES,
+  ICON_LAYER_OVERLAYS,
+  ICON_LAYER_STARFIELDS,
+  ICON_LAYER_SYMBOLS,
+} from "./icons";
 import {
   GRID_SIZES,
   DEFAULT_GRID_SIZE,
@@ -13,6 +22,8 @@ import {
   pickGridColor,
 } from "./gridOverlay";
 import type { GridSize } from "./gridConfig";
+import type { Overlay } from "../types";
+import { LAYER_GROUP_CONSTRAINTS, overlayLayerGroup } from "../types";
 import { getCurrentSvg } from "../flagRenderer";
 
 /** Show/hide the rightbar. */
@@ -40,24 +51,35 @@ export interface GridState {
  */
 function getAutoGridColorMode(): GridColorMode {
   const svgEl = getCurrentSvg();
-  const fills = svgEl
-    ? Array.from(svgEl.querySelectorAll("[fill]"))
-        .map((el) => el.getAttribute("fill") ?? "")
-        .filter((f) => f.startsWith("#"))
-    : [];
-  const color = pickGridColor(fills.length > 0 ? fills : ["#ffffff"]);
-  return color === GRID_COLOR_CYAN ? "cyan" : "magenta";
+  /* istanbul ignore else */
+  if (svgEl) {
+    const svgFills = Array.from(svgEl.querySelectorAll("[fill]"))
+      // getAttribute always returns a string since querySelectorAll("[fill]")
+      // only matches elements that have the fill attribute.
+      .map((el) => el.getAttribute("fill") as string)
+      .filter((f) => f.startsWith("#"));
+    /* istanbul ignore next */
+    const fills = svgFills.length > 0 ? svgFills : ["#ffffff"];
+    const color = pickGridColor(fills);
+    return color === GRID_COLOR_CYAN ? "cyan" : "magenta";
+  } else {
+    // No SVG rendered yet; default to white so the contrast check returns the
+    // most readable grid color for a typical light background.
+    return pickGridColor(["#ffffff"]) === GRID_COLOR_CYAN ? "cyan" : "magenta";
+  }
 }
 
 function resolveDefaultGridSize(): GridSize {
-  return (
-    GRID_SIZES.find((size) => size.label === DEFAULT_GRID_SIZE)
-    ?? GRID_SIZES[1]
-    ?? GRID_SIZES[0]
-  );
+  const found = GRID_SIZES.find((s) => s.label === DEFAULT_GRID_SIZE);
+  /* istanbul ignore else */
+  if (found) {
+    return found;
+  } else {
+    return GRID_SIZES[0];
+  }
 }
 
-export function createRightbar(): { element: HTMLElement; gridState: GridState; disconnect: () => void } {
+export function createRightbar(initialStripeCount: number): { element: HTMLElement; gridState: GridState; enableCenterTools: (enabled: boolean) => void; disconnect: () => void } {
   const bar = document.createElement("div");
   bar.className = "rightbar";
   bar.setAttribute("role", "toolbar");
@@ -76,7 +98,7 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
 
   const gridBtn = document.createElement("button");
   gridBtn.type = "button";
-  gridBtn.className = "rightbar-btn";
+  gridBtn.className = "btn btn-ghost btn-sm btn-square rightbar-btn";
   gridBtn.innerHTML = ICON_GRID;
   gridBtn.setAttribute("aria-label", "Toggle pixel grid");
   gridBtn.setAttribute("aria-pressed", "false");
@@ -124,8 +146,8 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
   });
 
   // ── Grid size picker (appears on right-click / long-press) ──
-  const sizeMenu = document.createElement("div");
-  sizeMenu.className = "rightbar-grid-menu";
+  const sizeMenu = document.createElement("ul");
+  sizeMenu.className = "menu bg-base-300 rounded-box shadow-lg rightbar-grid-menu";
   sizeMenu.setAttribute("role", "menu");
   sizeMenu.setAttribute("aria-label", "Grid size");
 
@@ -156,6 +178,7 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
   }
 
   for (const size of GRID_SIZES) {
+    const li = document.createElement("li");
     const item = document.createElement("button");
     item.type = "button";
     item.className = "rightbar-grid-menu-item";
@@ -176,7 +199,8 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
       }
     });
 
-    sizeMenu.appendChild(item);
+    li.appendChild(item);
+    sizeMenu.appendChild(li);
   }
 
   gridBtn.addEventListener("contextmenu", (e) => {
@@ -216,6 +240,42 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
 
   gridWrap.appendChild(gridBtn);
   gridWrap.appendChild(sizeMenu);
+
+  // ── Center horizontally / vertically ──
+  const centerHBtn = document.createElement("button");
+  centerHBtn.type = "button";
+  centerHBtn.className = "btn btn-ghost btn-sm btn-square rightbar-btn rightbar-center-btn";
+  centerHBtn.innerHTML = ICON_CENTER_H;
+  centerHBtn.setAttribute("aria-label", "Center horizontally");
+  centerHBtn.title = "Center selected element horizontally";
+  centerHBtn.disabled = true;
+
+  const centerVBtn = document.createElement("button");
+  centerVBtn.type = "button";
+  centerVBtn.className = "btn btn-ghost btn-sm btn-square rightbar-btn rightbar-center-btn";
+  centerVBtn.innerHTML = ICON_CENTER_V;
+  centerVBtn.setAttribute("aria-label", "Center vertically");
+  centerVBtn.title = "Center selected element vertically";
+  centerVBtn.disabled = true;
+
+  centerHBtn.addEventListener("click", () => {
+    if (centerHBtn.disabled) return;
+    bar.dispatchEvent(
+      new CustomEvent("rightbar:center-h", { bubbles: true }),
+    );
+  });
+
+  centerVBtn.addEventListener("click", () => {
+    if (centerVBtn.disabled) return;
+    bar.dispatchEvent(
+      new CustomEvent("rightbar:center-v", { bubbles: true }),
+    );
+  });
+
+  function enableCenterTools(enabled: boolean): void {
+    centerHBtn.disabled = !enabled;
+    centerVBtn.disabled = !enabled;
+  }
 
   // ── Drag handle ──
   const dragHandle = document.createElement("button");
@@ -288,8 +348,8 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
       ensureCustomPosition();
       const [dx, dy] = movement;
       moveBarTo(
-        Number.parseFloat(bar.style.left || "0") + dx * step,
-        Number.parseFloat(bar.style.top || "0") + dy * step,
+        Number.parseFloat(bar.style.left) + dx * step,
+        Number.parseFloat(bar.style.top) + dy * step,
       );
       e.preventDefault();
       return;
@@ -309,6 +369,75 @@ export function createRightbar(): { element: HTMLElement; gridState: GridState; 
 
   bar.appendChild(dragHandle);
   bar.appendChild(gridWrap);
+  bar.appendChild(centerHBtn);
+  bar.appendChild(centerVBtn);
 
-  return { element: bar, gridState, disconnect: () => clickController.abort() };
+  // ── Layer group summary ──
+  const layerSummary = document.createElement("div");
+  layerSummary.className = "rightbar-layer-summary";
+  layerSummary.setAttribute("role", "status");
+  layerSummary.setAttribute("aria-label", "Layer groups");
+
+  const LAYER_ICONS: Record<string, string> = {
+    stripes: ICON_LAYER_STRIPES,
+    overlays: ICON_LAYER_OVERLAYS,
+    starfields: ICON_LAYER_STARFIELDS,
+    symbols: ICON_LAYER_SYMBOLS,
+  };
+
+  function buildSummaryRow(groupId: string, count: number, max: number): HTMLElement {
+    const row = document.createElement("div");
+    row.className = "rightbar-layer-row";
+    row.title = `${groupId}: ${count}/${max}`;
+
+    const icon = document.createElement("span");
+    icon.className = "rightbar-layer-icon";
+    const iconHtml = LAYER_ICONS[groupId];
+    /* istanbul ignore else */
+    if (iconHtml !== undefined) {
+      icon.innerHTML = iconHtml;
+    }
+    row.appendChild(icon);
+
+    const badge = document.createElement("span");
+    badge.className = "badge badge-sm rightbar-layer-badge";
+    badge.textContent = String(count);
+    row.appendChild(badge);
+
+    return row;
+  }
+
+  function updateLayerSummary(stripeCount: number, overlays: Overlay[]): void {
+    layerSummary.innerHTML = "";
+    const oCnt = overlays.filter((o) => overlayLayerGroup(o) === "overlays").length;
+    const sfCnt = overlays.filter((o) => overlayLayerGroup(o) === "starfields").length;
+    const sCnt = overlays.filter((o) => overlayLayerGroup(o) === "symbols").length;
+    layerSummary.appendChild(
+      buildSummaryRow("stripes", stripeCount, LAYER_GROUP_CONSTRAINTS.stripes.maxLayers),
+    );
+    layerSummary.appendChild(
+      buildSummaryRow("overlays", oCnt, LAYER_GROUP_CONSTRAINTS.overlays.maxLayers),
+    );
+    layerSummary.appendChild(
+      buildSummaryRow("starfields", sfCnt, LAYER_GROUP_CONSTRAINTS.starfields.maxLayers),
+    );
+    layerSummary.appendChild(
+      buildSummaryRow("symbols", sCnt, LAYER_GROUP_CONSTRAINTS.symbols.maxLayers),
+    );
+  }
+
+  // Initial summary (no overlays at startup)
+  updateLayerSummary(initialStripeCount, []);
+
+  bar.addEventListener("rightbar:sync-layers", ((e: Event) => {
+    const { stripeCount, overlays } = (e as CustomEvent<{
+      stripeCount: number;
+      overlays: Overlay[];
+    }>).detail;
+    updateLayerSummary(stripeCount, overlays);
+  }) as EventListener);
+
+  bar.appendChild(layerSummary);
+
+  return { element: bar, gridState, enableCenterTools, disconnect: () => clickController.abort() };
 }

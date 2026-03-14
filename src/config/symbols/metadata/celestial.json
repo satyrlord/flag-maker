@@ -1,0 +1,43 @@
+[
+  {
+    "id": "sol_de_mayo",
+    "name": "Sol de Mayo",
+    "category": "Celestial",
+    "svgFile": "sol_de_mayo.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Sol_de_Mayo-Bandera_de_Argentina.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "sun_philippines",
+    "name": "Sun (Philippines)",
+    "category": "Celestial",
+    "svgFile": "sun_philippines.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Philippines_-_cropped_sun.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "star_morocco",
+    "name": "Pentacle (Morocco)",
+    "category": "Celestial",
+    "svgFile": "star_morocco.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Star_of_Morocco_(unbordered).svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "star_ethiopia",
+    "name": "Star (Ethiopia)",
+    "category": "Celestial",
+    "svgFile": "star_ethiopia.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_Ethiopia.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "star_five_pointed",
+    "name": "Star (Five-pointed)",
+    "category": "Celestial",
+    "viewBox": "10 9 240 228",
+    "path": "m56,237 74-228 74,228L10,96h240",
+    "source": "https://commons.wikimedia.org/wiki/File:Five_Pointed_Star_Solid.svg",
+    "license": "Public domain (ineligible for copyright - simple geometry)"
+  }
+]

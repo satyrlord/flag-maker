@@ -56,6 +56,17 @@ export default defineConfig({
   preview: { port: 5173, strictPort: true },
   build: {
     sourcemap: process.env.E2E_COVERAGE === "true",
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+          return undefined;
+        },
+      },
+    },
   },
   plugins: [
     ...(process.env.E2E_COVERAGE === "true"

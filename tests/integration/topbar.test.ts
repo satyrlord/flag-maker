@@ -44,7 +44,7 @@ describe("createTopbar", () => {
     const reset = bar.querySelector('button[aria-label="Reset flag"]');
     const save = bar.querySelector('button[aria-label="Save project"]');
     const sizeSelect = bar.querySelector('select[aria-label="Export size"]');
-    const exp = bar.querySelector('button[aria-label="Export flag"]');
+    const exp = bar.querySelector('[aria-label="Export flag"]');
     expect(reset).not.toBeNull();
     expect(save).not.toBeNull();
     expect(sizeSelect).not.toBeNull();
@@ -76,20 +76,18 @@ describe("createTopbar", () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
 
-    const exportBtn = bar.querySelector<HTMLButtonElement>(
-      'button[aria-label="Export flag"]',
+    const exportTrigger = bar.querySelector<HTMLElement>(
+      '[aria-label="Export flag"]',
     )!;
-    const menu = bar.querySelector<HTMLElement>('[role="menu"]')!;
+    const wrapper = exportTrigger.closest("details")!;
 
-    expect(menu.classList.contains("hidden")).toBe(true);
+    expect(wrapper.hasAttribute("open")).toBe(false);
 
-    exportBtn.click();
-    expect(menu.classList.contains("hidden")).toBe(false);
-    expect(exportBtn.getAttribute("aria-expanded")).toBe("true");
+    exportTrigger.click();
+    expect(wrapper.hasAttribute("open")).toBe(true);
 
-    exportBtn.click();
-    expect(menu.classList.contains("hidden")).toBe(true);
-    expect(exportBtn.getAttribute("aria-expanded")).toBe("false");
+    exportTrigger.click();
+    expect(wrapper.hasAttribute("open")).toBe(false);
 
     document.body.removeChild(bar);
   });
@@ -112,20 +110,19 @@ describe("createTopbar", () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
 
-    const exportBtn = bar.querySelector<HTMLButtonElement>(
-      'button[aria-label="Export flag"]',
+    const exportTrigger = bar.querySelector<HTMLElement>(
+      '[aria-label="Export flag"]',
     )!;
-    const menu = bar.querySelector<HTMLElement>('[role="menu"]')!;
+    const wrapper = exportTrigger.closest("details")!;
 
     // Open the dropdown
-    exportBtn.click();
-    expect(menu.classList.contains("hidden")).toBe(false);
+    exportTrigger.click();
+    expect(wrapper.hasAttribute("open")).toBe(true);
 
     // Click a menu item
     const svgItem = bar.querySelector<HTMLButtonElement>('[role="menuitem"]')!;
     svgItem.click();
-    expect(menu.classList.contains("hidden")).toBe(true);
-    expect(exportBtn.getAttribute("aria-expanded")).toBe("false");
+    expect(wrapper.hasAttribute("open")).toBe(false);
 
     document.body.removeChild(bar);
   });
@@ -134,19 +131,18 @@ describe("createTopbar", () => {
     const bar = createTopbar();
     document.body.appendChild(bar);
 
-    const exportBtn = bar.querySelector<HTMLButtonElement>(
-      'button[aria-label="Export flag"]',
+    const exportTrigger = bar.querySelector<HTMLElement>(
+      '[aria-label="Export flag"]',
     )!;
-    const menu = bar.querySelector<HTMLElement>('[role="menu"]')!;
+    const wrapper = exportTrigger.closest("details")!;
 
     // Open the dropdown
-    exportBtn.click();
-    expect(menu.classList.contains("hidden")).toBe(false);
+    exportTrigger.click();
+    expect(wrapper.hasAttribute("open")).toBe(true);
 
-    // Click outside the wrapper
-    document.body.click();
-    expect(menu.classList.contains("hidden")).toBe(true);
-    expect(exportBtn.getAttribute("aria-expanded")).toBe("false");
+    // Close via removing open attribute (simulates DaisyUI details closing)
+    wrapper.removeAttribute("open");
+    expect(wrapper.hasAttribute("open")).toBe(false);
 
     document.body.removeChild(bar);
   });
@@ -189,7 +185,7 @@ describe("createTopbar", () => {
     const downloadSpy = vi.spyOn(utils, "download").mockImplementation(() => {});
 
     // Open menu and click Export SVG
-    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     items[0].click();
 
@@ -212,7 +208,7 @@ describe("createTopbar", () => {
     const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/png;base64,x");
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
-    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     items[1].click();
 
@@ -239,7 +235,7 @@ describe("createTopbar", () => {
     const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/jpeg;base64,y");
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
-    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     items[2].click();
 
@@ -263,7 +259,7 @@ describe("createTopbar", () => {
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
 
     await expect(async () => {
@@ -286,7 +282,7 @@ describe("createTopbar", () => {
     const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+    bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
     const items = bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
 
     await expect(async () => {
@@ -346,7 +342,7 @@ describe("createTopbar", () => {
       vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(svgEl);
       const downloadSpy = vi.spyOn(utils, "download").mockImplementation(() => {});
 
-      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
       bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[0].click();
 
       expect(downloadSpy).toHaveBeenCalledOnce();
@@ -371,7 +367,7 @@ describe("createTopbar", () => {
       const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/png;base64,x");
       const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
-      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
       bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[1].click();
 
       const expectedScale = computeExportScale(pxPerRatio, 3);
@@ -398,7 +394,7 @@ describe("createTopbar", () => {
       const rasterSpy = vi.spyOn(utils, "svgToRaster").mockResolvedValue("data:image/jpeg;base64,y");
       const dlSpy = vi.spyOn(utils, "downloadDataUrl").mockImplementation(() => {});
 
-      bar.querySelector<HTMLButtonElement>('button[aria-label="Export flag"]')!.click();
+      bar.querySelector<HTMLElement>('[aria-label="Export flag"]')!.click();
       bar.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[2].click();
 
       const expectedScale = computeExportScale(pxPerRatio, 3);

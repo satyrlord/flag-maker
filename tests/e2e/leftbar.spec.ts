@@ -11,13 +11,13 @@ test.describe("Flag editor (leftbar)", () => {
     await expect(aside).toBeVisible();
   });
 
-  test("has 6 tab buttons", async ({ page }) => {
+  test("has 7 tab buttons", async ({ page }) => {
     const tabs = page.locator('nav[aria-label="Toolbar tabs"] button');
-    await expect(tabs).toHaveCount(6);
+    await expect(tabs).toHaveCount(7);
   });
 
   test("tab buttons have aria labels", async ({ page }) => {
-    const labels = ["Templates", "Aspect Ratio", "Stripes", "Overlays", "Symbols", "Saved"];
+    const labels = ["Templates", "Aspect Ratio", "Stripes", "Overlays", "Starfield", "Symbols", "Saved"];
     for (const label of labels) {
       const btn = page.getByRole("button", { name: label, exact: true });
       await expect(btn).toBeVisible();

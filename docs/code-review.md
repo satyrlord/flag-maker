@@ -1,7 +1,3 @@
----
-description: "Use when asked to review code, do a code review, audit changes, check for issues, or review uncommitted/staged changes. Covers diff-first review of pending changes and broader codebase audit."
----
-
 # Code Review
 
 Perform code review in two passes, ordered by priority.
@@ -44,7 +40,7 @@ classify severity as **critical**, **warning**, or **nit**.
     replace with plain text equivalents or remove entirely.
 11. **UI style guide compliance** — any change that adds or modifies a
     UI element (layout, component, styling, theming, interaction
-    behavior) must conform to `.github/instructions/ui-style-guide.md`.
+    behavior) must conform to `docs/ui-style-guide.md`.
     Verify colors, spacing, z-index, responsive behavior, and
     interaction constraints (no scrollbars, no text selection, no
     mobile swiping) match the style guide. The rightbar (Dynamic
@@ -59,11 +55,7 @@ classify severity as **critical**, **warning**, or **nit**.
     found, then run `npm run quality` (quick gate) to confirm the
     changes pass. For changes affecting UI rendering or layout, also
     run `npm run quality:full` (includes Playwright e2e tests).
-    Playwright tests must always run **headless** on two browser
-    targets only: (1) desktop-headless (Playwright built-in Chromium,
-    1400x800) and (2) mobile-android (Chromium emulating Pixel 7
-    landscape, 915x412). No headed mode is allowed — use Chrome
-    DevTools MCP for interactive debugging instead.
+    Playwright tests must always run headless.
 14. **Auto-fix** — after reporting findings, automatically fix all
     critical and warning issues in-place. Apply fixes directly to the
     source files, re-run the quality gate, and confirm everything
@@ -75,8 +67,7 @@ Summarize Pass 1 with a table: `| File | Line(s) | Severity | Finding |`.
 
 Only after Pass 1 is delivered, scan the wider codebase for systemic issues:
 
-- Patterns that conflict with the project's `copilot-instructions.md`
-  conventions.
+- Patterns that conflict with the project's `AGENTS.md` conventions.
 - Repeated anti-patterns across multiple files.
 - Stale TODO/FIXME comments with no tracking issue.
 - Missing or outdated documentation.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { rectOverlay, circleOverlay, polyOverlay, starOverlay, makeBandSegment } from "@/overlays";
+import { rectOverlay, circleOverlay, polyOverlay, makeBandSegment, starfieldOverlay } from "@/overlays";
 
 describe("rectOverlay", () => {
   it("creates a rectangle overlay with correct properties", () => {
@@ -78,22 +78,6 @@ describe("circleOverlay", () => {
   });
 });
 
-describe("starOverlay", () => {
-  it("creates a star overlay with square dimensions", () => {
-    const ov = starOverlay({ xPct: 50, yPct: 50, sizePct: 20, fill: "#FFD500" });
-    expect(ov.type).toBe("star");
-    expect(ov.w).toBe(20);
-    expect(ov.h).toBe(20);
-    expect(ov.fill).toBe("#FFD500");
-  });
-
-  it("applies default stroke and opacity", () => {
-    const ov = starOverlay({ xPct: 0, yPct: 0, sizePct: 10, fill: "#FFF" });
-    expect(ov.stroke).toBe("#0000");
-    expect(ov.opacity).toBe(1);
-  });
-});
-
 describe("makeBandSegment", () => {
   it("creates a rotated rectangle overlay", () => {
     const ov = makeBandSegment(0, 0, 100, 100, 18, "#0038A8", [2, 3]);
@@ -117,5 +101,42 @@ describe("makeBandSegment", () => {
   it("has a length greater than the thickness", () => {
     const ov = makeBandSegment(0, 0, 100, 100, 10, "#000", [2, 3]);
     expect(ov.w).toBeGreaterThan(ov.h);
+  });
+});
+
+describe("starfieldOverlay", () => {
+  it("creates a starfield overlay with correct properties", () => {
+    const ov = starfieldOverlay({
+      xPct: 20, yPct: 27, wPct: 36, hPct: 48.5,
+      fill: "#FFFFFF", starCount: 50, starDistribution: "staggered-grid",
+      starCols: 6, starPoints: 5, starPointLength: 0.38, starSize: 50,
+    });
+    expect(ov.type).toBe("starfield");
+    expect(ov.x).toBe(20);
+    expect(ov.y).toBe(27);
+    expect(ov.w).toBe(36);
+    expect(ov.h).toBe(48.5);
+    expect(ov.fill).toBe("#FFFFFF");
+    expect(ov.starCount).toBe(50);
+    expect(ov.starDistribution).toBe("staggered-grid");
+    expect(ov.starCols).toBe(6);
+    expect(ov.starPoints).toBe(5);
+    expect(ov.starPointLength).toBe(0.38);
+    expect(ov.starSize).toBe(50);
+    expect(ov.id).toBeTruthy();
+  });
+
+  it("applies default values for optional params", () => {
+    const ov = starfieldOverlay({
+      xPct: 50, yPct: 50, wPct: 40, hPct: 40, fill: "#FFD700",
+    });
+    expect(ov.starCount).toBe(12);
+    expect(ov.starDistribution).toBe("ring");
+    expect(ov.starPoints).toBe(5);
+    expect(ov.starPointLength).toBe(0.38);
+    expect(ov.starSize).toBe(50);
+    expect(ov.starCols).toBe(6);
+    expect(ov.starRotateWithPosition).toBe(false);
+    expect(ov.opacity).toBe(1);
   });
 });

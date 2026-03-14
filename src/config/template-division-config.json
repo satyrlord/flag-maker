@@ -1,0 +1,42 @@
+[
+  {
+    "id": "perPale",
+    "name": "Per Pale"
+  },
+  {
+    "id": "perFess",
+    "name": "Per Fess"
+  },
+  {
+    "id": "triV",
+    "name": "Tricolor V"
+  },
+  {
+    "id": "triH",
+    "name": "Tricolor H"
+  },
+  {
+    "id": "quartered",
+    "name": "Quartered"
+  },
+  {
+    "id": "perBend",
+    "name": "Per Bend"
+  },
+  {
+    "id": "perBendSin",
+    "name": "Per Bend Sin."
+  },
+  {
+    "id": "saltire",
+    "name": "Saltire"
+  },
+  {
+    "id": "centCross",
+    "name": "Centered Cross"
+  },
+  {
+    "id": "nordic",
+    "name": "Nordic Cross"
+  }
+]

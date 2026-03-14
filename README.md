@@ -6,6 +6,27 @@ Supports drag, edit, and export to **SVG/PNG**. Loads a
 `public/symbols.json` library (built-ins + your own) including **full
 multi-shape SVG emblems**.
 
+Templates are grouped into **Division**, **National**, and **State Level**
+sections so you can start from heraldic layouts, sovereign flags, or selected
+subnational flags such as England, Scotland, Wales, Catalunya, Euskadi, and
+Bavaria.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Language | TypeScript (strict mode, ES2020, DOM libs) |
+| Build | Vite 7 |
+| Styling | Tailwind CSS v4 (via `@tailwindcss/postcss` plugin) |
+| Components | DaisyUI 5 (component classes and custom themes) |
+| UI approach | No framework -- direct DOM manipulation with ES modules |
+| Testing | Vitest (unit/integration) + Playwright (e2e, headless) |
+| Coverage | `@vitest/coverage-v8` (Vitest) + Istanbul via `vite-plugin-istanbul` (Playwright) |
+| Path alias | `@/` maps to `src/` |
+| Node | >=20 (see `package.json` engines) |
+
 ---
 
 ## Quick Start
@@ -15,7 +36,6 @@ multi-shape SVG emblems**.
 - **Node.js 20+**.
   Check: `node -v`
 - **npm** 10+ (comes with Node 20+)
-- (Optional) **Python 3.9+** if you'll use the Wikimedia fetcher.
 
 ### 1) Install
 
@@ -62,14 +82,25 @@ npm run quality:full
 │  ├─ utils.ts              # Pure utilities (clamp, uid, starPath, download, svgToPng)
 │  ├─ geometry.ts           # Flag geometry (viewBox, stripe rect computation)
 │  ├─ overlays.ts           # Overlay builder functions (rect, poly, star, band)
-│  ├─ symbols.ts            # Built-in symbol definitions
+│  ├─ symbols.ts            # Built-in symbol registry (from generated catalog)
 │  ├─ symbolLoader.ts       # Fetch and merge symbols from symbols.json
-│  ├─ templates.ts          # Division templates and national flag presets
+│  ├─ templates.ts          # Division, national, and state-level template factories
+│  ├─ templateCatalog.ts    # Composes template groups from config files
+│  ├─ config/
+│  │  ├─ leftbar-config.json            # Leftbar UI config and declared template groups
+│  │  ├─ template-division-config.json  # Division template catalog entries
+│  │  ├─ national-division-config.json  # National template catalog entries
+│  │  ├─ substate-division-config.json  # State-level template catalog entries
+│  │  ├─ symbols-config.json            # Symbol source index (metadata files + svg dir)
+│  │  ├─ symbols-catalog.generated.json # Generated built-in runtime symbol catalog
+│  │  └─ symbols/                       # Source metadata and per-symbol SVG files
 │  ├─ vite-env.d.ts        # Vite client type declarations (CSS imports, env)
 │  └─ index.css             # Tailwind CSS import
 ├─ tools/
-│  ├─ fetch_emblems.py      # fetch official emblems from Wikimedia
-│  └─ svg2symbols.mjs       # convert a folder of SVGs → public/symbols.json
+│  ├─ fetch-emblems.ts       # fetch official emblems from Wikimedia
+│  ├─ fetch-symbols.ts       # fetch curated flag symbols into source metadata + SVG files
+│  ├─ build-symbol-catalog.ts # generate runtime symbol catalog from source metadata
+│  └─ svg2symbols.mjs       # convert a folder of SVGs -> public/symbols.json
 ├─ tailwind.config.js       # Tailwind config (legacy v3 format; v4 uses CSS-based config)
 ├─ postcss.config.js        # Tailwind v4 (using @tailwindcss/postcss)
 ├─ package.json
@@ -82,6 +113,8 @@ npm run quality:full
 
 - **Canvas**: choose orientation, aspect ratio, number of sections (stripes).
   Set each stripe's color + weight.
+- **Templates**: start from grayscale division templates, national flags, or
+  the new **State Level** preset group for selected subnational flags.
 - **Overlays**: add rectangle, circle, star, custom path, or **Symbol** from
   the dropdown.
   - Drag overlays directly on the flag.
@@ -108,31 +141,23 @@ in **`public/`**.
 
 ---
 
-## Adding Official Emblems (Two Tools)
+## Adding Official Emblems (Three Tools)
 
-### A) `fetch_emblems.py` – download SVG emblems from Wikimedia
+### A) `fetch-emblems.ts` -- download SVG emblems from Wikimedia
 
-Fetches original **SVG** emblem files (when available) for UN-recognized
+Fetches official **SVG** emblem files (coats of arms) for UN-recognized
 countries, then you can convert them into `symbols.json` with the converter
-(tool B).
-
-#### Setup
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install requests lxml
-```
+(tool C).
 
 #### IMPORTANT: Set a compliant User-Agent
 
 Edit the script header to include a real website/GitHub and email (Wikimedia
 policy):
 
-```python
-# inside tools/fetch_emblems.py
-CONTACT = "https://your-site-or-github ; email: you@example.com"
-USER_AGENT = f"FlagMakerCollector/1.0 ({CONTACT}) requests"
+```typescript
+// inside tools/fetch-emblems.ts
+const CONTACT = "https://your-site-or-github ; email: you@example.com";
+const USER_AGENT = `FlagMakerCollector/1.0 (${CONTACT}) node-fetch`;
 ```
 
 If you don't, Wikimedia may return **403 Forbidden**.
@@ -140,10 +165,10 @@ If you don't, Wikimedia may return **403 Forbidden**.
 #### Run it
 
 ```bash
-python tools/fetch_emblems.py
+npm run fetch-emblems
 ```
 
-- Downloads raw SVGs into `downloads/emblems/`.
+- Downloads raw SVGs into `public/emblems/`.
 - It's polite (rate-limited, retries, backoff) and merges results on subsequent
   runs.
 - Some countries may fail or have multiple variants; you can add filename
@@ -155,7 +180,70 @@ python tools/fetch_emblems.py
 
 ---
 
-### B) `svg2symbols.mjs` – convert SVG files → `public/symbols.json`
+### B) `fetch-symbols.ts` -- download curated flag symbols from Wikimedia
+
+Fetches individual flag symbols (suns, stars, eagles, heraldic charges, plants,
+etc.) from Wikimedia Commons using a curated manifest. These are symbols
+commonly *on* flags, not national coats of arms.
+
+#### User-Agent setup
+
+Same as tool A -- edit the CONTACT header in the script.
+
+#### Usage
+
+```bash
+npm run fetch-symbols
+```
+
+- Updates `src/config/symbols/metadata/*.json` and `src/config/symbols/svg/*.svg` by default.
+- Regenerates `src/config/symbols-catalog.generated.json` automatically after import.
+- Use `--out public/symbols.json` to write a flat runtime JSON file instead.
+- Use `--skip-existing` to skip symbols that are already defined in the source metadata.
+- Downloads are cached in `public/emblems/`; safe to re-run.
+
+#### Adding new symbols to the manifest
+
+Edit the `SYMBOL_MANIFEST` array in `tools/fetch-symbols.ts`. Each entry needs:
+
+```typescript
+{
+  id: "unique_id",
+  name: "Display Name",
+  category: "Celestial",  // or Heraldic, Cultural, Plants, Animals, etc.
+  titles: [
+    "Exact Wikimedia Commons File Title.svg",
+    "Fallback Title.svg",
+  ],
+}
+```
+
+The script tries each title in order, then falls back to a Commons search.
+
+After a successful default run, the app consumes the regenerated
+`src/config/symbols-catalog.generated.json` file automatically.
+
+---
+
+### C) `build-symbol-catalog.ts` -- generate built-in runtime symbols
+
+Builds `src/config/symbols-catalog.generated.json` from the split source files:
+
+- `src/config/symbols-config.json` for the source index
+- `src/config/symbols/metadata/*.json` for per-category metadata
+- `src/config/symbols/svg/*.svg` for SVG payloads
+
+Usage:
+
+```bash
+npm run build:symbols
+```
+
+Run this after any manual edit to symbol metadata or SVG source files.
+
+---
+
+### D) `svg2symbols.mjs` -- convert SVG files -> `public/symbols.json`
 
 Reads a folder of SVGs, **preserves viewBox**, inlines styles, and emits a
 `symbols.json` that your app loads. Can output **authentic colors** or
@@ -170,7 +258,7 @@ Both `svgo` and `fast-xml-parser` are already in `devDependencies`; just run
 npm i -D svgo@^4 fast-xml-parser
 ```
 
-#### Usage
+#### Converting SVGs
 
 Convert all SVGs in a folder to a merged `symbols.json`:
 
@@ -289,7 +377,7 @@ The app merges this with built-in symbols.
 
 ### Fetcher gets 403 from Wikimedia
 
-- You **must** set a descriptive User-Agent + contact in `fetch_emblems.py`.
+- You **must** set a descriptive User-Agent + contact in `fetch-emblems.ts`.
 - Try a smaller subset of countries while testing.
 - Be patient; the script has polite backoff/retries.
 

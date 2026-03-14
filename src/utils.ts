@@ -5,7 +5,14 @@
 export const clamp = (v: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, v));
 
-export const uid = (): string => Math.random().toString(36).slice(2, 9);
+export const uid = (): string => crypto.randomUUID();
+
+export interface SvgRasterOptions {
+  mimeType: "image/png" | "image/jpeg";
+  width: number;
+  height: number;
+  quality?: number;
+}
 
 /** Generate a 5-point (or n-point) star path centered at (cx, cy). */
 export function starPath(
@@ -52,6 +59,50 @@ export function download(
  * - The SVG references external resources blocked by CORS, tainting the canvas.
  * - The browser's image decoder is unavailable (e.g. in a worker context).
  */
+export function svgMarkupToRasterDataUrl(
+  markup: string,
+  { mimeType, width, height, quality }: SvgRasterOptions,
+): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const img = new Image();
+    const blob = new Blob([markup], { type: "image/svg+xml;charset=utf-8" });
+    const objectUrl = URL.createObjectURL(blob);
+    const cleanup = (): void => {
+      URL.revokeObjectURL(objectUrl);
+      img.onload = null;
+      img.onerror = null;
+    };
+    img.onerror = () => {
+      cleanup();
+      reject(new Error("Failed to load SVG as image"));
+    };
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          cleanup();
+          return resolve("");
+        }
+        if (mimeType === "image/jpeg") {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL(mimeType, quality);
+        cleanup();
+        resolve(dataUrl);
+      } catch (error) {
+        cleanup();
+        reject(error instanceof Error ? error : new Error("Failed to rasterize SVG"));
+      }
+    };
+    img.src = objectUrl;
+  });
+}
+
 export function svgToRaster(
   svgEl: SVGSVGElement,
   mimeType: "image/png" | "image/jpeg",
@@ -59,24 +110,11 @@ export function svgToRaster(
   quality?: number,
 ): Promise<string> {
   const xml = new XMLSerializer().serializeToString(svgEl);
-  const image64 = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`;
-  return new Promise<string>((resolve, reject) => {
-    const img = new Image();
-    img.onerror = () => reject(new Error("Failed to load SVG as image"));
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = svgEl.viewBox.baseVal.width * scale;
-      canvas.height = svgEl.viewBox.baseVal.height * scale;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return resolve("");
-      if (mimeType === "image/jpeg") {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL(mimeType, quality));
-    };
-    img.src = image64;
+  return svgMarkupToRasterDataUrl(xml, {
+    mimeType,
+    width: svgEl.viewBox.baseVal.width * scale,
+    height: svgEl.viewBox.baseVal.height * scale,
+    quality,
   });
 }
 

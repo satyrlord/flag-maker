@@ -30,10 +30,9 @@ describe("uid", () => {
     expect(typeof id).toBe("string");
   });
 
-  it("returns ids of expected length", () => {
+  it("returns a RFC 4122 UUID (36 characters, hex with hyphens)", () => {
     const id = uid();
-    expect(id.length).toBeGreaterThanOrEqual(5);
-    expect(id.length).toBeLessThanOrEqual(7);
+    expect(id).toMatch(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/);
   });
 
   it("returns unique ids on consecutive calls", () => {

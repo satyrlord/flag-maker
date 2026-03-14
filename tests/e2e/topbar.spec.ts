@@ -35,13 +35,13 @@ test.describe("Application settings (topbar)", () => {
   });
 
   test("has export dropdown that opens and closes", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await expect(exportBtn).toBeVisible();
     await exportBtn.click();
     const menu = page.locator('header [role="menu"]');
     await expect(menu).toBeVisible();
-    // Close by clicking elsewhere
-    await page.locator("header").click({ position: { x: 10, y: 10 } });
+    // Close by clicking the export button again (summary toggles details open/closed)
+    await exportBtn.click();
     await expect(menu).not.toBeVisible();
   });
 
@@ -52,7 +52,7 @@ test.describe("Application settings (topbar)", () => {
   });
 
   test("export menu has SVG, PNG, and JPG options", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const svgBtn = page.getByRole("menuitem", { name: /svg/i });
     const pngBtn = page.getByRole("menuitem", { name: /png/i });
@@ -70,7 +70,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("clicking Export SVG closes the menu", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const menu = page.locator('header [role="menu"]');
     await expect(menu).toBeVisible();
@@ -80,7 +80,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("Export SVG triggers a file download", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const svgBtn = page.getByRole("menuitem", { name: /svg/i });
     const [download] = await Promise.all([
@@ -91,7 +91,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("clicking Export PNG closes the menu", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const pngBtn = page.getByRole("menuitem", { name: /png/i });
     await pngBtn.click();
@@ -100,7 +100,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("Export PNG triggers a file download", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const pngBtn = page.getByRole("menuitem", { name: /png/i });
     const [download] = await Promise.all([
@@ -111,7 +111,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("clicking Export JPG closes the menu", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const jpgBtn = page.getByRole("menuitem", { name: /jpg/i });
     await jpgBtn.click();
@@ -120,7 +120,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("Export JPG triggers a file download", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const jpgBtn = page.getByRole("menuitem", { name: /jpg/i });
     const [download] = await Promise.all([
@@ -131,7 +131,7 @@ test.describe("Export menu interactions", () => {
   });
 
   test("toggling export button open then closed via button", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     const menu = page.locator('header [role="menu"]');
     await expect(menu).toBeVisible();
@@ -165,21 +165,21 @@ test.describe("Export error handling", () => {
   });
 
   test("Export PNG shows error toast when rasterization fails", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     await page.getByRole("menuitem", { name: /png/i }).click();
     await expect(page.locator("body")).toContainText(/PNG export failed/i);
   });
 
   test("Export JPG shows error toast when rasterization fails", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     await exportBtn.click();
     await page.getByRole("menuitem", { name: /jpg/i }).click();
     await expect(page.locator("body")).toContainText(/JPG export failed/i);
   });
 
   test("second export error replaces the first toast", async ({ page }) => {
-    const exportBtn = page.getByRole("button", { name: /export flag/i });
+    const exportBtn = page.locator('[aria-label="Export flag"]');
     // Trigger first error
     await exportBtn.click();
     await page.getByRole("menuitem", { name: /png/i }).click();

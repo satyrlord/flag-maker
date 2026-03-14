@@ -1,0 +1,34 @@
+[
+  {
+    "id": "trigram_geon",
+    "name": "Trigram Geon (Heaven)",
+    "category": "Geometric",
+    "svgFile": "trigram_geon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Geon.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "trigram_gon",
+    "name": "Trigram Gon (Earth)",
+    "category": "Geometric",
+    "svgFile": "trigram_gon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Gon.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "trigram_ri",
+    "name": "Trigram Ri (Fire)",
+    "category": "Geometric",
+    "svgFile": "trigram_ri.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Ri.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "trigram_gam",
+    "name": "Trigram Gam (Water)",
+    "category": "Geometric",
+    "svgFile": "trigram_gam.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Gam.svg",
+    "license": "Check file page on Wikimedia Commons"
+  }
+]

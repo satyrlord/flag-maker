@@ -1,6 +1,26 @@
 import { describe, it, expect } from "vitest";
-import { renderFlag, registerSymbols, getCurrentSvg, getCurrentRatio } from "@/flagRenderer";
+import { renderFlag, registerSymbols, getCurrentSvg, getCurrentRatio, computeStarPositions } from "@/flagRenderer";
 import type { FlagDesign, Overlay } from "@/types";
+
+/* Register test-only symbols so render tests do not depend on built-in config */
+registerSymbols([
+  { id: "test_path_sym", name: "Test Path", category: "Test", path: "M10 10 H90 V90 H10 Z" },
+  { id: "test_gen_sym", name: "Test Gen", category: "Test", generator: "star5" },
+  {
+    id: "test_svg_sym",
+    name: "Test SVG",
+    category: "Test",
+    viewBox: "0 0 10 10",
+    svg: "<defs><circle id=\"dot\" cx=\"5\" cy=\"5\" r=\"4\" /></defs><use href=\"#dot\" fill=\"#123456\" stroke=\"#123456\" />",
+  },
+  {
+    id: "test_multicolor_svg_sym",
+    name: "Test Multicolor SVG",
+    category: "Test",
+    viewBox: "0 0 10 10",
+    svg: "<circle cx=\"5\" cy=\"5\" r=\"4\" fill=\"#123456\" /><path d=\"M1 1 L9 9\" stroke=\"#abcdef\" stroke-width=\"1\" />",
+  },
+]);
 
 const baseDesign: FlagDesign = {
   orientation: "horizontal",
@@ -148,29 +168,6 @@ describe("renderFlag with overlays", () => {
     expect(ellipses[0].getAttribute("transform")).toContain("rotate(30");
   });
 
-  it("renders a star overlay as a path", () => {
-    const ov: Overlay = {
-      id: "s1", type: "star",
-      x: 50, y: 50, w: 20, h: 20,
-      rotation: 0, fill: "#FFFF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
-    };
-    const el = renderFlag(makeBase([ov]));
-    const paths = el.querySelectorAll("path");
-    expect(paths.length).toBe(1);
-    expect(paths[0].getAttribute("fill")).toBe("#FFFF00");
-  });
-
-  it("applies rotation on star overlay", () => {
-    const ov: Overlay = {
-      id: "s2", type: "star",
-      x: 50, y: 50, w: 20, h: 20,
-      rotation: 15, fill: "#FFFF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
-    };
-    const el = renderFlag(makeBase([ov]));
-    const paths = el.querySelectorAll("path");
-    expect(paths[0].getAttribute("transform")).toContain("rotate(15");
-  });
-
   it("renders a custom path overlay", () => {
     const ov: Overlay = {
       id: "p1", type: "custom",
@@ -243,7 +240,7 @@ describe("renderFlag with overlays", () => {
   it("renders a symbol overlay with built-in path symbol", () => {
     const ov: Overlay = {
       id: "sym1", type: "symbol",
-      symbolId: "greek_cross",
+      symbolId: "test_path_sym",
       x: 50, y: 50, w: 20, h: 20,
       rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
     };
@@ -255,7 +252,7 @@ describe("renderFlag with overlays", () => {
   it("renders a symbol overlay with star5 generator", () => {
     const ov: Overlay = {
       id: "sym2", type: "symbol",
-      symbolId: "star5",
+      symbolId: "test_gen_sym",
       x: 50, y: 50, w: 20, h: 20,
       rotation: 0, fill: "#FFFF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
     };
@@ -267,13 +264,49 @@ describe("renderFlag with overlays", () => {
   it("applies rotation on symbol overlay", () => {
     const ov: Overlay = {
       id: "sym3", type: "symbol",
-      symbolId: "greek_cross",
+      symbolId: "test_path_sym",
       x: 50, y: 50, w: 20, h: 20,
       rotation: 45, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
     };
     const el = renderFlag(makeBase([ov]));
     const nestedSvgs = el.querySelectorAll("svg > svg");
     expect(nestedSvgs[0].getAttribute("transform")).toContain("rotate(45");
+  });
+
+  it("normalizes imported svg symbols so overlay tinting applies consistently", () => {
+    const ov: Overlay = {
+      id: "sym4", type: "symbol",
+      symbolId: "test_svg_sym",
+      x: 50, y: 50, w: 20, h: 20,
+      rotation: 0, fill: "#abcdef", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    };
+    const el = renderFlag(makeBase([ov]));
+    const nested = el.querySelector<SVGSVGElement>("svg > svg");
+    const use = nested?.querySelector("use");
+    expect(nested).not.toBeNull();
+    expect(nested?.querySelector("defs")).not.toBeNull();
+    expect(nested?.style.color).not.toBe("");
+    expect(nested?.getAttribute("overflow")).toBe("visible");
+    expect(use?.getAttribute("fill")).toBe("currentColor");
+    expect(use?.getAttribute("stroke")).toBe("currentColor");
+  });
+
+  it("preserves multicolor imported svg symbol paint in the rendered output", () => {
+    const ov: Overlay = {
+      id: "sym-multi", type: "symbol",
+      symbolId: "test_multicolor_svg_sym",
+      x: 50, y: 50, w: 20, h: 20,
+      rotation: 0, fill: "#fedf00", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    };
+    const el = renderFlag(makeBase([ov]));
+    const nested = el.querySelector<SVGSVGElement>("svg > svg");
+    const circle = nested?.querySelector("circle");
+    const path = nested?.querySelector("path");
+
+    expect(nested).not.toBeNull();
+    expect(nested?.style.color).not.toBe("");
+    expect(circle?.getAttribute("fill")).toBe("#123456");
+    expect(path?.getAttribute("stroke")).toBe("#abcdef");
   });
 
   it("ignores symbol overlay with unknown symbolId", () => {
@@ -360,5 +393,264 @@ describe("getCurrentSvg", () => {
     // after a render call it must return the last rendered SVG
     const el = renderFlag(baseDesign);
     expect(getCurrentSvg()).toBe(el);
+  });
+});
+
+describe("data-overlay-id attribute", () => {
+  const makeBase = (overlays: Overlay[]): FlagDesign => ({
+    ...baseDesign,
+    sections: 1,
+    weights: [1],
+    colors: ["#FFFFFF"],
+    overlays,
+  });
+
+  it("sets data-overlay-id on rendered overlay elements", () => {
+    const ov: Overlay = {
+      id: "ov-test-1", type: "rectangle",
+      x: 50, y: 50, w: 30, h: 20,
+      rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    };
+    const el = renderFlag(makeBase([ov]));
+    const tagged = el.querySelector("[data-overlay-id='ov-test-1']");
+    expect(tagged).not.toBeNull();
+  });
+
+  it("sets data-overlay-id on symbol overlays", () => {
+    const ov: Overlay = {
+      id: "sym-test-1", type: "symbol",
+      symbolId: "test_gen_sym",
+      x: 50, y: 50, w: 20, h: 20,
+      rotation: 0, fill: "#FFFF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    };
+    const el = renderFlag(makeBase([ov]));
+    const tagged = el.querySelector("[data-overlay-id='sym-test-1']");
+    expect(tagged).not.toBeNull();
+  });
+
+  it("does not set data-overlay-id on hidden overlays", () => {
+    const ov: Overlay = {
+      id: "hidden-1", type: "rectangle",
+      x: 50, y: 50, w: 30, h: 20,
+      rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      visible: false,
+    };
+    const el = renderFlag(makeBase([ov]));
+    const tagged = el.querySelector("[data-overlay-id='hidden-1']");
+    expect(tagged).toBeNull();
+  });
+});
+
+describe("computeStarPositions", () => {
+  const makeStarfieldOv = (dist: string, count: number, cols = 6): Overlay => ({
+    id: "sf1", type: "starfield",
+    x: 50, y: 50, w: 40, h: 40,
+    rotation: 0, fill: "#FFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    starDistribution: dist,
+    starCount: count,
+    starCols: cols,
+    starPoints: 5,
+    starPointLength: 0.38,
+    starSize: 50,
+  });
+
+  it("ring distribution returns correct count of positions", () => {
+    const positions = computeStarPositions(makeStarfieldOv("ring", 12), 400, 400);
+    expect(positions).toHaveLength(12);
+  });
+
+  it("ring positions lie on an ellipse within bounding box", () => {
+    const bw = 400, bh = 300;
+    const positions = computeStarPositions(makeStarfieldOv("ring", 8), bw, bh);
+    for (const p of positions) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(bw);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(bh);
+    }
+  });
+
+  it("grid distribution creates count positions", () => {
+    const positions = computeStarPositions(makeStarfieldOv("grid", 9, 3), 300, 300);
+    expect(positions).toHaveLength(9);
+  });
+
+  it("staggered-grid produces 50 positions for US flag layout", () => {
+    const positions = computeStarPositions(makeStarfieldOv("staggered-grid", 50, 6), 400, 300);
+    expect(positions).toHaveLength(50);
+  });
+
+  it("line distribution arranges stars horizontally", () => {
+    const positions = computeStarPositions(makeStarfieldOv("line", 5), 500, 100);
+    expect(positions).toHaveLength(5);
+    // All stars should have the same y coordinate (center)
+    const ys = positions.map((p) => p.y);
+    expect(new Set(ys).size).toBe(1);
+  });
+
+  it("arc distribution returns correct count", () => {
+    const positions = computeStarPositions(makeStarfieldOv("arc", 4), 400, 400);
+    expect(positions).toHaveLength(4);
+  });
+
+  it("returns empty array for unknown distribution", () => {
+    const positions = computeStarPositions(makeStarfieldOv("unknown", 6), 400, 400);
+    expect(positions).toHaveLength(0);
+  });
+
+  it("staggered-grid positions all lie within bounding box", () => {
+    const bw = 400, bh = 300;
+    const positions = computeStarPositions(makeStarfieldOv("staggered-grid", 50, 6), bw, bh);
+    for (const p of positions) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(bw);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(bh);
+    }
+  });
+
+  it("grid positions all lie within bounding box", () => {
+    const bw = 300, bh = 300;
+    const positions = computeStarPositions(makeStarfieldOv("grid", 9, 3), bw, bh);
+    for (const p of positions) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(bw);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(bh);
+    }
+  });
+
+  it("line positions all have zero rotation", () => {
+    const positions = computeStarPositions(makeStarfieldOv("line", 5), 500, 100);
+    for (const p of positions) {
+      expect(p.rotation).toBe(0);
+    }
+  });
+
+  it("arc positions spread in a quarter-circle arc", () => {
+    const bw = 400, bh = 400;
+    const positions = computeStarPositions(makeStarfieldOv("arc", 4), bw, bh);
+    expect(positions).toHaveLength(4);
+    // All positions should be within bounds
+    for (const p of positions) {
+      expect(p.x).toBeGreaterThanOrEqual(-10);
+      expect(p.x).toBeLessThanOrEqual(bw + 10);
+      expect(p.y).toBeGreaterThanOrEqual(-10);
+      expect(p.y).toBeLessThanOrEqual(bh + 10);
+    }
+  });
+});
+
+describe("renderFlag with starfield overlay", () => {
+  const makeBase2 = (overlays: Overlay[]): FlagDesign => ({
+    ...baseDesign,
+    sections: 1,
+    weights: [1],
+    colors: ["#002868"],
+    overlays,
+  });
+
+  it("renders starfield as a group with star paths", () => {
+    const ov: Overlay = {
+      id: "sf-render", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-render']");
+    expect(group).not.toBeNull();
+    const paths = group!.querySelectorAll("path");
+    expect(paths).toHaveLength(12);
+  });
+
+  it("does not render hidden starfield", () => {
+    const ov: Overlay = {
+      id: "sf-hidden", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 6,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+      visible: false,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-hidden']");
+    expect(group).toBeNull();
+  });
+
+  it("renders starfield with rotation transform", () => {
+    const ov: Overlay = {
+      id: "sf-rot", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 45, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "grid", starCount: 4,
+      starCols: 2,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-rot']");
+    expect(group).not.toBeNull();
+    expect(group!.getAttribute("transform")).toContain("rotate(45");
+  });
+
+  it("renders starfield with staggered-grid distribution", () => {
+    const ov: Overlay = {
+      id: "sf-stag", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "staggered-grid", starCount: 11,
+      starCols: 3,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-stag']");
+    expect(group).not.toBeNull();
+    const paths = group!.querySelectorAll("path");
+    expect(paths).toHaveLength(11);
+  });
+
+  it("renders starfield with line distribution", () => {
+    const ov: Overlay = {
+      id: "sf-line", type: "starfield",
+      x: 50, y: 50, w: 80, h: 20,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "line", starCount: 5,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-line']");
+    expect(group).not.toBeNull();
+    const paths = group!.querySelectorAll("path");
+    expect(paths).toHaveLength(5);
+  });
+
+  it("renders starfield with arc distribution", () => {
+    const ov: Overlay = {
+      id: "sf-arc", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "arc", starCount: 4,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-arc']");
+    expect(group).not.toBeNull();
+    const paths = group!.querySelectorAll("path");
+    expect(paths).toHaveLength(4);
+  });
+
+  it("applies opacity less than 1 on starfield", () => {
+    const ov: Overlay = {
+      id: "sf-opac", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 0.7,
+      starDistribution: "ring", starCount: 4,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    const el = renderFlag(makeBase2([ov]));
+    const group = el.querySelector("g[data-overlay-id='sf-opac']");
+    expect(group).not.toBeNull();
+    expect(group!.getAttribute("opacity")).toBe("0.7");
   });
 });

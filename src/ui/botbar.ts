@@ -17,7 +17,7 @@ export interface BotbarHandle {
 
 export function createBotbar(): BotbarHandle {
   const bar = document.createElement("div");
-  bar.className = "botbar";
+  bar.className = "join botbar";
   bar.setAttribute("role", "toolbar");
   bar.setAttribute("aria-label", "Zoom Level");
 
@@ -26,19 +26,19 @@ export function createBotbar(): BotbarHandle {
   // Zoom out button
   const btnOut = document.createElement("button");
   btnOut.type = "button";
-  btnOut.className = "botbar-btn";
+  btnOut.className = "join-item btn btn-ghost btn-circle btn-sm";
   btnOut.textContent = "\u2212";
   btnOut.setAttribute("aria-label", "Zoom out");
 
   // Zoom level display
   const level = document.createElement("span");
-  level.className = "botbar-level";
+  level.className = "join-item botbar-level";
   level.textContent = `${zoom}%`;
 
   // Zoom in button
   const btnIn = document.createElement("button");
   btnIn.type = "button";
-  btnIn.className = "botbar-btn";
+  btnIn.className = "join-item btn btn-ghost btn-circle btn-sm";
   btnIn.textContent = "+";
   btnIn.setAttribute("aria-label", "Zoom in");
 

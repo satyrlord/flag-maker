@@ -63,6 +63,21 @@ test.describe("Dynamic Tools (rightbar)", () => {
     await expect(rightbar).toHaveCSS("top", /px$/);
   });
 
+  test("shift+arrow moves the drag handle by a larger step", async ({ page }) => {
+    const rightbar = page.getByRole("toolbar", { name: "Dynamic Tools" });
+    const handle = page.locator(".rightbar-drag-handle");
+
+    await handle.focus();
+    // Shift+arrow uses step=32 instead of step=16
+    await handle.evaluate((element) => {
+      element.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true, bubbles: true }));
+      // A second press exercises the ensureCustomPosition early-return path
+      element.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true, bubbles: true }));
+    });
+
+    await expect(rightbar).toHaveClass(/rightbar-custom-pos/);
+  });
+
   test("responds to visibility events", async ({ page }) => {
     const rightbar = page.getByRole("toolbar", { name: "Dynamic Tools" });
     await page.locator("#root").evaluate((root) => {
@@ -86,23 +101,24 @@ test.describe("Dynamic Tools (rightbar)", () => {
     await expect(rightbar).not.toHaveClass(/rightbar-visible/);
   });
 
-  test("grid button cycles through cyan, magenta, off", async ({ page }) => {
+  test("grid button cycles through auto-selected color, off, and back", async ({ page }) => {
     const gridBtn = page.getByRole("button", { name: "Toggle pixel grid" });
     await expect(gridBtn).toBeVisible();
     await expect(gridBtn).toHaveAttribute("aria-pressed", "false");
 
-    // Click 1: off -> cyan
+    // Click 1: off -> auto-selected magenta for the default Per Pale startup flag
     await gridBtn.click();
     await expect(gridBtn).toHaveAttribute("aria-pressed", "true");
-    await expect(gridBtn).toHaveClass(/rightbar-btn-cyan/);
-
-    // Click 2: cyan -> magenta
-    await gridBtn.click();
     await expect(gridBtn).toHaveClass(/rightbar-btn-magenta/);
 
-    // Click 3: magenta -> off
+    // Click 2: auto-selected color -> off
     await gridBtn.click();
     await expect(gridBtn).toHaveAttribute("aria-pressed", "false");
+
+    // Click 3: off -> auto-selected color again
+    await gridBtn.click();
+    await expect(gridBtn).toHaveAttribute("aria-pressed", "true");
+    await expect(gridBtn).toHaveClass(/rightbar-btn-magenta/);
   });
 
   test("grid button shows a grid overlay on the flag when active", async ({ page }) => {
@@ -112,7 +128,6 @@ test.describe("Dynamic Tools (rightbar)", () => {
     await expect(gridSvg).toBeAttached();
 
     // Turn off
-    await gridBtn.click(); // magenta
     await gridBtn.click(); // off
     await expect(gridSvg).not.toBeAttached();
   });
@@ -208,12 +223,12 @@ test.describe("Dynamic Tools (rightbar)", () => {
     await expect(page.locator(".grid-overlay")).not.toBeAttached();
   });
 
-  test("grid auto-selects cyan when the flag is dark-colored", async ({ page }) => {
-    // The default flag (France: red/white/blue) has average luminance < 0.5
-    // so pickGridColor should return cyan.
+  test("grid auto-selects magenta when the default flag is light-dominant", async ({ page }) => {
+    // The default Per Pale template mixes a very dark field with a very light one,
+    // yielding a light-dominant average luminance that should prefer magenta.
     const gridBtn = page.getByRole("button", { name: "Toggle pixel grid" });
     await gridBtn.click();
-    await expect(gridBtn).toHaveClass(/rightbar-btn-cyan/);
+    await expect(gridBtn).toHaveClass(/rightbar-btn-magenta/);
   });
 
   test("grid auto-selects magenta when the flag is light-colored", async ({ page }) => {

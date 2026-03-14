@@ -6,7 +6,7 @@ This document defines the visual layout, interaction rules, and design constrain
 
 ## Global Layout
 
-The app uses a **fixed full-viewport layout** with four sections arranged in a single screen — no scrolling, no overflow, no content extending beyond the viewport on any axis.
+The app uses a **fixed full-viewport layout** with four sections arranged in a single screen — no global scrolling (individual section scrolling is still permitted), no overflow, no content extending beyond the viewport on any axis.
 
 ```text
 ┌──────────────────────────────────────────────────────┐
@@ -24,7 +24,7 @@ The app uses a **fixed full-viewport layout** with four sections arranged in a s
 ├─────────┴─────────────────────────────────────┴──────┤
 ```
 
-All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, Zoom Level (botbar), and Dynamic Tools (rightbar) — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls. The Zoom Level (botbar) floats over the canvas area near the bottom center. The Dynamic Tools (rightbar) is always visible, floating at the right edge. Its contents are dynamic and contextual -- tool buttons appear and change based on the current editing context.
+All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag Canvas, Zoom Level (botbar), and Dynamic Tools (rightbar) — are **position-fixed or fit within a fixed flex/grid layout** so nothing ever scrolls (individual section scrolling is still permitted). The Zoom Level (botbar) floats over the canvas area near the bottom center. The Dynamic Tools (rightbar) is always visible, floating at the right edge. Its contents are dynamic and contextual -- tool buttons appear and change based on the current editing context.
 
 ---
 
@@ -110,21 +110,10 @@ All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 
 ## Interaction Constraints
 
-### No Scrollbars — Ever
+### No Global Scrollbars
 
 - `html, body` must have `overflow: hidden` at all times.
-- No element should produce visible scrollbars on desktop or mobile.
-- Internal overflow within the Flag Editor (leftbar) uses hidden-scrollbar techniques:
-
-  ```css
-  .toolbar-scroll {
-    overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
-  }
-  .toolbar-scroll::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge */
-  }
-  ```
+- No element should produce global scrollbars on desktop or mobile (individual section scrolling is still permitted).
 
 ### No Text Selection
 
@@ -142,7 +131,7 @@ All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 
 ### No Mobile Swiping / Pull-to-Refresh
 
-- Disable touch-based scrolling and browser gestures on the app shell:
+- Disable touch-based scrolling and browser gestures on the app shell (individual section scrolling is still permitted):
 
   ```css
   html, body {
@@ -163,37 +152,53 @@ All five sections — Application Settings (topbar), Flag Editor (leftbar), Flag
 
 ## Theming
 
-### Dark Mode (Default)
+Theming is managed by **DaisyUI 5 custom themes** defined in `src/index.css`. Two themes are configured:
 
-| Element          | Color                    |
-| ---------------- | ------------------------ |
-| Topbar bg        | `#1e1e2e`                |
-| Leftbar bg       | `#252535`                |
-| Canvas bg        | `#2a2a2a`                |
-| Botbar bg        | `rgba(30,30,46,0.85)`    |
-| Rightbar bg      | `rgba(30,30,46,0.85)`    |
-| Text (primary)   | `#e0e0e0`                |
-| Text (secondary) | `#888`                   |
-| Accent           | `#4a9eff`                |
-| Button hover     | `rgba(255,255,255,0.08)` |
-| Dividers         | `rgba(255,255,255,0.06)` |
+- `flagmaker-dark` (default, `--prefersdark true`)
+- `flagmaker-light` (`--prefersdark false`)
 
-### Light Mode
+Theme switching sets both `data-theme="flagmaker-dark"` / `data-theme="flagmaker-light"` on `<html>` (for DaisyUI) and `class="dark"` / `class="light"` (for backward-compatible legacy CSS).
 
-| Element          | Color                    |
-| ---------------- | ------------------------ |
-| Topbar bg        | `#ffffff`                |
-| Leftbar bg       | `#f5f5f5`                |
-| Canvas bg        | `#d0d0d0`                |
-| Botbar bg        | `rgba(255,255,255,0.85)` |
-| Rightbar bg      | `rgba(255,255,255,0.85)` |
-| Text (primary)   | `#1a1a1a`                |
-| Text (secondary) | `#666`                   |
-| Accent           | `#0066cc`                |
-| Button hover     | `rgba(0,0,0,0.05)`       |
-| Dividers         | `rgba(0,0,0,0.08)`       |
+### Dark Mode (Default) — `flagmaker-dark`
 
-Theme toggling applies a class (`dark` / `light`) on `<html>` and all colors are driven by CSS custom properties or Tailwind's dark mode variants.
+| DaisyUI Variable | Hex Value | Usage |
+| --- | --- | --- |
+| `--color-base-100` | `#2a2a2a` | Canvas background |
+| `--color-base-200` | `#252535` | Leftbar background |
+| `--color-base-300` | `#1e1e2e` | Topbar background, borders |
+| `--color-base-content` | `#e0e0e0` | Primary text |
+| `--color-primary` | `#4a9eff` | Accent / highlights |
+| `--color-primary-content` | `#ffffff` | Text on primary color |
+| `--color-secondary` | `#888888` | Secondary text |
+| `--color-neutral` | `#1e1e2e` | Floating bars (botbar, rightbar) |
+
+### Light Mode — `flagmaker-light`
+
+| DaisyUI Variable | Hex Value | Usage |
+| --- | --- | --- |
+| `--color-base-100` | `#d0d0d0` | Canvas background |
+| `--color-base-200` | `#f5f5f5` | Leftbar background |
+| `--color-base-300` | `#ffffff` | Topbar background, borders |
+| `--color-base-content` | `#1a1a1a` | Primary text |
+| `--color-primary` | `#0066cc` | Accent / highlights |
+| `--color-primary-content` | `#ffffff` | Text on primary color |
+| `--color-secondary` | `#666666` | Secondary text |
+| `--color-neutral` | `#ffffff` | Floating bars (botbar, rightbar) |
+
+### Legacy CSS Custom Properties
+
+The following CSS custom properties are still defined in both `.dark` and `.light` class blocks in `src/index.css` for backward compatibility. **New code should use DaisyUI semantic color classes or oklch variables instead.**
+
+| Property | Dark Value | Light Value |
+| --- | --- | --- |
+| `--topbar-bg` | `#1e1e2e` | `#ffffff` |
+| `--toolbar-bg` | `#252535` | `#f5f5f5` |
+| `--canvas-bg` | `#2a2a2a` | `#d0d0d0` |
+| `--text-primary` | `#e0e0e0` | `#1a1a1a` |
+| `--text-secondary` | `#888` | `#666` |
+| `--accent` | `#4a9eff` | `#0066cc` |
+| `--btn-hover` | `rgba(255,255,255,0.08)` | `rgba(0,0,0,0.05)` |
+| `--divider` | `rgba(255,255,255,0.06)` | `rgba(0,0,0,0.08)` |
 
 ---
 
@@ -215,7 +220,76 @@ Theme toggling applies a class (`dark` / `light`) on `<html>` and all colors are
 
 ## Dropdowns (`<select>`)
 
-All `<select>` dropdown elements throughout the app must use the `toolbar-sort-select` CSS class (defined in `src/index.css`). This class provides theme-aware text color, transparent background, proper border styling, focus ring, and correctly themed `<option>` elements in both dark and light mode. Additional sizing classes (e.g. `h-8 text-sm`) may be combined as needed, but `toolbar-sort-select` is the required base class for every `<select>`.
+All `<select>` dropdown elements throughout the app must use DaisyUI's `select` component classes (e.g. `select select-sm select-ghost`). These provide theme-aware styling automatically through DaisyUI's semantic color system. Additional sizing or variant classes may be combined as needed.
+
+---
+
+## UI Component Framework: DaisyUI 5
+
+The project uses **DaisyUI 5** as its component library on top of Tailwind CSS 4. DaisyUI provides semantic, theme-aware CSS classes for common UI components, reducing the need for custom CSS.
+
+### Installation and Configuration
+
+DaisyUI is installed as a dev dependency and configured in `src/index.css`:
+
+```css
+@plugin "daisyui" {
+  themes: flagmaker-dark --default, flagmaker-light --prefersdark false;
+  logs: false;
+}
+```
+
+Two custom themes are defined using `@plugin "daisyui/theme"` blocks that map to the app's existing color palette.
+
+### Key Rules for DaisyUI Usage
+
+1. **Use DaisyUI component classes** (`btn`, `navbar`, `dropdown`, `menu`, `select`, `input`, `badge`, `join`, `tabs`, `swap`, `alert`, `divider`, `toggle`) instead of building components from scratch with Tailwind utility classes alone.
+2. **Use DaisyUI semantic colors** (`base-100`, `base-200`, `base-300`, `base-content`, `primary`, `secondary`, `accent`, `neutral`, `info`, `success`, `warning`, `error`) instead of hardcoded Tailwind color names. These adapt automatically when themes change.
+3. **No `dark:` prefix needed** -- DaisyUI colors respond to the active `data-theme` attribute on `<html>`, not the `dark` class. The `dark` class is kept for backward compatibility, but new code should rely on DaisyUI's theme system.
+4. **Theme switching:** Toggle both `class="dark"/"light"` on `<html>` and `data-theme="flagmaker-dark"/"flagmaker-light"`. The `data-theme` attribute controls DaisyUI colors; the class controls any remaining legacy CSS custom properties.
+5. **Component class order:** component class first, then part classes, then style/color/size modifiers, then Tailwind utilities. Example: `btn btn-ghost btn-sm btn-square`.
+6. **Dropdowns:** Use `<details class="dropdown">` with `<summary>` as trigger and `<ul class="dropdown-content menu">` as the menu. This is the DaisyUI 5 pattern.
+7. **Size classes:** The custom themes set `--size-selector` and `--size-field` to `0.21875rem` for a compact, tool-like UI. Avoid overriding these unless necessary.
+
+### DaisyUI Component Mapping
+
+| UI Element | DaisyUI Classes |
+| --- | --- |
+| Topbar | `navbar bg-base-300` |
+| Topbar buttons | `btn btn-ghost btn-sm btn-square` |
+| Theme toggle | `btn btn-ghost btn-sm btn-square` with icon swap |
+| Export dropdown | `dropdown dropdown-end` (`<details>`) |
+| Export menu | `dropdown-content menu bg-base-300 rounded-box` |
+| Export size select | `select select-sm select-ghost` |
+| Tab strip buttons | `btn btn-ghost btn-sm btn-square toolbar-tab-btn` |
+| Leftbar aside | `bg-base-200 border-r border-base-300` |
+| Ratio/orient/count buttons | `btn btn-outline btn-xs` |
+| Add overlay buttons | `btn btn-outline btn-xs` |
+| Category filter buttons | `btn btn-xs` |
+| Search input | `input input-sm input-bordered` |
+| Botbar container | `join botbar` |
+| Botbar buttons | `join-item btn btn-ghost btn-circle btn-sm` |
+| Rightbar buttons | `btn btn-ghost btn-sm btn-square rightbar-btn` |
+| Grid size menu | `menu bg-base-300 rounded-box shadow-lg` |
+| Layer badges | `badge badge-sm` |
+| Dividers | `divider divider-horizontal` |
+| Error toasts | `alert alert-error` |
+
+### CSS Custom Property References
+
+In `src/index.css`, use DaisyUI's oklch-based CSS variables for colors:
+
+- `oklch(var(--b1))` -- base-100 (canvas background)
+- `oklch(var(--b2))` -- base-200 (leftbar background)
+- `oklch(var(--b3))` -- base-300 (topbar background, borders)
+- `oklch(var(--bc))` -- base-content (primary text)
+- `oklch(var(--p))` -- primary (accent color)
+- `oklch(var(--sc))` -- secondary-content (secondary text)
+- `oklch(var(--n))` -- neutral (floating bar backgrounds)
+
+### Legacy Compatibility
+
+Legacy CSS custom properties (`--topbar-bg`, `--toolbar-bg`, `--canvas-bg`, `--text-primary`, `--text-secondary`, `--accent`, `--btn-hover`, `--divider`) are still defined in `src/index.css` for any remaining custom CSS that has not been migrated to DaisyUI semantic colors. New code should prefer DaisyUI classes and color variables over these legacy properties.
 
 ---
 

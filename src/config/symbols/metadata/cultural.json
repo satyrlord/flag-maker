@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ashoka_chakra",
+    "name": "Ashoka Chakra",
+    "category": "Cultural",
+    "svgFile": "ashoka_chakra.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ashoka_Chakra.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "taeguk",
+    "name": "Taeguk (Yin-Yang)",
+    "category": "Cultural",
+    "svgFile": "taeguk.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Taegeuk.svg",
+    "license": "Check file page on Wikimedia Commons"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"\\\\[\\\\.\\\\.\\\\..*\\\\]\\\\s*as\\\\|spread operator\\\\|clone\" /d/dev/flag-maker/src/*.ts /d/dev/flag-maker/src/ui/*.ts)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

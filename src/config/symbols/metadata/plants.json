@@ -1,0 +1,26 @@
+[
+  {
+    "id": "olive_branch",
+    "name": "Olive Branch",
+    "category": "Plants",
+    "svgFile": "olive_branch.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Olive_branch.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "maple_leaf",
+    "name": "Maple Leaf (Canada)",
+    "category": "Plants",
+    "svgFile": "maple_leaf.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(leaf).svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "cedar_lebanon",
+    "name": "Cedar (Lebanon)",
+    "category": "Plants",
+    "svgFile": "cedar_lebanon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lebanon_-_Cedar_Tree.svg",
+    "license": "Check file page on Wikimedia Commons"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "dragon_heraldic",
+    "name": "Dragon (Heraldic)",
+    "category": "Animals",
+    "svgFile": "dragon_heraldic.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Welsh_dragon.svg",
+    "license": "Check file page on Wikimedia Commons"
+  }
+]

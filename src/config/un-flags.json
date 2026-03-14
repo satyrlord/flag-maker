@@ -1,0 +1,2362 @@
+[
+  {
+    "id": "afghanistan",
+    "name": "Afghanistan",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#000000", "#D32011", "#007A36"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "afghanistan_emblem", "x": 50, "y": 50, "w": 25, "h": 55, "fill": "#D4AF37"}
+    ]
+  },
+  {
+    "id": "albania",
+    "name": "Albania",
+    "ratio": [5, 7],
+    "sections": 1,
+    "colors": ["#E41E20"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "albania_eagle", "x": 50, "y": 50, "w": 80, "h": 90, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "algeria",
+    "name": "Algeria",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 2,
+    "colors": ["#006633", "#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "algeria_crescent_star", "x": 50, "y": 50, "w": 32, "h": 50, "fill": "#D21034"}
+    ]
+  },
+  {
+    "id": "american_samoa",
+    "name": "American Samoa",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#002868"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 50], [100, 0], [100, 100]], "fill": "#BF0A30"},
+      {"type": "polygon", "points": [[7, 50], [100, 7], [100, 93]], "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "american_samoa_eagle", "x": 63, "y": 50, "w": 35, "h": 45}
+    ]
+  },
+  {
+    "id": "andorra",
+    "name": "Andorra",
+    "ratio": [7, 10],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#003DA5", "#FEDD00", "#D20000"],
+    "weights": [8, 8, 8],
+    "overlays": [
+      {"type": "symbol", "symbolId": "andorra_emblem", "x": 50, "y": 50, "w": 22, "h": 40}
+    ]
+  },
+  {
+    "id": "angola",
+    "name": "Angola",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#CC0000", "#000000"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "angola_flag_emblem", "x": 50, "y": 50, "w": 40, "h": 50, "fill": "#FFCB00"}
+    ]
+  },
+  {
+    "id": "anguilla",
+    "name": "Anguilla",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#012169"},
+      {"type": "symbol", "symbolId": "union_jack", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "anguilla_emblem", "x": 75, "y": 50, "w": 30, "h": 40, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "antigua_and_barbuda",
+    "name": "Antigua and Barbuda",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [100, 0], [93.5, 50], [6.5, 50]], "fill": "#000000"},
+      {"type": "symbol", "symbolId": "antigua_rising_sun", "x": 50, "y": 28, "w": 44, "h": 44, "fill": "#FCD116"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 87, "h": 21.7, "fill": "#0072C6"},
+      {"type": "polygon", "points": [[0, 0], [50, 100], [100, 0], [100, 100], [0, 100]], "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "argentina",
+    "name": "Argentina",
+    "ratio": [9, 14],
+    "sections": 3,
+    "colors": ["#74ACDF", "#FFFFFF", "#74ACDF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "sol_de_mayo", "x": 50, "y": 50, "w": 20, "h": 20, "fill": "#F6B40E"}
+    ]
+  },
+  {
+    "id": "armenia",
+    "name": "Armenia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#D90012", "#0033A0", "#F2A800"]
+  },
+  {
+    "id": "australia",
+    "name": "Australia",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#003F87"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "union_jack", "x": 12.5, "y": 25, "w": 25, "h": 50, "fill": "#FFFFFF"},
+      {"type": "star", "x": 12.5, "y": 75, "size": 8, "fill": "#FFFFFF", "points": 7, "pointLength": 0.4},
+      {"type": "star", "x": 75.6, "y": 16.7, "size": 6, "fill": "#FFFFFF", "points": 7, "pointLength": 0.4},
+      {"type": "star", "x": 91.4, "y": 35.4, "size": 5, "fill": "#FFFFFF", "points": 7, "pointLength": 0.4},
+      {"type": "star", "x": 78.9, "y": 73.6, "size": 7, "fill": "#FFFFFF", "points": 7, "pointLength": 0.4},
+      {"type": "star", "x": 63.1, "y": 48.3, "size": 6, "fill": "#FFFFFF", "points": 7, "pointLength": 0.4},
+      {"type": "star", "x": 84.5, "y": 58.3, "size": 3.5, "fill": "#FFFFFF", "points": 5, "pointLength": 0.4}
+    ]
+  },
+  {
+    "id": "austria",
+    "name": "Austria",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#ED2939", "#FFFFFF", "#ED2939"]
+  },
+  {
+    "id": "azerbaijan",
+    "name": "Azerbaijan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#00B5E2", "#EF3340", "#509E2F"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "azerbaijan_crescent_star", "x": 50, "y": 50, "w": 21, "h": 30, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "bahamas",
+    "name": "Bahamas",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#00778B", "#FFC72C", "#00778B"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "bahrain",
+    "name": "Bahrain",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#DA291C"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [24.38, 0], [32.5, 10], [24.38, 20], [32.5, 30], [24.38, 40], [32.5, 50], [24.38, 60], [32.5, 70], [24.38, 80], [32.5, 90], [24.38, 100], [0, 100]], "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "bangladesh",
+    "name": "Bangladesh",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#006A4E"],
+    "overlays": [
+      {"type": "circle", "x": 45, "y": 50, "w": 40, "h": 66.67, "fill": "#DA291C"}
+    ]
+  },
+  {
+    "id": "barbados",
+    "name": "Barbados",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#012169", "#F3D54E", "#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "barbados_trident", "x": 50, "y": 50, "w": 22, "h": 55, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "belarus",
+    "name": "Belarus",
+    "ratio": [1, 2],
+    "sections": 2,
+    "colors": ["#CE1126", "#009739"],
+    "weights": [2, 1],
+    "overlays": [
+      {"type": "rectangle", "x": 5, "y": 50, "w": 10, "h": 100, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "belarus_ornament", "x": 5, "y": 50, "w": 10, "h": 100, "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "belgium",
+    "name": "Belgium",
+    "ratio": [13, 15],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#000000", "#FDDA24", "#EF3340"]
+  },
+  {
+    "id": "belize",
+    "name": "Belize",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#003F87", "#CE1126"],
+    "weights": [1, 10, 1],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 37, "h": 55, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "belize_emblem", "x": 50, "y": 50, "w": 35, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "benin",
+    "name": "Benin",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#008751"],
+    "overlays": [
+      {"type": "rectangle", "x": 66.7, "y": 25, "w": 66.7, "h": 50, "fill": "#FCD116"},
+      {"type": "rectangle", "x": 66.7, "y": 75, "w": 66.7, "h": 50, "fill": "#E8112D"}
+    ]
+  },
+  {
+    "id": "bermuda",
+    "name": "Bermuda",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#CE1126"],
+    "overlays": [
+      {"type": "rectangle", "x": 12.5, "y": 25, "w": 25, "h": 50, "fill": "#012169"},
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 12.5, "y": 25, "w": 25, "h": 50, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "bermuda_emblem", "x": 75, "y": 50, "w": 30, "h": 60, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "bhutan",
+    "name": "Bhutan",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FF8000"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 0], [100, 100]], "fill": "#E5243B"},
+      {"type": "symbol", "symbolId": "bhutan_emblem", "x": 50, "y": 50, "w": 60, "h": 60, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "bolivia",
+    "name": "Bolivia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#D52B1E", "#F9E300", "#007934"]
+  },
+  {
+    "id": "bosnia_and_herzegovina",
+    "name": "Bosnia and Herzegovina",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#002395"],
+    "overlays": [
+      {"type": "polygon", "points": [[24, 0], [100, 0], [100, 100]], "fill": "#FECB00"},
+      {"type": "starfield", "x": 61, "y": 50, "w": 10, "h": 96, "fill": "#FFFFFF", "starCount": 9, "distribution": "grid", "starCols": 1, "starPoints": 5, "starPointLength": 0.38, "starSize": 55}
+    ]
+  },
+  {
+    "id": "botswana",
+    "name": "Botswana",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#6DA9E4", "#FFFFFF", "#000000", "#FFFFFF", "#6DA9E4"],
+    "weights": [9, 1, 4, 1, 9]
+  },
+  {
+    "id": "brazil",
+    "name": "Brazil",
+    "ratio": [7, 10],
+    "sections": 1,
+    "colors": ["#009739"],
+    "overlays": [
+      {"type": "polygon", "points": [[50, 7.15], [91.5, 50], [50, 92.85], [8.5, 50]], "fill": "#FEDD00"},
+      {"type": "symbol", "symbolId": "brazil_flag_globe", "x": 50, "y": 50, "w": 42.86, "h": 42.86, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "british_virgin_islands",
+    "name": "British Virgin Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 12.5, "y": 25, "w": 25, "h": 50, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "british_virgin_islands_emblem", "x": 75, "y": 50, "w": 35, "h": 70, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "brunei",
+    "name": "Brunei",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#F7E017"],
+    "overlays": [
+      {"type": "band", "x1": 0, "y1": 15, "x2": 100, "y2": 35, "thickness": 26, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 65, "x2": 100, "y2": 85, "thickness": 26, "fill": "#000000"},
+      {"type": "symbol", "symbolId": "brunei_emblem", "x": 50, "y": 50, "w": 30, "h": 45, "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "bulgaria",
+    "name": "Bulgaria",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#00966E", "#D62612"]
+  },
+  {
+    "id": "burkina_faso",
+    "name": "Burkina Faso",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#EF2B2D", "#009E49"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 20, "fill": "#FCD116", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "burundi",
+    "name": "Burundi",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 30, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 100, "y1": 0, "x2": 0, "y2": 100, "thickness": 30, "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 0], [50, 0], [50, 50], [0, 50]], "fill": "#CE1126"},
+      {"type": "polygon", "points": [[50, 0], [100, 0], [100, 50], [50, 50]], "fill": "#1EB53A"},
+      {"type": "polygon", "points": [[0, 50], [50, 50], [50, 100], [0, 100]], "fill": "#1EB53A"},
+      {"type": "polygon", "points": [[50, 50], [100, 50], [100, 100], [50, 100]], "fill": "#CE1126"},
+      {"type": "circle", "x": 50, "y": 50, "w": 28, "h": 28, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "burundi_emblem", "x": 50, "y": 50, "w": 24, "h": 24, "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "cabo_verde",
+    "name": "Cabo Verde",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#003893", "#FFFFFF", "#003893"],
+    "weights": [6, 1, 3],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 65, "w": 100, "h": 2, "fill": "#CE1126"},
+      {"type": "starfield", "x": 28, "y": 73, "w": 22, "h": 22, "fill": "#F7D116", "starCount": 10, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "cambodia",
+    "name": "Cambodia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#032EA1", "#E00025", "#032EA1"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "cambodia_emblem", "x": 50, "y": 50, "w": 30, "h": 30, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "cameroon",
+    "name": "Cameroon",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#007A5E", "#CE1126", "#FCD116"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 14, "fill": "#FCD116", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "canada",
+    "name": "Canada",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#FF0000", "#FFFFFF", "#FF0000"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "maple_leaf", "x": 50, "y": 50, "w": 30, "h": 30, "fill": "#FF0000"}
+    ]
+  },
+  {
+    "id": "cayman_islands",
+    "name": "Cayman Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "central_african_republic",
+    "name": "Central African Republic",
+    "ratio": [2, 3],
+    "sections": 4,
+    "colors": ["#003082", "#FFFFFF", "#009A44", "#FFCE00"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 12, "h": 100, "fill": "#D21034"},
+      {"type": "star", "x": 15, "y": 12, "size": 12, "fill": "#FFCE00", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "chad",
+    "name": "Chad",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#002664", "#FECB00", "#C60C30"]
+  },
+  {
+    "id": "chile",
+    "name": "Chile",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#FFFFFF", "#D52B1E"],
+    "overlays": [
+      {"type": "rectangle", "x": 16.7, "y": 25, "w": 33.3, "h": 50, "fill": "#0039A6"},
+      {"type": "star", "x": 16.7, "y": 25, "size": 18, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "china",
+    "name": "China",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#DE2910"],
+    "overlays": [
+      {"type": "star", "x": 16.7, "y": 25, "size": 20, "fill": "#FFDE00", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 33.3, "y": 10, "size": 6.7, "fill": "#FFDE00", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 40, "y": 20, "size": 6.7, "fill": "#FFDE00", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 40, "y": 35, "size": 6.7, "fill": "#FFDE00", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 33.3, "y": 45, "size": 6.7, "fill": "#FFDE00", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "colombia",
+    "name": "Colombia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FCD116", "#003893", "#CE1126"],
+    "weights": [2, 1, 1]
+  },
+  {
+    "id": "comoros",
+    "name": "Comoros",
+    "ratio": [3, 5],
+    "sections": 4,
+    "colors": ["#FFC61E", "#FFFFFF", "#CE1126", "#3A75C4"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#009E49"},
+      {"type": "circle", "x": 18, "y": 50, "w": 18, "h": 18, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 20, "y": 50, "w": 15, "h": 15, "fill": "#009E49"},
+      {"type": "starfield", "x": 16, "y": 50, "w": 8, "h": 26, "fill": "#FFFFFF", "starCount": 4, "distribution": "grid", "starCols": 1, "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "congo",
+    "name": "Congo",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#009543"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [66.7, 0], [100, 100], [33.3, 100]], "fill": "#FBDE4A"},
+      {"type": "polygon", "points": [[66.7, 0], [100, 0], [100, 100]], "fill": "#DC241F"}
+    ]
+  },
+  {
+    "id": "cook_islands",
+    "name": "Cook Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "starfield", "x": 72, "y": 50, "w": 30, "h": 50, "fill": "#FFFFFF", "starCount": 15, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "costa_rica",
+    "name": "Costa Rica",
+    "ratio": [3, 5],
+    "sections": 5,
+    "colors": ["#002B7F", "#FFFFFF", "#CE1126", "#FFFFFF", "#002B7F"],
+    "weights": [1, 1, 2, 1, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "costa_rica_emblem", "x": 33, "y": 50, "w": 16, "h": 20, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "cote_divoire",
+    "name": "Cote d'Ivoire",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#F77F00", "#FFFFFF", "#009E60"]
+  },
+  {
+    "id": "croatia",
+    "name": "Croatia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#FF0000", "#FFFFFF", "#171796"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "croatia_emblem", "x": 50, "y": 37, "w": 18, "h": 37, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "cuba",
+    "name": "Cuba",
+    "ratio": [1, 2],
+    "sections": 5,
+    "colors": ["#002A8F", "#FFFFFF", "#002A8F", "#FFFFFF", "#002A8F"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [43, 50], [0, 100]], "fill": "#CE1126"},
+      {"type": "star", "x": 17, "y": 50, "size": 16, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "cyprus",
+    "name": "Cyprus",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "cyprus_emblem", "x": 50, "y": 42, "w": 45, "h": 30, "fill": "#D57800"},
+      {"type": "symbol", "symbolId": "olive_branch", "x": 50, "y": 70, "w": 40, "h": 18, "fill": "#4E7A27"}
+    ]
+  },
+  {
+    "id": "czechia",
+    "name": "Czechia",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#FFFFFF", "#D7141A"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [50, 50], [0, 100]], "fill": "#11457E"}
+    ]
+  },
+  {
+    "id": "democratic_republic_of_the_congo",
+    "name": "Democratic Republic of the Congo",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#007FFF"],
+    "overlays": [
+      {"type": "band", "x1": 100, "y1": 0, "x2": 0, "y2": 100, "thickness": 26, "fill": "#F7D618"},
+      {"type": "band", "x1": 100, "y1": 0, "x2": 0, "y2": 100, "thickness": 20, "fill": "#CE1021"},
+      {"type": "star", "x": 15, "y": 15, "size": 18, "fill": "#F7D618", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "denmark",
+    "name": "Denmark",
+    "ratio": [28, 37],
+    "sections": 1,
+    "colors": ["#C8102E"],
+    "overlays": [
+      {"type": "rectangle", "x": 36, "y": 50, "w": 12, "h": 100, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 12, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "djibouti",
+    "name": "Djibouti",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#6AB2E7", "#12AD2B"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#FFFFFF"},
+      {"type": "star", "x": 16, "y": 50, "size": 14, "fill": "#D7141A", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "dominica",
+    "name": "Dominica",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#006B3F"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 12, "fill": "#000000"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 6, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 2, "fill": "#FCD116"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 12, "h": 100, "fill": "#000000"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 6, "h": 100, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 2, "h": 100, "fill": "#FCD116"},
+      {"type": "circle", "x": 50, "y": 50, "w": 22, "h": 22, "fill": "#D41C30"},
+      {"type": "symbol", "symbolId": "dominica_emblem", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "dominican_republic",
+    "name": "Dominican Republic",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#002D62"},
+      {"type": "rectangle", "x": 75, "y": 25, "w": 50, "h": 50, "fill": "#CE1126"},
+      {"type": "rectangle", "x": 25, "y": 75, "w": 50, "h": 50, "fill": "#CE1126"},
+      {"type": "rectangle", "x": 75, "y": 75, "w": 50, "h": 50, "fill": "#002D62"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 16, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 16, "h": 100, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "dominican_republic_emblem", "x": 50, "y": 50, "w": 14, "h": 14, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "ecuador",
+    "name": "Ecuador",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FFD100", "#0038A8", "#CE1126"],
+    "weights": [2, 1, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "ecuador_emblem", "x": 50, "y": 45, "w": 24, "h": 30, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "egypt",
+    "name": "Egypt",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#FFFFFF", "#000000"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "egypt_emblem", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#C09300"}
+    ]
+  },
+  {
+    "id": "el_salvador",
+    "name": "El Salvador",
+    "ratio": [189, 335],
+    "sections": 3,
+    "colors": ["#0047AB", "#FFFFFF", "#0047AB"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "el_salvador_emblem", "x": 50, "y": 50, "w": 22, "h": 22, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "equatorial_guinea",
+    "name": "Equatorial Guinea",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#3E9A00", "#FFFFFF", "#E32118"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [25, 50], [0, 100]], "fill": "#0073CE"},
+      {"type": "symbol", "symbolId": "equatorial_guinea_emblem", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "eritrea",
+    "name": "Eritrea",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#4189DD"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [100, 50], [0, 50]], "fill": "#12AD2B"},
+      {"type": "polygon", "points": [[0, 50], [100, 50], [0, 100]], "fill": "#4189DD"},
+      {"type": "polygon", "points": [[0, 0], [100, 50], [0, 100]], "fill": "#EA0437"},
+      {"type": "polygon", "points": [[0, 5], [95, 50], [0, 95]], "fill": "#EA0437"},
+      {"type": "symbol", "symbolId": "eritrea_emblem", "x": 28, "y": 50, "w": 35, "h": 40, "fill": "#F2CF13"}
+    ]
+  },
+  {
+    "id": "estonia",
+    "name": "Estonia",
+    "ratio": [7, 11],
+    "sections": 3,
+    "colors": ["#0072CE", "#000000", "#FFFFFF"]
+  },
+  {
+    "id": "eswatini",
+    "name": "Eswatini",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#3E5EB9", "#FED100", "#B10C0C", "#FED100", "#3E5EB9"],
+    "weights": [3, 1, 8, 1, 3],
+    "overlays": [
+      {"type": "symbol", "symbolId": "eswatini_emblem", "x": 50, "y": 50, "w": 50, "h": 32, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "ethiopia",
+    "name": "Ethiopia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#009A44", "#FCDD09", "#DA121A"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 36, "h": 36, "fill": "#0F47AF"},
+      {"type": "symbol", "symbolId": "star_ethiopia", "x": 50, "y": 50, "w": 28, "h": 28, "fill": "#FCDD09"}
+    ]
+  },
+  {
+    "id": "falkland_islands",
+    "name": "Falkland Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "fiji",
+    "name": "Fiji",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#68BFE5"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#012169"},
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "fiji_emblem", "x": 75, "y": 50, "w": 25, "h": 35, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "finland",
+    "name": "Finland",
+    "ratio": [11, 18],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 36, "y": 50, "w": 14, "h": 100, "fill": "#002F6C"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 14, "fill": "#002F6C"}
+    ]
+  },
+  {
+    "id": "france",
+    "name": "France",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#002395", "#FFFFFF", "#ED2939"]
+  },
+  {
+    "id": "french_polynesia",
+    "name": "French Polynesia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#FFFFFF", "#CE1126"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "france_emblem", "x": 50, "y": 50, "w": 30, "h": 30, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "gabon",
+    "name": "Gabon",
+    "ratio": [3, 4],
+    "sections": 3,
+    "colors": ["#009E60", "#FCD116", "#3A75C4"]
+  },
+  {
+    "id": "gambia",
+    "name": "Gambia",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#CE1126", "#FFFFFF", "#0C1C8C", "#FFFFFF", "#3A7728"],
+    "weights": [6, 1, 4, 1, 6]
+  },
+  {
+    "id": "georgia",
+    "name": "Georgia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 20, "fill": "#FF0000"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 20, "h": 100, "fill": "#FF0000"},
+      {"type": "custom", "path": "M 22 18 L 28 18 L 26 23 L 32 23 L 32 27 L 26 27 L 28 32 L 22 32 L 24 27 L 18 27 L 18 23 L 24 23 Z", "fill": "#FF0000"},
+      {"type": "custom", "path": "M 72 18 L 78 18 L 76 23 L 82 23 L 82 27 L 76 27 L 78 32 L 72 32 L 74 27 L 68 27 L 68 23 L 74 23 Z", "fill": "#FF0000"},
+      {"type": "custom", "path": "M 22 68 L 28 68 L 26 73 L 32 73 L 32 77 L 26 77 L 28 82 L 22 82 L 24 77 L 18 77 L 18 73 L 24 73 Z", "fill": "#FF0000"},
+      {"type": "custom", "path": "M 72 68 L 78 68 L 76 73 L 82 73 L 82 77 L 76 77 L 78 82 L 72 82 L 74 77 L 68 77 L 68 73 L 74 73 Z", "fill": "#FF0000"}
+    ]
+  },
+  {
+    "id": "germany",
+    "name": "Germany",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#000000", "#DD0000", "#FFCC00"]
+  },
+  {
+    "id": "ghana",
+    "name": "Ghana",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CF0921", "#FCD116", "#006B3F"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 16, "fill": "#000000", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "gibraltar",
+    "name": "Gibraltar",
+    "ratio": [1, 2],
+    "sections": 2,
+    "colors": ["#FFFFFF", "#DA000C"],
+    "weights": [2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "gibraltar_emblem", "x": 50, "y": 50, "w": 30, "h": 60, "fill": "#DA000C"}
+    ]
+  },
+  {
+    "id": "greece",
+    "name": "Greece",
+    "ratio": [2, 3],
+    "sections": 9,
+    "colors": ["#004C98", "#FFFFFF", "#004C98", "#FFFFFF", "#004C98", "#FFFFFF", "#004C98", "#FFFFFF", "#004C98"],
+    "overlays": [
+      {"type": "rectangle", "x": 18.5, "y": 27.8, "w": 37, "h": 55.6, "fill": "#004C98"},
+      {"type": "rectangle", "x": 18.5, "y": 27.8, "w": 37, "h": 10, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 18.5, "y": 27.8, "w": 10, "h": 55.6, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "grenada",
+    "name": "Grenada",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#CE1126"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 80, "h": 75, "fill": "#007A5E"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 72, "h": 68, "fill": "#FCD116"},
+      {"type": "polygon", "points": [[14, 16], [50, 50], [14, 84]], "fill": "#007A5E"},
+      {"type": "polygon", "points": [[86, 16], [50, 50], [86, 84]], "fill": "#007A5E"},
+      {"type": "polygon", "points": [[14, 16], [50, 50], [86, 16]], "fill": "#CE1126"},
+      {"type": "polygon", "points": [[14, 84], [50, 50], [86, 84]], "fill": "#CE1126"},
+      {"type": "star", "x": 50, "y": 50, "size": 14, "fill": "#CE1126", "points": 5, "pointLength": 0.38},
+      {"type": "starfield", "x": 50, "y": 10, "w": 55, "h": 6, "fill": "#FCD116", "starCount": 3, "distribution": "grid", "starCols": 3, "starPoints": 5, "starPointLength": 0.38, "starSize": 40},
+      {"type": "starfield", "x": 50, "y": 90, "w": 55, "h": 6, "fill": "#FCD116", "starCount": 3, "distribution": "grid", "starCols": 3, "starPoints": 5, "starPointLength": 0.38, "starSize": 40},
+      {"type": "symbol", "symbolId": "grenada_emblem", "x": 15, "y": 50, "w": 12, "h": 16, "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "guam",
+    "name": "Guam",
+    "ratio": [22, 41],
+    "sections": 1,
+    "colors": ["#002868"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 96, "h": 96, "fill": "#002868"},
+      {"type": "rectangle", "x": 50, "y": 1, "w": 100, "h": 2, "fill": "#BF0A30"},
+      {"type": "rectangle", "x": 50, "y": 99, "w": 100, "h": 2, "fill": "#BF0A30"},
+      {"type": "rectangle", "x": 1, "y": 50, "w": 2, "h": 100, "fill": "#BF0A30"},
+      {"type": "rectangle", "x": 99, "y": 50, "w": 2, "h": 100, "fill": "#BF0A30"},
+      {"type": "symbol", "symbolId": "guam_emblem", "x": 50, "y": 50, "w": 30, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "guatemala",
+    "name": "Guatemala",
+    "ratio": [5, 8],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#4997D0", "#FFFFFF", "#4997D0"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "guatemala_emblem", "x": 50, "y": 50, "w": 22, "h": 30, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "guinea",
+    "name": "Guinea",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#CE1126", "#FCD116", "#009460"]
+  },
+  {
+    "id": "guinea_bissau",
+    "name": "Guinea-Bissau",
+    "ratio": [1, 2],
+    "sections": 2,
+    "colors": ["#FCD116", "#009E49"],
+    "overlays": [
+      {"type": "rectangle", "x": 16.7, "y": 50, "w": 33.3, "h": 100, "fill": "#CE1126"},
+      {"type": "star", "x": 16.7, "y": 50, "size": 18, "fill": "#000000", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "guyana",
+    "name": "Guyana",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#009E49"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [100, 50], [0, 100]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 5], [90, 50], [0, 95]], "fill": "#FCD116"},
+      {"type": "polygon", "points": [[0, 0], [50, 50], [0, 100]], "fill": "#000000"},
+      {"type": "polygon", "points": [[0, 5], [44, 50], [0, 95]], "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "haiti",
+    "name": "Haiti",
+    "ratio": [3, 5],
+    "sections": 2,
+    "colors": ["#00209F", "#D21034"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "haiti_emblem", "x": 50, "y": 50, "w": 25, "h": 25, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "holy_see",
+    "name": "Holy See",
+    "ratio": [1, 1],
+    "orientation": "vertical",
+    "sections": 2,
+    "colors": ["#FFE000", "#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "holy_see_emblem", "x": 75, "y": 50, "w": 30, "h": 60, "fill": "#FFE000"}
+    ]
+  },
+  {
+    "id": "honduras",
+    "name": "Honduras",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#0073CF", "#FFFFFF", "#0073CF"],
+    "overlays": [
+      {"type": "starfield", "x": 50, "y": 50, "w": 40, "h": 20, "fill": "#0073CF", "starCount": 5, "distribution": "staggered-grid", "starCols": 3, "starPoints": 5, "starPointLength": 0.38, "starSize": 50}
+    ]
+  },
+  {
+    "id": "hungary",
+    "name": "Hungary",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#CE2939", "#FFFFFF", "#477050"]
+  },
+  {
+    "id": "iceland",
+    "name": "Iceland",
+    "ratio": [18, 25],
+    "sections": 1,
+    "colors": ["#003897"],
+    "overlays": [
+      {"type": "rectangle", "x": 36, "y": 50, "w": 16, "h": 100, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 22, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 36, "y": 50, "w": 8, "h": 100, "fill": "#D72828"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 11, "fill": "#D72828"}
+    ]
+  },
+  {
+    "id": "india",
+    "name": "India",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FF9933", "#FFFFFF", "#138808"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "ashoka_chakra", "x": 50, "y": 50, "w": 16, "h": 16, "fill": "#000080"}
+    ]
+  },
+  {
+    "id": "indonesia",
+    "name": "Indonesia",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#CE1126", "#FFFFFF"]
+  },
+  {
+    "id": "iran",
+    "name": "Iran",
+    "ratio": [4, 7],
+    "sections": 3,
+    "colors": ["#239F40", "#FFFFFF", "#DA0000"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "iran_emblem", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#DA0000"}
+    ]
+  },
+  {
+    "id": "iraq",
+    "name": "Iraq",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#FFFFFF", "#000000"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "iraq_emblem", "x": 50, "y": 50, "w": 50, "h": 18, "fill": "#007A3D"}
+    ]
+  },
+  {
+    "id": "ireland",
+    "name": "Ireland",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#169B62", "#FFFFFF", "#FF883E"]
+  },
+  {
+    "id": "israel",
+    "name": "Israel",
+    "ratio": [8, 11],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#FFFFFF", "#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 12.5, "w": 100, "h": 25, "fill": "#0038B8"},
+      {"type": "rectangle", "x": 50, "y": 12.5, "w": 100, "h": 17, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 87.5, "w": 100, "h": 25, "fill": "#0038B8"},
+      {"type": "rectangle", "x": 50, "y": 87.5, "w": 100, "h": 17, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "israel_emblem", "x": 50, "y": 50, "w": 24, "h": 24, "fill": "#0038B8"}
+    ]
+  },
+  {
+    "id": "italy",
+    "name": "Italy",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#009246", "#FFFFFF", "#CE2B37"]
+  },
+  {
+    "id": "jamaica",
+    "name": "Jamaica",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#009B3A"],
+    "overlays": [
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 20, "fill": "#FED100"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 20, "fill": "#FED100"},
+      {"type": "polygon", "points": [[0, 0], [44, 50], [0, 100]], "fill": "#000000"},
+      {"type": "polygon", "points": [[100, 0], [56, 50], [100, 100]], "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "japan",
+    "name": "Japan",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 40, "h": 40, "fill": "#BC002D"}
+    ]
+  },
+  {
+    "id": "jordan",
+    "name": "Jordan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#000000", "#FFFFFF", "#007A3D"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [36, 50], [0, 100]], "fill": "#CE1126"},
+      {"type": "star", "x": 15, "y": 50, "size": 10, "fill": "#FFFFFF", "points": 7, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "kazakhstan",
+    "name": "Kazakhstan",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#00AFCA"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "kazakhstan_emblem", "x": 50, "y": 50, "w": 50, "h": 50, "fill": "#FFD700"},
+      {"type": "rectangle", "x": 8, "y": 50, "w": 6, "h": 80, "fill": "#FFD700"}
+    ]
+  },
+  {
+    "id": "kenya",
+    "name": "Kenya",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#000000", "#FFFFFF", "#BB0000", "#FFFFFF", "#006600"],
+    "weights": [6, 1, 6, 1, 6],
+    "overlays": [
+      {"type": "symbol", "symbolId": "kenya_emblem", "x": 50, "y": 50, "w": 30, "h": 60, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "kiribati",
+    "name": "Kiribati",
+    "ratio": [1, 2],
+    "sections": 2,
+    "colors": ["#CE1126", "#003F87"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 52, "w": 100, "h": 6, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 56, "w": 100, "h": 4, "fill": "#003F87"},
+      {"type": "rectangle", "x": 50, "y": 60, "w": 100, "h": 4, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "kiribati_emblem", "x": 50, "y": 30, "w": 50, "h": 40, "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "kuwait",
+    "name": "Kuwait",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#007A3D", "#FFFFFF", "#CE1126"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [25, 50], [0, 100]], "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "kyrgyzstan",
+    "name": "Kyrgyzstan",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#E8112D"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "kyrgyzstan_emblem", "x": 50, "y": 50, "w": 40, "h": 40, "fill": "#FFC72C"}
+    ]
+  },
+  {
+    "id": "laos",
+    "name": "Laos",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#002868", "#CE1126"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 26, "h": 26, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "latvia",
+    "name": "Latvia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#9E3039", "#FFFFFF", "#9E3039"],
+    "weights": [2, 1, 2]
+  },
+  {
+    "id": "lebanon",
+    "name": "Lebanon",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#ED1C24", "#FFFFFF", "#ED1C24"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "cedar_lebanon", "x": 50, "y": 50, "w": 22, "h": 28, "fill": "#00A651"}
+    ]
+  },
+  {
+    "id": "lesotho",
+    "name": "Lesotho",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#00209F", "#FFFFFF", "#009543"],
+    "weights": [3, 4, 3],
+    "overlays": [
+      {"type": "symbol", "symbolId": "lesotho_emblem", "x": 50, "y": 50, "w": 18, "h": 24, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "liberia",
+    "name": "Liberia",
+    "ratio": [10, 19],
+    "sections": 11,
+    "colors": ["#BF0A30", "#FFFFFF", "#BF0A30", "#FFFFFF", "#BF0A30", "#FFFFFF", "#BF0A30", "#FFFFFF", "#BF0A30", "#FFFFFF", "#BF0A30"],
+    "overlays": [
+      {"type": "rectangle", "x": 18.2, "y": 22.7, "w": 36.4, "h": 45.5, "fill": "#002868"},
+      {"type": "star", "x": 18.2, "y": 22.7, "size": 22, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "libya",
+    "name": "Libya",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#E70013", "#000000", "#239E46"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "circle", "x": 52, "y": 50, "w": 18, "h": 18, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 54, "y": 50, "w": 14, "h": 14, "fill": "#000000"},
+      {"type": "star", "x": 56, "y": 50, "size": 10, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "liechtenstein",
+    "name": "Liechtenstein",
+    "ratio": [3, 5],
+    "sections": 2,
+    "colors": ["#002B7F", "#CE1126"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "liechtenstein_emblem", "x": 22, "y": 30, "w": 14, "h": 18, "fill": "#FFD83D"}
+    ]
+  },
+  {
+    "id": "lithuania",
+    "name": "Lithuania",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#FDB913", "#006A44", "#C1272D"]
+  },
+  {
+    "id": "luxembourg",
+    "name": "Luxembourg",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#EF3340", "#FFFFFF", "#00A3E0"]
+  },
+  {
+    "id": "madagascar",
+    "name": "Madagascar",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#FC3D32", "#007E3A"],
+    "overlays": [
+      {"type": "rectangle", "x": 16.7, "y": 50, "w": 33.3, "h": 100, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "malawi",
+    "name": "Malawi",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#000000", "#CE1126", "#009E49"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "malawi_emblem", "x": 50, "y": 16.7, "w": 30, "h": 20, "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "malaysia",
+    "name": "Malaysia",
+    "ratio": [1, 2],
+    "sections": 14,
+    "colors": ["#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF", "#CC0001", "#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#010066"},
+      {"type": "circle", "x": 22, "y": 25, "w": 18, "h": 18, "fill": "#FFC726"},
+      {"type": "circle", "x": 24, "y": 25, "w": 14, "h": 14, "fill": "#010066"},
+      {"type": "star", "x": 28, "y": 25, "size": 14, "fill": "#FFC726", "points": 14, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "maldives",
+    "name": "Maldives",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#D21034"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 73, "h": 70, "fill": "#007E3A"},
+      {"type": "circle", "x": 48, "y": 50, "w": 28, "h": 28, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 52, "y": 50, "w": 24, "h": 24, "fill": "#007E3A"}
+    ]
+  },
+  {
+    "id": "mali",
+    "name": "Mali",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#14B53A", "#FCD116", "#CE1126"]
+  },
+  {
+    "id": "malta",
+    "name": "Malta",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 2,
+    "colors": ["#FFFFFF", "#CF142B"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "malta_emblem", "x": 18, "y": 15, "w": 12, "h": 15, "fill": "#7B7B7B"}
+    ]
+  },
+  {
+    "id": "marshall_islands",
+    "name": "Marshall Islands",
+    "ratio": [10, 19],
+    "sections": 1,
+    "colors": ["#003893"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 25], [100, 50]], "fill": "#DD7500"},
+      {"type": "polygon", "points": [[0, 100], [100, 50], [100, 75]], "fill": "#FFFFFF"},
+      {"type": "star", "x": 18, "y": 18, "size": 25, "fill": "#FFFFFF", "points": 24, "pointLength": 0.30}
+    ]
+  },
+  {
+    "id": "mauritania",
+    "name": "Mauritania",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CD2A3E", "#006233", "#CD2A3E"],
+    "weights": [1, 5, 1],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 44, "w": 24, "h": 24, "fill": "#FFC400"},
+      {"type": "circle", "x": 50, "y": 40, "w": 22, "h": 22, "fill": "#006233"},
+      {"type": "star", "x": 50, "y": 35, "size": 10, "fill": "#FFC400", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "mauritius",
+    "name": "Mauritius",
+    "ratio": [2, 3],
+    "sections": 4,
+    "colors": ["#EA2839", "#002066", "#FFD500", "#00A551"]
+  },
+  {
+    "id": "mexico",
+    "name": "Mexico",
+    "ratio": [4, 7],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#006847", "#FFFFFF", "#CE1126"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "mexico_emblem", "x": 50, "y": 50, "w": 20, "h": 26, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "micronesia",
+    "name": "Micronesia",
+    "ratio": [10, 19],
+    "sections": 1,
+    "colors": ["#75B2DD"],
+    "overlays": [
+      {"type": "starfield", "x": 50, "y": 50, "w": 40, "h": 50, "fill": "#FFFFFF", "starCount": 4, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 35}
+    ]
+  },
+  {
+    "id": "moldova",
+    "name": "Moldova",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#003DA5", "#FFD200", "#CC092F"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "moldova_emblem", "x": 50, "y": 50, "w": 20, "h": 30, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "monaco",
+    "name": "Monaco",
+    "ratio": [4, 5],
+    "sections": 2,
+    "colors": ["#CE1126", "#FFFFFF"]
+  },
+  {
+    "id": "mongolia",
+    "name": "Mongolia",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#C4272F", "#015197", "#C4272F"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "mongolia_emblem", "x": 16.7, "y": 50, "w": 18, "h": 55, "fill": "#F9CF02"}
+    ]
+  },
+  {
+    "id": "montenegro",
+    "name": "Montenegro",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#D4213D"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 3, "w": 100, "h": 5, "fill": "#C8A243"},
+      {"type": "rectangle", "x": 50, "y": 97, "w": 100, "h": 5, "fill": "#C8A243"},
+      {"type": "rectangle", "x": 1.5, "y": 50, "w": 3, "h": 100, "fill": "#C8A243"},
+      {"type": "rectangle", "x": 98.5, "y": 50, "w": 3, "h": 100, "fill": "#C8A243"},
+      {"type": "symbol", "symbolId": "montenegro_emblem", "x": 50, "y": 50, "w": 30, "h": 40, "fill": "#C8A243"}
+    ]
+  },
+  {
+    "id": "montserrat",
+    "name": "Montserrat",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "morocco",
+    "name": "Morocco",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#C1272D"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "star_morocco", "x": 50, "y": 50, "w": 30, "h": 30, "fill": "#006233"}
+    ]
+  },
+  {
+    "id": "mozambique",
+    "name": "Mozambique",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#009A44", "#000000", "#FCB514"],
+    "weights": [3, 3, 3],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 28, "w": 100, "h": 3, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 72, "w": 100, "h": 3, "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 0], [33, 50], [0, 100]], "fill": "#D21034"},
+      {"type": "symbol", "symbolId": "mozambique_emblem", "x": 14, "y": 50, "w": 20, "h": 20, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "myanmar",
+    "name": "Myanmar",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FECB00", "#34B233", "#EA2839"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 30, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "namibia",
+    "name": "Namibia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#003580"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [100, 100], [0, 100]], "fill": "#009543"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 26, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 20, "fill": "#D21034"},
+      {"type": "circle", "x": 25, "y": 25, "w": 18, "h": 18, "fill": "#FFD100"},
+      {"type": "circle", "x": 25, "y": 25, "w": 12, "h": 12, "fill": "#003580"}
+    ]
+  },
+  {
+    "id": "nauru",
+    "name": "Nauru",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#002B7F"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 6, "fill": "#FFC72C"},
+      {"type": "star", "x": 25, "y": 75, "size": 18, "fill": "#FFFFFF", "points": 12, "pointLength": 0.30}
+    ]
+  },
+  {
+    "id": "nepal",
+    "name": "Nepal",
+    "ratio": [4, 3],
+    "sections": 1,
+    "colors": ["transparent"],
+    "overlays": [
+      {"type": "custom", "path": "M 0 46.966991411 L 75 46.966991411 L 0 0 L 0 100 L 75 100 L 0 25 Z", "fill": "#003893"},
+      {"type": "custom", "path": "M 4 47.5 L 67.5 47.5 L 4 7 L 4 93 L 67.5 93 L 4 28 Z", "fill": "#DC143C"},
+      {"type": "symbol", "symbolId": "nepal_moon", "x": 23.5, "y": 29.5, "w": 26, "h": 26, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "nepal_sun", "x": 23.5, "y": 71.5, "w": 21, "h": 21, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "netherlands",
+    "name": "Netherlands",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#AE1C28", "#FFFFFF", "#21468B"]
+  },
+  {
+    "id": "new_caledonia",
+    "name": "New Caledonia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#009543", "#CE1126", "#003580"],
+    "overlays": [
+      {"type": "circle", "x": 35, "y": 50, "w": 22, "h": 22, "fill": "#FCD116"},
+      {"type": "symbol", "symbolId": "new_caledonia_emblem", "x": 35, "y": 50, "w": 18, "h": 18, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "new_zealand",
+    "name": "New Zealand",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "new_zealand_emblem", "x": 50, "y": 50, "w": 100, "h": 100, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "nicaragua",
+    "name": "Nicaragua",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#0067C6", "#FFFFFF", "#0067C6"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "nicaragua_emblem", "x": 50, "y": 50, "w": 20, "h": 20, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "niger",
+    "name": "Niger",
+    "ratio": [6, 7],
+    "sections": 3,
+    "colors": ["#E05206", "#FFFFFF", "#0DB02B"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 14, "h": 14, "fill": "#E05206"}
+    ]
+  },
+  {
+    "id": "nigeria",
+    "name": "Nigeria",
+    "ratio": [1, 2],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#008751", "#FFFFFF", "#008751"]
+  },
+  {
+    "id": "niue",
+    "name": "Niue",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#FFC72C"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#012169"},
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "starfield", "x": 25, "y": 25, "w": 20, "h": 20, "fill": "#FFC72C", "starCount": 5, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "north_korea",
+    "name": "North Korea",
+    "ratio": [1, 2],
+    "sections": 5,
+    "colors": ["#024FA2", "#FFFFFF", "#ED1C27", "#FFFFFF", "#024FA2"],
+    "weights": [3, 1, 14, 1, 3],
+    "overlays": [
+      {"type": "circle", "x": 33, "y": 50, "w": 22, "h": 22, "fill": "#FFFFFF"},
+      {"type": "star", "x": 33, "y": 50, "size": 18, "fill": "#ED1C27", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "north_macedonia",
+    "name": "North Macedonia",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#CE2028"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 24, "h": 24, "fill": "#FFD200"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 12, "fill": "#FFD200"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 12, "fill": "#FFD200"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 12, "fill": "#FFD200"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 12, "h": 100, "fill": "#FFD200"},
+      {"type": "circle", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#CE2028"},
+      {"type": "circle", "x": 50, "y": 50, "w": 14, "h": 14, "fill": "#FFD200"}
+    ]
+  },
+  {
+    "id": "norway",
+    "name": "Norway",
+    "ratio": [8, 11],
+    "sections": 1,
+    "colors": ["#EF2B2D"],
+    "overlays": [
+      {"type": "rectangle", "x": 36, "y": 50, "w": 14, "h": 100, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 14, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 36, "y": 50, "w": 7, "h": 100, "fill": "#002868"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 7, "fill": "#002868"}
+    ]
+  },
+  {
+    "id": "oman",
+    "name": "Oman",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#D21034", "#009E49"],
+    "overlays": [
+      {"type": "rectangle", "x": 16.7, "y": 50, "w": 33.3, "h": 100, "fill": "#D21034"},
+      {"type": "symbol", "symbolId": "oman_emblem", "x": 16.7, "y": 15, "w": 18, "h": 14, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "pakistan",
+    "name": "Pakistan",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#01411C"],
+    "overlays": [
+      {"type": "rectangle", "x": 8.3, "y": 50, "w": 16.7, "h": 100, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 55, "y": 50, "w": 30, "h": 30, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 58, "y": 50, "w": 25, "h": 25, "fill": "#01411C"},
+      {"type": "star", "x": 62, "y": 42, "size": 10, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "palau",
+    "name": "Palau",
+    "ratio": [5, 8],
+    "sections": 1,
+    "colors": ["#009FDB"],
+    "overlays": [
+      {"type": "circle", "x": 42, "y": 50, "w": 38, "h": 38, "fill": "#FFC72C"}
+    ]
+  },
+  {
+    "id": "palestine",
+    "name": "Palestine",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#000000", "#FFFFFF", "#009736"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [36, 50], [0, 100]], "fill": "#CE1126"}
+    ]
+  },
+  {
+    "id": "panama",
+    "name": "Panama",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 75, "y": 25, "w": 50, "h": 50, "fill": "#DA121A"},
+      {"type": "rectangle", "x": 25, "y": 75, "w": 50, "h": 50, "fill": "#0055A4"},
+      {"type": "rectangle", "x": 75, "y": 75, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "star", "x": 25, "y": 25, "size": 16, "fill": "#0055A4", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 75, "y": 75, "size": 16, "fill": "#DA121A", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "papua_new_guinea",
+    "name": "Papua New Guinea",
+    "ratio": [3, 4],
+    "sections": 1,
+    "colors": ["#000000"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 0], [100, 100]], "fill": "#CE1126"},
+      {"type": "symbol", "symbolId": "papua_new_guinea_emblem", "x": 72, "y": 72, "w": 30, "h": 30, "fill": "#FCD116"},
+      {"type": "starfield", "x": 30, "y": 42, "w": 30, "h": 50, "fill": "#FFFFFF", "starCount": 5, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "paraguay",
+    "name": "Paraguay",
+    "ratio": [3, 5],
+    "sections": 3,
+    "colors": ["#D52B1E", "#FFFFFF", "#0038A8"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "paraguay_emblem", "x": 50, "y": 50, "w": 18, "h": 18, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "peru",
+    "name": "Peru",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#D91023", "#FFFFFF", "#D91023"]
+  },
+  {
+    "id": "philippines",
+    "name": "Philippines",
+    "ratio": [1, 2],
+    "sections": 2,
+    "colors": ["#0038A8", "#CE1126"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "sun_philippines", "x": 18, "y": 50, "w": 20, "h": 20, "fill": "#FCD116"},
+      {"type": "star", "x": 8, "y": 12, "size": 6, "fill": "#FCD116", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 8, "y": 88, "size": 6, "fill": "#FCD116", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 32, "y": 50, "size": 6, "fill": "#FCD116", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "pitcairn",
+    "name": "Pitcairn",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "poland",
+    "name": "Poland",
+    "ratio": [5, 8],
+    "sections": 2,
+    "colors": ["#FFFFFF", "#DC143C"]
+  },
+  {
+    "id": "portugal",
+    "name": "Portugal",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 2,
+    "colors": ["#006600", "#FF0000"],
+    "weights": [2, 3],
+    "overlays": [
+      {"type": "symbol", "symbolId": "portugal_emblem", "x": 40, "y": 50, "w": 22, "h": 28, "fill": "#FFC72C"}
+    ]
+  },
+  {
+    "id": "qatar",
+    "name": "Qatar",
+    "ratio": [11, 28],
+    "sections": 1,
+    "colors": ["#8D1B3D"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [32, 0], [24, 5.56], [32, 11.11], [24, 16.67], [32, 22.22], [24, 27.78], [32, 33.33], [24, 38.89], [32, 44.44], [24, 50], [32, 55.56], [24, 61.11], [32, 66.67], [24, 72.22], [32, 77.78], [24, 83.33], [32, 88.89], [24, 94.44], [32, 100], [0, 100]], "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "romania",
+    "name": "Romania",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#002B7F", "#FCD116", "#CE1126"]
+  },
+  {
+    "id": "russia",
+    "name": "Russia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#0039A6", "#D52B1E"]
+  },
+  {
+    "id": "rwanda",
+    "name": "Rwanda",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#00A1DE", "#FFC726", "#009739"],
+    "weights": [2, 1, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "rwanda_emblem", "x": 75, "y": 25, "w": 18, "h": 18, "fill": "#E5BE01"}
+    ]
+  },
+  {
+    "id": "saint_helena",
+    "name": "Saint Helena",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "saint_kitts_and_nevis",
+    "name": "Saint Kitts and Nevis",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#009E49"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 0], [100, 100]], "fill": "#CE1126"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 28, "fill": "#FCD116"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 20, "fill": "#000000"},
+      {"type": "star", "x": 33, "y": 63, "size": 14, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 60, "y": 40, "size": 14, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "saint_lucia",
+    "name": "Saint Lucia",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#65CFFF"],
+    "overlays": [
+      {"type": "polygon", "points": [[50, 18], [30, 90], [70, 90]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[50, 30], [35, 90], [65, 90]], "fill": "#000000"},
+      {"type": "polygon", "points": [[50, 50], [37, 90], [63, 90]], "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "saint_vincent_and_the_grenadines",
+    "name": "Saint Vincent and the Grenadines",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#0072C6", "#FCD116", "#009E60"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "polygon", "points": [[37, 70], [50, 40], [63, 70]], "fill": "#009E60"},
+      {"type": "polygon", "points": [[30, 60], [43, 30], [56, 60]], "fill": "#009E60"},
+      {"type": "polygon", "points": [[44, 60], [57, 30], [70, 60]], "fill": "#009E60"}
+    ]
+  },
+  {
+    "id": "samoa",
+    "name": "Samoa",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#CE1126"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#002B7F"},
+      {"type": "starfield", "x": 22, "y": 25, "w": 20, "h": 25, "fill": "#FFFFFF", "starCount": 5, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "san_marino",
+    "name": "San Marino",
+    "ratio": [3, 4],
+    "sections": 2,
+    "colors": ["#FFFFFF", "#73C2FB"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "san_marino_emblem", "x": 50, "y": 50, "w": 30, "h": 35, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "sao_tome_and_principe",
+    "name": "Sao Tome and Principe",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#12AD2B", "#FCD116", "#12AD2B"],
+    "weights": [2, 3, 2],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [25, 50], [0, 100]], "fill": "#D21034"},
+      {"type": "star", "x": 57.5, "y": 50, "size": 8, "fill": "#000000", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 72.5, "y": 50, "size": 8, "fill": "#000000", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "saudi_arabia",
+    "name": "Saudi Arabia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#005430"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "saudi_shahada", "x": 50, "y": 41.5, "w": 68, "h": 24, "fill": "#FFFFFF"},
+      {"type": "custom", "path": "M 15.5 68 L 69 68 L 73.5 69.4 L 76.8 68.5 L 79.2 68.5 L 80.5 69.1 L 79 69.9 L 74.5 69.9 L 70.5 71.4 L 33.5 71.4 L 28.2 69.9 L 24 69.9 L 21.6 72.2 L 18.5 72.2 L 18.5 69.9 L 15.5 69.9 Z", "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "senegal",
+    "name": "Senegal",
+    "ratio": [2, 3],
+    "orientation": "vertical",
+    "sections": 3,
+    "colors": ["#00853F", "#FDEF42", "#E31B23"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 18, "fill": "#00853F", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "serbia",
+    "name": "Serbia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#C7363D", "#0C4077", "#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "serbia_emblem", "x": 35.7, "y": 50, "w": 22, "h": 35, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "seychelles",
+    "name": "Seychelles",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#003F87"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [33, 0], [100, 100], [0, 100]], "fill": "#D62828"},
+      {"type": "polygon", "points": [[0, 0], [33, 0], [100, 100], [66, 100], [0, 100]], "fill": "#FCD856"},
+      {"type": "polygon", "points": [[0, 100], [0, 0], [50, 100]], "fill": "#003F87"},
+      {"type": "polygon", "points": [[0, 100], [0, 33], [33, 100]], "fill": "#007A3D"},
+      {"type": "polygon", "points": [[50, 100], [100, 100], [100, 66]], "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "sierra_leone",
+    "name": "Sierra Leone",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#1EB53A", "#FFFFFF", "#0072C6"]
+  },
+  {
+    "id": "singapore",
+    "name": "Singapore",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#EE2536", "#FFFFFF"],
+    "overlays": [
+      {"type": "circle", "x": 31.5, "y": 25, "w": 18, "h": 18, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 34.5, "y": 25, "w": 14.5, "h": 14.5, "fill": "#EE2536"},
+      {"type": "starfield", "x": 39.5, "y": 25, "w": 14, "h": 10, "fill": "#FFFFFF", "starCount": 5, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 23}
+    ]
+  },
+  {
+    "id": "slovakia",
+    "name": "Slovakia",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#254AA5", "#ED1C24"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "slovakia_emblem", "x": 30, "y": 50, "w": 24, "h": 38, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "slovenia",
+    "name": "Slovenia",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#FFFFFF", "#005CE6", "#FF0000"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "slovenia_emblem", "x": 22, "y": 33.33, "w": 16, "h": 18, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "solomon_islands",
+    "name": "Solomon Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#0051A5"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 0], [100, 100]], "fill": "#009E49"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 10, "fill": "#FCD116"},
+      {"type": "star", "x": 17, "y": 18, "size": 7, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 30, "y": 18, "size": 7, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 23.5, "y": 25, "size": 7, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 17, "y": 32, "size": 7, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 30, "y": 32, "size": 7, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "somalia",
+    "name": "Somalia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#418FDE"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 30, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "south_africa",
+    "name": "South Africa",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#DE3831", "#002395"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [0, 100], [50, 50]], "fill": "#000000"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 50, "y2": 50, "thickness": 33.33, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 50, "y2": 50, "thickness": 33.33, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 50, "y1": 50, "x2": 100, "y2": 50, "thickness": 33.33, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 50, "y2": 50, "thickness": 26.67, "fill": "#FFB612"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 50, "y2": 50, "thickness": 26.67, "fill": "#FFB612"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 50, "y2": 50, "thickness": 20, "fill": "#007A4D"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 50, "y2": 50, "thickness": 20, "fill": "#007A4D"},
+      {"type": "band", "x1": 50, "y1": 50, "x2": 100, "y2": 50, "thickness": 20, "fill": "#007A4D"}
+    ]
+  },
+  {
+    "id": "south_korea",
+    "name": "South Korea",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "taeguk", "x": 50, "y": 50, "w": 33.33, "h": 50, "fill": "#CD2E3A"},
+      {"type": "symbol", "symbolId": "trigram_geon", "x": 31.5, "y": 25, "w": 16.67, "h": 17.86, "rotation": 56.31, "fill": "#000000"},
+      {"type": "symbol", "symbolId": "trigram_gon", "x": 68.5, "y": 75, "w": 16.67, "h": 17.86, "rotation": 56.31, "fill": "#000000"},
+      {"type": "symbol", "symbolId": "trigram_gam", "x": 68.5, "y": 25, "w": 16.67, "h": 17.86, "rotation": -56.31, "fill": "#000000"},
+      {"type": "symbol", "symbolId": "trigram_ri", "x": 31.5, "y": 75, "w": 16.67, "h": 17.86, "rotation": -56.31, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "south_sudan",
+    "name": "South Sudan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#000000", "#FFFFFF", "#007A3D"],
+    "weights": [3, 1, 3],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 14, "fill": "#CE1126"},
+      {"type": "polygon", "points": [[0, 0], [43.3, 50], [0, 100]], "fill": "#33A1DE"},
+      {"type": "star", "x": 14, "y": 50, "size": 14, "fill": "#FCD116", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "spain",
+    "name": "Spain",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#AD1519", "#FABD00", "#AD1519"],
+    "weights": [1, 2, 1],
+    "overlays": [
+      {"type": "symbol", "symbolId": "spain_emblem", "x": 33.33, "y": 50, "w": 18, "h": 40, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "sri_lanka",
+    "name": "Sri Lanka",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#F7B718"],
+    "overlays": [
+      {"type": "rectangle", "x": 10, "y": 50, "w": 14, "h": 80, "fill": "#005F56"},
+      {"type": "rectangle", "x": 26, "y": 50, "w": 14, "h": 80, "fill": "#DF7500"},
+      {"type": "rectangle", "x": 68, "y": 50, "w": 56, "h": 80, "fill": "#941E32"},
+      {"type": "symbol", "symbolId": "sri_lanka_emblem", "x": 68, "y": 50, "w": 30, "h": 60, "fill": "#F7B718"}
+    ]
+  },
+  {
+    "id": "sudan",
+    "name": "Sudan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#D21034", "#FFFFFF", "#000000"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [30, 50], [0, 100]], "fill": "#007229"}
+    ]
+  },
+  {
+    "id": "suriname",
+    "name": "Suriname",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#377E3F", "#FFFFFF", "#B40A2D", "#FFFFFF", "#377E3F"],
+    "weights": [2, 1, 4, 1, 2],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 18, "fill": "#ECC81D", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "sweden",
+    "name": "Sweden",
+    "ratio": [5, 8],
+    "sections": 1,
+    "colors": ["#005583"],
+    "overlays": [
+      {"type": "rectangle", "x": 37.5, "y": 50, "w": 12.5, "h": 100, "fill": "#FFCD00"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 20, "fill": "#FFCD00"}
+    ]
+  },
+  {
+    "id": "switzerland",
+    "name": "Switzerland",
+    "ratio": [1, 1],
+    "sections": 1,
+    "colors": ["#FF0000"],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 50, "w": 18.75, "h": 62.5, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 62.5, "h": 18.75, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "syria",
+    "name": "Syria",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#007A3D", "#FFFFFF", "#000000"],
+    "overlays": [
+      {"type": "star", "x": 19.44, "y": 50, "size": 18.52, "fill": "#CE1126", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 50, "y": 50, "size": 18.52, "fill": "#CE1126", "points": 5, "pointLength": 0.38},
+      {"type": "star", "x": 80.56, "y": 50, "size": 18.52, "fill": "#CE1126", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "tajikistan",
+    "name": "Tajikistan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#CC0000", "#FFFFFF", "#006600"],
+    "weights": [2, 3, 2],
+    "overlays": [
+      {"type": "symbol", "symbolId": "tajikistan_emblem", "x": 50, "y": 50, "w": 18, "h": 20, "fill": "#FFD700"}
+    ]
+  },
+  {
+    "id": "tanzania",
+    "name": "Tanzania",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#1EB53A"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 100], [100, 0], [100, 100]], "fill": "#00A3DD"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 22, "fill": "#FCD116"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 0, "thickness": 16, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "thailand",
+    "name": "Thailand",
+    "ratio": [2, 3],
+    "sections": 5,
+    "colors": ["#ED1C24", "#FFFFFF", "#241D4F", "#FFFFFF", "#ED1C24"],
+    "weights": [1, 1, 2, 1, 1]
+  },
+  {
+    "id": "timor_leste",
+    "name": "Timor-Leste",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#CE1126"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [60, 50], [0, 100]], "fill": "#FFC726"},
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#000000"},
+      {"type": "star", "x": 18, "y": 50, "size": 16, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "togo",
+    "name": "Togo",
+    "ratio": [1, 1.618],
+    "sections": 5,
+    "colors": ["#006A4E", "#FCD116", "#006A4E", "#FCD116", "#006A4E"],
+    "overlays": [
+      {"type": "rectangle", "x": 20, "y": 20, "w": 40, "h": 40, "fill": "#D21034"},
+      {"type": "star", "x": 20, "y": 20, "size": 18, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "tokelau",
+    "name": "Tokelau",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#003580"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "tokelau_emblem", "x": 30, "y": 50, "w": 30, "h": 40, "fill": "#FCD116"},
+      {"type": "starfield", "x": 72, "y": 40, "w": 25, "h": 35, "fill": "#FFFFFF", "starCount": 4, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "tonga",
+    "name": "Tonga",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#C10000"],
+    "overlays": [
+      {"type": "rectangle", "x": 20, "y": 25, "w": 40, "h": 50, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 20, "y": 25, "w": 5, "h": 14, "fill": "#C10000"},
+      {"type": "rectangle", "x": 20, "y": 25, "w": 14, "h": 5, "fill": "#C10000"}
+    ]
+  },
+  {
+    "id": "trinidad_and_tobago",
+    "name": "Trinidad and Tobago",
+    "ratio": [3, 5],
+    "sections": 1,
+    "colors": ["#CE1126"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [100, 0], [100, 22]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 78], [0, 100], [100, 100]], "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 24, "fill": "#FFFFFF"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 100, "thickness": 18, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "tunisia",
+    "name": "Tunisia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#E70013"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 36, "h": 36, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 50, "y": 50, "w": 24, "h": 24, "fill": "#E70013"},
+      {"type": "circle", "x": 53, "y": 50, "w": 20, "h": 20, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 53, "y": 50, "w": 16, "h": 16, "fill": "#E70013"},
+      {"type": "star", "x": 53, "y": 50, "size": 12, "fill": "#E70013", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "turkey",
+    "name": "Turkey",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#E30A17"],
+    "overlays": [
+      {"type": "circle", "x": 42, "y": 50, "w": 30, "h": 30, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 45, "y": 50, "w": 24, "h": 24, "fill": "#E30A17"},
+      {"type": "star", "x": 55, "y": 50, "size": 14, "fill": "#FFFFFF", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "turkmenistan",
+    "name": "Turkmenistan",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#00843D"],
+    "overlays": [
+      {"type": "rectangle", "x": 18, "y": 50, "w": 11, "h": 100, "fill": "#C8102E"},
+      {"type": "symbol", "symbolId": "turkmenistan_emblem", "x": 18, "y": 50, "w": 11, "h": 80, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 50, "y": 30, "w": 18, "h": 18, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 53, "y": 30, "w": 14, "h": 14, "fill": "#00843D"},
+      {"type": "starfield", "x": 55, "y": 24, "w": 16, "h": 6, "fill": "#FFFFFF", "starCount": 5, "distribution": "grid", "starCols": 5, "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "turks_and_caicos_islands",
+    "name": "Turks and Caicos Islands",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"}
+    ]
+  },
+  {
+    "id": "tuvalu",
+    "name": "Tuvalu",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#009FCC"],
+    "overlays": [
+      {"type": "rectangle", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#012169"},
+      {"type": "symbol", "symbolId": "united_kingdom_emblem", "x": 25, "y": 25, "w": 50, "h": 50, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "tuvalu_emblem", "x": 70, "y": 60, "w": 40, "h": 50, "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "uganda",
+    "name": "Uganda",
+    "ratio": [2, 3],
+    "sections": 6,
+    "colors": ["#000000", "#FCDC04", "#D90000", "#000000", "#FCDC04", "#D90000"],
+    "overlays": [
+      {"type": "circle", "x": 50, "y": 50, "w": 20, "h": 20, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "uganda_emblem", "x": 50, "y": 50, "w": 16, "h": 16, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "ukraine",
+    "name": "Ukraine",
+    "ratio": [2, 3],
+    "sections": 2,
+    "colors": ["#005BBB", "#FFD500"]
+  },
+  {
+    "id": "united_arab_emirates",
+    "name": "United Arab Emirates",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#00732F", "#FFFFFF", "#000000"],
+    "overlays": [
+      {"type": "rectangle", "x": 12.5, "y": 50, "w": 25, "h": 100, "fill": "#FF0000"}
+    ]
+  },
+  {
+    "id": "united_kingdom",
+    "name": "United Kingdom",
+    "ratio": [1, 2],
+    "sections": 1,
+    "colors": ["#012169"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [10, 0], [60, 40], [50, 50], [40, 50], [0, 10]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[90, 0], [100, 0], [100, 10], [60, 50], [50, 50], [50, 40]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 90], [40, 50], [50, 50], [50, 60], [10, 100], [0, 100]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[50, 50], [60, 50], [100, 90], [100, 100], [90, 100], [50, 60]], "fill": "#FFFFFF"},
+      {"type": "polygon", "points": [[0, 6], [6, 0], [52, 36], [46, 42], [40, 42], [0, 8]], "fill": "#C8102E"},
+      {"type": "polygon", "points": [[92, 0], [100, 0], [100, 6], [58, 48], [52, 48], [52, 42]], "fill": "#C8102E"},
+      {"type": "polygon", "points": [[0, 92], [36, 52], [42, 52], [42, 58], [6, 100], [0, 100]], "fill": "#C8102E"},
+      {"type": "polygon", "points": [[58, 52], [64, 52], [100, 92], [100, 100], [94, 100], [52, 58]], "fill": "#C8102E"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 33.3, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 16.7, "h": 100, "fill": "#FFFFFF"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 20, "fill": "#C8102E"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 10, "h": 100, "fill": "#C8102E"}
+    ]
+  },
+  {
+    "id": "united_states",
+    "name": "United States",
+    "ratio": [10, 19],
+    "sections": 13,
+    "colors": ["#B31942", "#FFFFFF", "#B31942", "#FFFFFF", "#B31942", "#FFFFFF", "#B31942", "#FFFFFF", "#B31942", "#FFFFFF", "#B31942", "#FFFFFF", "#B31942"],
+    "overlays": [
+      {"type": "rectangle", "x": 20, "y": 26.9, "w": 40, "h": 53.8, "fill": "#002868"},
+      {"type": "starfield", "x": 20, "y": 26.9, "w": 36, "h": 48.5, "fill": "#FFFFFF", "starCount": 50, "distribution": "staggered-grid", "starCols": 6, "starPoints": 5, "starPointLength": 0.38, "starSize": 50}
+    ]
+  },
+  {
+    "id": "united_states_virgin_islands",
+    "name": "United States Virgin Islands",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#FFFFFF"],
+    "overlays": [
+      {"type": "symbol", "symbolId": "united_states_emblem", "x": 50, "y": 50, "w": 50, "h": 60, "fill": "#000000"}
+    ]
+  },
+  {
+    "id": "uruguay",
+    "name": "Uruguay",
+    "ratio": [2, 3],
+    "sections": 9,
+    "colors": ["#FFFFFF", "#0038A8", "#FFFFFF", "#0038A8", "#FFFFFF", "#0038A8", "#FFFFFF", "#0038A8", "#FFFFFF"],
+    "overlays": [
+      {"type": "rectangle", "x": 18.5, "y": 27.8, "w": 37, "h": 55.6, "fill": "#FFFFFF"},
+      {"type": "symbol", "symbolId": "sol_de_mayo", "x": 18.5, "y": 27.8, "w": 22, "h": 22, "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "uzbekistan",
+    "name": "Uzbekistan",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#1EB53A", "#FFFFFF", "#0099B5"],
+    "weights": [5, 1, 5],
+    "overlays": [
+      {"type": "rectangle", "x": 50, "y": 42, "w": 100, "h": 2, "fill": "#CE1126"},
+      {"type": "rectangle", "x": 50, "y": 58, "w": 100, "h": 2, "fill": "#CE1126"},
+      {"type": "circle", "x": 20, "y": 20, "w": 12, "h": 12, "fill": "#FFFFFF"},
+      {"type": "circle", "x": 22, "y": 20, "w": 10, "h": 10, "fill": "#0099B5"},
+      {"type": "starfield", "x": 32, "y": 18, "w": 18, "h": 14, "fill": "#FFFFFF", "starCount": 12, "distribution": "grid", "starCols": 4, "starPoints": 5, "starPointLength": 0.38, "starSize": 35}
+    ]
+  },
+  {
+    "id": "vanuatu",
+    "name": "Vanuatu",
+    "ratio": [3, 5],
+    "sections": 2,
+    "colors": ["#D21034", "#009543"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [40, 50], [0, 100]], "fill": "#000000"},
+      {"type": "band", "x1": 0, "y1": 0, "x2": 100, "y2": 0, "thickness": 8, "fill": "#000000"},
+      {"type": "rectangle", "x": 50, "y": 50, "w": 100, "h": 8, "fill": "#000000"},
+      {"type": "band", "x1": 0, "y1": 100, "x2": 100, "y2": 100, "thickness": 8, "fill": "#000000"},
+      {"type": "rectangle", "x": 50, "y": 47, "w": 100, "h": 4, "fill": "#FCD116"},
+      {"type": "rectangle", "x": 50, "y": 53, "w": 100, "h": 4, "fill": "#FCD116"},
+      {"type": "symbol", "symbolId": "vanuatu_emblem", "x": 18, "y": 50, "w": 20, "h": 30, "fill": "#FCD116"}
+    ]
+  },
+  {
+    "id": "venezuela",
+    "name": "Venezuela",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#FFCC00", "#00247D", "#CF142B"],
+    "overlays": [
+      {"type": "starfield", "x": 50, "y": 50, "w": 35, "h": 10, "fill": "#FFFFFF", "starCount": 8, "distribution": "ring", "starPoints": 5, "starPointLength": 0.38, "starSize": 30}
+    ]
+  },
+  {
+    "id": "vietnam",
+    "name": "Vietnam",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#DA251D"],
+    "overlays": [
+      {"type": "star", "x": 50, "y": 50, "size": 30, "fill": "#FFCD00", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "western_sahara",
+    "name": "Western Sahara",
+    "ratio": [1, 2],
+    "sections": 3,
+    "colors": ["#000000", "#FFFFFF", "#007A3D"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [33, 50], [0, 100]], "fill": "#CE1126"},
+      {"type": "circle", "x": 55, "y": 50, "w": 14, "h": 14, "fill": "#CE1126"},
+      {"type": "circle", "x": 57, "y": 50, "w": 12, "h": 12, "fill": "#FFFFFF"},
+      {"type": "star", "x": 60, "y": 50, "size": 8, "fill": "#CE1126", "points": 5, "pointLength": 0.38}
+    ]
+  },
+  {
+    "id": "yemen",
+    "name": "Yemen",
+    "ratio": [2, 3],
+    "sections": 3,
+    "colors": ["#CE1126", "#FFFFFF", "#000000"]
+  },
+  {
+    "id": "zambia",
+    "name": "Zambia",
+    "ratio": [2, 3],
+    "sections": 1,
+    "colors": ["#198A00"],
+    "overlays": [
+      {"type": "rectangle", "x": 78, "y": 60, "w": 14, "h": 40, "fill": "#EF7D00"},
+      {"type": "rectangle", "x": 88, "y": 60, "w": 14, "h": 40, "fill": "#000000"},
+      {"type": "rectangle", "x": 98, "y": 60, "w": 4, "h": 40, "fill": "#DE2010"},
+      {"type": "symbol", "symbolId": "zambia_emblem", "x": 88, "y": 30, "w": 18, "h": 25, "fill": "#EF7D00"}
+    ]
+  },
+  {
+    "id": "zimbabwe",
+    "name": "Zimbabwe",
+    "ratio": [1, 2],
+    "sections": 7,
+    "colors": ["#006400", "#FFD200", "#D21034", "#000000", "#D21034", "#FFD200", "#006400"],
+    "overlays": [
+      {"type": "polygon", "points": [[0, 0], [25, 50], [0, 100]], "fill": "#FFFFFF"},
+      {"type": "star", "x": 12, "y": 50, "size": 14, "fill": "#D21034", "points": 5, "pointLength": 0.38},
+      {"type": "symbol", "symbolId": "zimbabwe_emblem", "x": 12, "y": 50, "w": 10, "h": 10, "fill": "#FFD200"}
+    ]
+  }
+]

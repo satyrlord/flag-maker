@@ -3,11 +3,13 @@
    ────────────────────────────────────────────── */
 
 import type { Orientation, StripeRect } from "./types";
+import leftbarConfig from "./config/leftbar-config.json";
+import { parseRatio } from "./ratio";
 
 export const VIEW_W = 1200;
 
-/** Default flag aspect ratio [height, width]. Shared by the renderer initial state and the default flag design. */
-export const DEFAULT_RATIO: [number, number] = [2, 3];
+/** Default flag aspect ratio [height, width]. Derived from leftbar-config.json defaultRatio. */
+export const DEFAULT_RATIO: [number, number] = parseRatio(leftbarConfig.defaultRatio);
 
 export function computeViewH(ratio: [number, number]): number {
   return Math.round((VIEW_W * ratio[0]) / ratio[1]);

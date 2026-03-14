@@ -20,41 +20,41 @@ describe("createRightbar", () => {
     return () => vi.restoreAllMocks();
   });
   it("returns an object with element and gridState", () => {
-    const result = createRightbar();
+    const result = createRightbar(3);
     expect(result.element).toBeDefined();
     expect(result.gridState).toBeDefined();
   });
 
   it("element is a div", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     expect(element.tagName).toBe("DIV");
   });
 
   it("has the rightbar class", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     expect(element.classList.contains("rightbar")).toBe(true);
   });
 
   it("has toolbar role and aria-label", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     expect(element.getAttribute("role")).toBe("toolbar");
     expect(element.getAttribute("aria-label")).toBe("Dynamic Tools");
   });
 
   it("is hidden by default (no rightbar-visible class)", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     expect(element.classList.contains("rightbar-visible")).toBe(false);
   });
 
   it("contains a grid toggle button", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn");
     expect(btn).not.toBeNull();
     expect(btn!.getAttribute("aria-label")).toBe("Toggle pixel grid");
   });
 
   it("contains a drag handle", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const handle = element.querySelector(".rightbar-drag-handle");
     expect(handle).not.toBeNull();
     expect(handle!.tagName).toBe("BUTTON");
@@ -62,14 +62,14 @@ describe("createRightbar", () => {
   });
 
   it("drag handle is the first child of the bar", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const firstChild = element.firstElementChild;
     expect(firstChild).not.toBeNull();
     expect(firstChild!.classList.contains("rightbar-drag-handle")).toBe(true);
   });
 
   it("dragging repositions the bar", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLElement;
@@ -92,7 +92,7 @@ describe("createRightbar", () => {
   });
 
   it("ignores pointer move when not dragging", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLElement;
@@ -108,7 +108,7 @@ describe("createRightbar", () => {
   });
 
   it("uses pointer capture helpers when available", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
@@ -137,7 +137,7 @@ describe("createRightbar", () => {
   });
 
   it("clears dragging when pointer capture is lost", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
@@ -156,7 +156,7 @@ describe("createRightbar", () => {
   });
 
   it("arrow keys reposition the bar", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
@@ -169,7 +169,7 @@ describe("createRightbar", () => {
   });
 
   it("supports all keyboard move directions once custom positioned", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
@@ -188,7 +188,7 @@ describe("createRightbar", () => {
   });
 
   it("escape closes the grid menu and unrelated keys do nothing", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
 
     const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
@@ -208,7 +208,7 @@ describe("createRightbar", () => {
   });
 
   it("grid state defaults to off with 5x5 size", () => {
-    const { gridState } = createRightbar();
+    const { gridState } = createRightbar(3);
     expect(gridState.active).toBe(false);
     expect(gridState.colorMode).toBe("off");
     expect(gridState.size.label).toBe("5x5");
@@ -217,7 +217,7 @@ describe("createRightbar", () => {
   });
 
   it("dispatches rightbar:grid-toggle on button click", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     let received = false;
     element.addEventListener("rightbar:grid-toggle", () => { received = true; });
@@ -226,7 +226,7 @@ describe("createRightbar", () => {
   });
 
   it("cycles through cyan, magenta, off on clicks", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
 
     // off -> cyan
@@ -256,7 +256,7 @@ describe("createRightbar", () => {
 
   it("auto-selects magenta when the flag is mostly light-colored", () => {
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(makeFlag("#ffffff", "#eeeeee"));
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click();
     expect(gridState.colorMode).toBe("magenta");
@@ -264,14 +264,14 @@ describe("createRightbar", () => {
 
   it("auto-selects magenta when no SVG is available (fallback to white)", () => {
     vi.spyOn(flagRenderer, "getCurrentSvg").mockReturnValue(null);
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click();
     expect(gridState.colorMode).toBe("magenta");
   });
 
   it("contains a grid size menu with all sizes", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const items = element.querySelectorAll(".rightbar-grid-menu-item");
     expect(items.length).toBe(6);
     expect(items[0].textContent).toBe("2x2");
@@ -280,7 +280,7 @@ describe("createRightbar", () => {
   });
 
   it("selecting a grid size updates gridState", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const items = element.querySelectorAll<HTMLButtonElement>(".rightbar-grid-menu-item");
     // Click "10x10"
     items[2].click();
@@ -290,7 +290,7 @@ describe("createRightbar", () => {
   });
 
   it("selecting a grid size marks item active and deactivates others", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const items = element.querySelectorAll<HTMLButtonElement>(".rightbar-grid-menu-item");
     // Default: 5x5 is active
     expect(items[1].classList.contains("active")).toBe(true);
@@ -306,7 +306,7 @@ describe("createRightbar", () => {
   });
 
   it("selecting a grid size while grid is active dispatches event", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     // Activate grid first (set to cyan)
     gridState.active = true;
     gridState.colorMode = "cyan";
@@ -318,7 +318,7 @@ describe("createRightbar", () => {
   });
 
   it("selecting a grid size while grid is inactive does not dispatch event", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const items = element.querySelectorAll<HTMLButtonElement>(".rightbar-grid-menu-item");
     let received = false;
     element.addEventListener("rightbar:grid-toggle", () => { received = true; });
@@ -327,7 +327,7 @@ describe("createRightbar", () => {
   });
 
   it("selecting a size closes the menu", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const menu = element.querySelector(".rightbar-grid-menu") as HTMLElement;
     menu.classList.add("menu-open");
     const items = element.querySelectorAll<HTMLButtonElement>(".rightbar-grid-menu-item");
@@ -336,7 +336,7 @@ describe("createRightbar", () => {
   });
 
   it("right-click on grid button toggles menu", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     const menu = element.querySelector(".rightbar-grid-menu") as HTMLElement;
     expect(menu.classList.contains("menu-open")).toBe(false);
@@ -349,7 +349,7 @@ describe("createRightbar", () => {
   });
 
   it("clicking outside of the grid wrap closes the menu", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
     const menu = element.querySelector(".rightbar-grid-menu") as HTMLElement;
     menu.classList.add("menu-open");
@@ -362,7 +362,7 @@ describe("createRightbar", () => {
   });
 
   it("clicking inside the grid wrap does not close the menu", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     document.body.appendChild(element);
     const menu = element.querySelector(".rightbar-grid-menu") as HTMLElement;
     const gridWrap = element.querySelector(".rightbar-grid-wrap") as HTMLElement;
@@ -380,14 +380,14 @@ describe("createRightbar", () => {
     // fallback path by testing that gridState has a valid size even
     // when the module loads correctly (covers the ?? branch via
     // the GRID_SIZES.find succeeding).
-    const { gridState } = createRightbar();
+    const { gridState } = createRightbar(3);
     expect(gridState.size).toBeDefined();
     expect(gridState.size.width).toBeGreaterThan(0);
     expect(gridState.size.height).toBeGreaterThan(0);
   });
 
   it("scrolling down on grid button cycles to next size when active", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     // Activate grid
     btn.click(); // off -> cyan
@@ -401,7 +401,7 @@ describe("createRightbar", () => {
   });
 
   it("scrolling up on grid button cycles to previous size when active", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click(); // activate
     // Default is 5x5 (index 1), scroll up to 2x2 (index 0)
@@ -410,7 +410,7 @@ describe("createRightbar", () => {
   });
 
   it("scrolling does not go past first or last size", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click(); // activate
 
@@ -432,7 +432,7 @@ describe("createRightbar", () => {
   });
 
   it("scrolling is ignored when grid is off", () => {
-    const { element, gridState } = createRightbar();
+    const { element, gridState } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     expect(gridState.active).toBe(false);
 
@@ -441,7 +441,7 @@ describe("createRightbar", () => {
   });
 
   it("scrolling updates the size menu active state", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click(); // activate
 
@@ -453,7 +453,7 @@ describe("createRightbar", () => {
   });
 
   it("scrolling dispatches rightbar:grid-toggle event", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     const btn = element.querySelector(".rightbar-btn") as HTMLButtonElement;
     btn.click(); // activate
 
@@ -462,17 +462,93 @@ describe("createRightbar", () => {
     btn.dispatchEvent(new WheelEvent("wheel", { deltaY: 100, bubbles: true }));
     expect(received).toBe(true);
   });
+
+  // ── Center horizontally / vertically buttons ──
+
+  it("contains center-horizontally and center-vertically buttons", () => {
+    const { element } = createRightbar(3);
+    const centerBtns = element.querySelectorAll(".rightbar-center-btn");
+    expect(centerBtns.length).toBe(2);
+    const labels = Array.from(centerBtns).map((b) => b.getAttribute("aria-label"));
+    expect(labels).toContain("Center horizontally");
+    expect(labels).toContain("Center vertically");
+  });
+
+  it("center buttons are disabled by default", () => {
+    const { element } = createRightbar(3);
+    const centerBtns = element.querySelectorAll<HTMLButtonElement>(".rightbar-center-btn");
+    for (const btn of centerBtns) {
+      expect(btn.disabled).toBe(true);
+    }
+  });
+
+  it("enableCenterTools(true) enables center buttons", () => {
+    const { element, enableCenterTools } = createRightbar(3);
+    enableCenterTools(true);
+    const centerBtns = element.querySelectorAll<HTMLButtonElement>(".rightbar-center-btn");
+    for (const btn of centerBtns) {
+      expect(btn.disabled).toBe(false);
+    }
+  });
+
+  it("enableCenterTools(false) disables center buttons", () => {
+    const { element, enableCenterTools } = createRightbar(3);
+    enableCenterTools(true);
+    enableCenterTools(false);
+    const centerBtns = element.querySelectorAll<HTMLButtonElement>(".rightbar-center-btn");
+    for (const btn of centerBtns) {
+      expect(btn.disabled).toBe(true);
+    }
+  });
+
+  it("center-h button dispatches rightbar:center-h event when enabled", () => {
+    const { element, enableCenterTools } = createRightbar(3);
+    enableCenterTools(true);
+    const btn = element.querySelector("[aria-label='Center horizontally']") as HTMLButtonElement;
+    let received = false;
+    element.addEventListener("rightbar:center-h", () => { received = true; });
+    btn.click();
+    expect(received).toBe(true);
+  });
+
+  it("center-v button dispatches rightbar:center-v event when enabled", () => {
+    const { element, enableCenterTools } = createRightbar(3);
+    enableCenterTools(true);
+    const btn = element.querySelector("[aria-label='Center vertically']") as HTMLButtonElement;
+    let received = false;
+    element.addEventListener("rightbar:center-v", () => { received = true; });
+    btn.click();
+    expect(received).toBe(true);
+  });
+
+  it("center-h button does not dispatch event when disabled", () => {
+    const { element } = createRightbar(3);
+    const btn = element.querySelector("[aria-label='Center horizontally']") as HTMLButtonElement;
+    let received = false;
+    element.addEventListener("rightbar:center-h", () => { received = true; });
+    btn.click();
+    expect(received).toBe(false);
+  });
+
+  it("center-v button does not dispatch event when disabled", () => {
+    const { element } = createRightbar(3);
+    const btn = element.querySelector("[aria-label='Center vertically']") as HTMLButtonElement;
+    let received = false;
+    element.addEventListener("rightbar:center-v", () => { received = true; });
+    btn.click();
+    expect(received).toBe(false);
+  });
 });
 
 describe("setRightbarVisible", () => {
   it("adds rightbar-visible class when true", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     setRightbarVisible(element, true);
     expect(element.classList.contains("rightbar-visible")).toBe(true);
   });
 
   it("removes rightbar-visible class when false", () => {
-    const { element } = createRightbar();
+    const { element } = createRightbar(3);
     setRightbarVisible(element, true);
     setRightbarVisible(element, false);
     expect(element.classList.contains("rightbar-visible")).toBe(false);
@@ -481,7 +557,7 @@ describe("setRightbarVisible", () => {
 
 describe("createRightbar disconnect", () => {
   it("disconnect stops the click-outside listener from closing the menu", () => {
-    const { element, disconnect } = createRightbar();
+    const { element, disconnect } = createRightbar(3);
     document.body.appendChild(element);
     const menu = element.querySelector(".rightbar-grid-menu") as HTMLElement;
     menu.classList.add("menu-open");

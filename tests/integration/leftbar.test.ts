@@ -1,50 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createLeftbar } from "@/ui/leftbar";
+import type { Overlay } from "@/types";
+import { BUILTIN_SYMBOLS } from "@/symbols";
 import config from "@/config/leftbar-config.json";
 import { validateLeftbarConfig } from "@/ui/leftbarConfig";
+import { ALL_TEMPLATE_FACTORIES, TEMPLATE_GROUPED_CONFIGS, validateTemplateCatalog } from "@/templateCatalog";
 import {
-  templatePerPale,
-  templatePerFess,
-  templateTricolorVertical,
-  templateTricolorHorizontal,
-  templateQuartered,
-  templatePerBend,
-  templatePerBendSinister,
-  templatePerSaltire,
-  templatePerChevron,
-  templateCenteredCross,
-  templateNordicCross,
-  templateUS,
-  templateIceland,
-  templateUruguay,
-  templateDRC,
-  templateUK,
-  templateSouthAfrica,
+  NATIONAL_FLAG_CONFIGS,
 } from "@/templates";
-import { VIEW_W, computeViewH } from "@/geometry";
-
-const TEMPLATE_FACTORIES = {
-  perPale: templatePerPale,
-  perFess: templatePerFess,
-  triV: templateTricolorVertical,
-  triH: templateTricolorHorizontal,
-  quartered: templateQuartered,
-  perBend: templatePerBend,
-  perBendSin: templatePerBendSinister,
-  saltire: templatePerSaltire,
-  chevron: templatePerChevron,
-  centCross: templateCenteredCross,
-  nordic: templateNordicCross,
-  us: () => {
-    const r: [number, number] = [10, 19];
-    return templateUS(VIEW_W, computeViewH(r));
-  },
-  iceland: templateIceland,
-  uruguay: templateUruguay,
-  drc: templateDRC,
-  uk: templateUK,
-  sa: templateSouthAfrica,
-};
 
 /* Mock matchMedia (not implemented in jsdom) */
 beforeEach(() => {
@@ -81,7 +44,7 @@ describe("createLeftbar", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    expect(tabs.length).toBe(6);
+    expect(tabs.length).toBe(7);
   });
 
   it("tab buttons have correct labels", () => {
@@ -89,7 +52,7 @@ describe("createLeftbar", () => {
       'nav[aria-label="Toolbar tabs"] button',
     );
     const labels = Array.from(tabs).map((b) => b.getAttribute("aria-label"));
-    expect(labels).toEqual(["Templates", "Aspect Ratio", "Stripes", "Overlays", "Symbols", "Saved"]);
+    expect(labels).toEqual(["Templates", "Aspect Ratio", "Stripes", "Overlays", "Starfield", "Symbols", "Saved"]);
   });
 
   it("shows Templates panel by default", () => {
@@ -106,8 +69,8 @@ describe("createLeftbar", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    // Saved is the last tab (index 5)
-    tabs[5].click();
+    // Saved is the last tab (index 6)
+    tabs[6].click();
     const panel = toolbar.querySelector(".toolbar-panel-content");
     expect(panel).not.toBeNull();
     expect(panel!.textContent).toContain("No saved designs yet");
@@ -128,7 +91,7 @@ describe("createLeftbar", () => {
 
   it("has a sort select with commonality and value options", () => {
     switchToRatioTab();
-    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select");
+    const select = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Sort aspect ratios"]');
     expect(select).not.toBeNull();
     const options = select!.querySelectorAll("option");
     expect(options.length).toBe(2);
@@ -147,7 +110,7 @@ describe("createLeftbar", () => {
 
   it("re-sorts ratios by value (ascending h/w) when select changes", () => {
     switchToRatioTab();
-    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
+    const select = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Sort aspect ratios"]')!;
     select.value = "value";
     select.dispatchEvent(new Event("change"));
     const btns = toolbar.querySelectorAll(".toolbar-ratio-btn");
@@ -156,15 +119,20 @@ describe("createLeftbar", () => {
   });
 
   it("accepts the current leftbar config", () => {
-    expect(() => validateLeftbarConfig(config, TEMPLATE_FACTORIES)).not.toThrow();
+    expect(() => validateLeftbarConfig(config)).not.toThrow();
+  });
+
+  it("accepts the current template catalog", () => {
+    expect(() => validateTemplateCatalog(config.templateGroups, TEMPLATE_GROUPED_CONFIGS, ALL_TEMPLATE_FACTORIES)).not.toThrow();
   });
 
   it("rejects a config with an unknown template id", () => {
-    const invalid = {
-      ...config,
-      templates: [...config.templates, { id: "missing", name: "Missing", group: "Division" }],
-    };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/missing template factories/i);
+    const invalid = TEMPLATE_GROUPED_CONFIGS.map((group) =>
+      group.group === "Division"
+        ? { ...group, entries: [...group.entries, { id: "missing", name: "Missing" }] }
+        : group,
+    );
+    expect(() => validateTemplateCatalog(config.templateGroups, invalid, ALL_TEMPLATE_FACTORIES)).toThrow(/missing template factories/i);
   });
 
   it("rejects a config with an invalid default ratio", () => {
@@ -172,7 +140,7 @@ describe("createLeftbar", () => {
       ...config,
       defaultRatio: "9:99",
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultRatio/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultRatio/i);
   });
 
   it("rejects a config with no ratios", () => {
@@ -180,7 +148,7 @@ describe("createLeftbar", () => {
       ...config,
       ratios: [],
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/ratios must not be empty/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/ratios must not be empty/i);
   });
 
   it("rejects duplicate ratio labels", () => {
@@ -188,7 +156,7 @@ describe("createLeftbar", () => {
       ...config,
       ratios: [config.ratios[0], config.ratios[0]],
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/ratio labels must be unique/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/ratio labels must be unique/i);
   });
 
   it("rejects a ratio with the wrong number of values", () => {
@@ -197,7 +165,7 @@ describe("createLeftbar", () => {
       ratios: [{ ...config.ratios[0], ratio: [1] }],
       defaultRatio: config.ratios[0].label,
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/exactly two values/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/exactly two values/i);
   });
 
   it("rejects a non-positive ratio", () => {
@@ -206,7 +174,7 @@ describe("createLeftbar", () => {
       ratios: [{ ...config.ratios[0], ratio: [0, 1] }],
       defaultRatio: config.ratios[0].label,
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/must be positive/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/must be positive/i);
   });
 
   it("rejects an invalid stripe default count range", () => {
@@ -218,7 +186,7 @@ describe("createLeftbar", () => {
         defaultCount: 3,
       },
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultCount must be within/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultCount must be within/i);
   });
 
   it("rejects default colors shorter than the stripe max count", () => {
@@ -229,15 +197,7 @@ describe("createLeftbar", () => {
         defaultColors: ["#ffffff"],
       },
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/defaultColors must cover maxCount/i);
-  });
-
-  it("rejects a config with an invalid overlay type", () => {
-    const invalid = {
-      ...config,
-      overlayTypes: [...config.overlayTypes, { id: "diamond", label: "Diamond" }],
-    };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/unknown overlay type/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultColors must cover maxCount/i);
   });
 
   it("rejects duplicate overlay type ids", () => {
@@ -245,15 +205,12 @@ describe("createLeftbar", () => {
       ...config,
       overlayTypes: [config.overlayTypes[0], config.overlayTypes[0]],
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/overlay type IDs must be unique/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/overlay type IDs must be unique/i);
   });
 
   it("rejects a config with a template group missing from templateGroups", () => {
-    const invalid = {
-      ...config,
-      templates: [...config.templates, { id: "perPale", name: "Per Pale Copy", group: "Historic" }],
-    };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/template groups missing/i);
+    const invalid = [...TEMPLATE_GROUPED_CONFIGS, { group: "Historic", entries: [{ id: "perPale", name: "Per Pale Copy" }] }];
+    expect(() => validateTemplateCatalog(config.templateGroups, invalid, ALL_TEMPLATE_FACTORIES)).toThrow(/template groups missing/i);
   });
 
   it("rejects a config with an empty declared template group", () => {
@@ -261,7 +218,7 @@ describe("createLeftbar", () => {
       ...config,
       templateGroups: [...config.templateGroups, "Unused"],
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/has no templates/i);
+    expect(() => validateTemplateCatalog(invalid.templateGroups, TEMPLATE_GROUPED_CONFIGS, ALL_TEMPLATE_FACTORIES)).toThrow(/has no templates/i);
   });
 
   it("rejects duplicate template groups", () => {
@@ -269,7 +226,68 @@ describe("createLeftbar", () => {
       ...config,
       templateGroups: [config.templateGroups[0], config.templateGroups[0]],
     };
-    expect(() => validateLeftbarConfig(invalid, TEMPLATE_FACTORIES)).toThrow(/templateGroups must be unique/i);
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/templateGroups must be unique/i);
+  });
+
+  it("rejects a config missing a required layer group", () => {
+    const { stripes: _s, ...partialGroups } = config.layerGroups;
+    const invalid = {
+      ...config,
+      layerGroups: partialGroups,
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/must include "stripes"/i);
+  });
+
+  it("rejects layer group with invalid min/max", () => {
+    const invalid = {
+      ...config,
+      layerGroups: {
+        ...config.layerGroups,
+        overlays: { minLayers: 5, maxLayers: 2 },
+      },
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/invalid min\/max/i);
+  });
+
+  it("rejects an invalid defaultOrientation", () => {
+    const invalid = {
+      ...config,
+      defaultOrientation: "diagonal",
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultOrientation/i);
+  });
+
+  it("rejects a malformed defaultRatio string", () => {
+    const invalid = {
+      ...config,
+      ratios: [{ label: "bad", ratio: [2, 3], commonality: 1 }],
+      defaultRatio: "bad",
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultRatio.*must be.*N:M/i);
+  });
+
+  it("rejects an invalid defaultOverlayFill", () => {
+    const invalid = {
+      ...config,
+      defaultOverlayFill: "red",
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/defaultOverlayFill/i);
+  });
+
+  it("rejects an invalid layerGroupOrder", () => {
+    const invalid = {
+      ...config,
+      layerGroupOrder: ["stripes", "overlays"],
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/layerGroupOrder/i);
+  });
+
+  it("rejects unsupported overlay type IDs", () => {
+    const invalid = {
+      ...config,
+      overlayTypes: [...config.overlayTypes, { id: "hexagon", label: "Hexagon", shortLabel: "Hex" }],
+    };
+    expect(() => validateLeftbarConfig(invalid)).toThrow(/unsupported overlay types.*hexagon/i);
   });
 
   it("2:3 ratio is active by default", () => {
@@ -389,6 +407,8 @@ describe("Stripes tab", () => {
 
 describe("Templates tab", () => {
   let toolbar: HTMLElement;
+  const divisionTemplates = TEMPLATE_GROUPED_CONFIGS.find((group) => group.group === "Division")!.entries.length;
+  const nationalTemplates = TEMPLATE_GROUPED_CONFIGS.find((group) => group.group === "National")!.entries.length;
 
   beforeEach(() => {
     document.documentElement.className = "dark";
@@ -401,19 +421,57 @@ describe("Templates tab", () => {
     tabs[0].click(); // Templates
   });
 
-  it("shows Division and National section titles", () => {
+  it("shows Division, National, and State Level section titles", () => {
     const titles = toolbar.querySelectorAll(".toolbar-section-title");
     const texts = Array.from(titles).map((t) => t.textContent);
     expect(texts).toContain("Division");
     expect(texts).toContain("National");
+    expect(texts).toContain("State Level");
   });
 
-  it("renders template items with SVG thumbnails", () => {
+  it("opens only the Division section by default", () => {
+    const toggles = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-template-section-toggle");
+    expect(toggles[0]?.getAttribute("aria-expanded")).toBe("true");
+    expect(toggles[1]?.getAttribute("aria-expanded")).toBe("false");
+    expect(toggles[2]?.getAttribute("aria-expanded")).toBe("false");
+    expect(toolbar.querySelector('[aria-label="Apply France template"]')).toBeNull();
+  });
+
+  it("renders only Division template items with SVG thumbnails by default", () => {
     const items = toolbar.querySelectorAll(".toolbar-template-item");
-    expect(items.length).toBeGreaterThanOrEqual(17);
+    expect(items.length).toBe(divisionTemplates);
     for (const item of items) {
       expect(item.querySelector("svg")).not.toBeNull();
     }
+  });
+
+  it("lazy loads National templates when expanding the section", () => {
+    const nationalToggle = Array.from(toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-template-section-toggle")).find((button) =>
+      button.textContent?.includes("National"),
+    )!;
+
+    nationalToggle.click();
+
+    expect(nationalToggle.getAttribute("aria-expanded")).toBe("true");
+    const items = toolbar.querySelectorAll(".toolbar-template-item");
+    expect(items.length).toBe(divisionTemplates + nationalTemplates);
+    expect(toolbar.querySelector('[aria-label="Apply France template"]')).not.toBeNull();
+  });
+
+  it("uses static image previews for done templates and SVG previews for unfinished ones", () => {
+    const nationalToggle = Array.from(toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-template-section-toggle")).find((button) =>
+      button.textContent?.includes("National"),
+    )!;
+
+    nationalToggle.click();
+
+    const austriaButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply Austria template"]');
+    const franceButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply France template"]');
+
+    expect(austriaButton?.querySelector("img.toolbar-template-thumb")).not.toBeNull();
+    expect(austriaButton?.querySelector("svg")).toBeNull();
+    expect(franceButton?.querySelector("svg")).not.toBeNull();
+    expect(franceButton?.querySelector("img.toolbar-template-thumb")).toBeNull();
   });
 
   it("clicking a template emits toolbar:template event", () => {
@@ -441,7 +499,7 @@ describe("Symbols tab", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[4].click(); // Symbols
+    tabs[5].click(); // Symbols
   });
 
   it("has a search input", () => {
@@ -450,25 +508,23 @@ describe("Symbols tab", () => {
     expect(search!.placeholder).toBe("Search symbols...");
   });
 
-  it("renders all 10 builtin symbols", () => {
+  it("defaults to the first category", () => {
+    const activeCatBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-cat-btn.active");
+    expect(activeCatBtn).not.toBeNull();
+    expect(activeCatBtn!.textContent).toBe(BUILTIN_SYMBOLS[0].category);
     const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(10);
+    const expectedCount = BUILTIN_SYMBOLS.filter(
+      (s) => s.category === BUILTIN_SYMBOLS[0].category,
+    ).length;
+    expect(items.length).toBe(expectedCount);
   });
 
-  it("filters symbols by search text", () => {
+  it("filters symbols by search text within category", () => {
     const search = toolbar.querySelector<HTMLInputElement>('input[type="search"]')!;
-    search.value = "cross";
+    search.value = "sol";
     search.dispatchEvent(new Event("input"));
     const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(2); // Greek Cross and Latin Cross
-  });
-
-  it("filters symbols by category", () => {
-    const catBtns = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-cat-btn");
-    const starsBtn = Array.from(catBtns).find((b) => b.textContent === "Stars")!;
-    starsBtn.click();
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(2); // star5 and star6_hexagram
+    expect(items.length).toBe(1); // Sol de Mayo
   });
 
   it("clicking a symbol emits toolbar:symbol event", () => {
@@ -498,11 +554,11 @@ describe("Overlays tab", () => {
     tabs[3].click(); // Overlays
   });
 
-  it("shows add overlay buttons for rectangle, circle, star", () => {
+  it("shows add overlay buttons for rectangle, circle, triangle", () => {
     const addBtns = toolbar.querySelectorAll(".toolbar-add-btn");
     expect(addBtns.length).toBe(3);
     const labels = Array.from(addBtns).map((b) => b.textContent);
-    expect(labels).toEqual(["Rectangle", "Circle", "Star"]);
+    expect(labels).toEqual(["Rectangle", "Circle", "Triangle"]);
   });
 
   it("clicking add overlay emits toolbar:add-overlay event", () => {
@@ -519,6 +575,719 @@ describe("Overlays tab", () => {
   it("shows empty layer list text", () => {
     const empty = toolbar.querySelector(".toolbar-empty-text");
     expect(empty?.textContent).toBe("No overlays yet");
+  });
+
+  it("shows layer count indicator", () => {
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toBe("0 / 99 layers");
+  });
+
+  it("renders layer rows when sync-layers event dispatched with overlays", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+      {
+        id: "ov2", type: "circle", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#00FF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const rows = toolbar.querySelectorAll(".toolbar-layer-row");
+    expect(rows.length).toBe(2);
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toBe("2 / 99 layers");
+  });
+
+  it("does not show symbol overlays in overlay layer list", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+      {
+        id: "sym1", type: "symbol", symbolId: "star5", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const rows = toolbar.querySelectorAll(".toolbar-layer-row");
+    expect(rows.length).toBe(1);
+  });
+
+  it("visibility button emits toolbar:layer-visibility event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-visibility", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    const visBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Hide layer"]');
+    expect(visBtn).not.toBeNull();
+    visBtn!.click();
+    expect(detail).toEqual({ id: "ov1", visible: false });
+  });
+
+  it("visibility button shows eye-off icon for hidden layers", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+        visible: false,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const visBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Show layer"]');
+    expect(visBtn).not.toBeNull();
+  });
+
+  it("lock button emits toolbar:layer-lock event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-lock", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    const lockBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Lock layer"]');
+    expect(lockBtn).not.toBeNull();
+    lockBtn!.click();
+    expect(detail).toEqual({ id: "ov1", locked: true });
+  });
+
+  it("lock button shows lock icon for locked layers", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+        locked: true,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const lockBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Unlock layer"]');
+    expect(lockBtn).not.toBeNull();
+  });
+
+  it("delete button emits toolbar:layer-remove event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-remove", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    const delBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Delete layer"]');
+    expect(delBtn).not.toBeNull();
+    delBtn!.click();
+    expect(detail).toEqual({ id: "ov1" });
+  });
+
+  it("move up button emits toolbar:layer-move event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+      {
+        id: "ov2", type: "circle", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#00FF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-move", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    // First layer (index 0) can move up
+    const upBtns = toolbar.querySelectorAll<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Move layer up"]');
+    // Rows are in reverse order (top-most first), so last row = index 0 overlay
+    const enabledUpBtn = Array.from(upBtns).find((b) => !b.disabled);
+    expect(enabledUpBtn).not.toBeUndefined();
+    enabledUpBtn!.click();
+    expect(detail).not.toBeNull();
+    expect(detail!.direction).toBe("up");
+  });
+
+  it("move down button emits toolbar:layer-move event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+      {
+        id: "ov2", type: "circle", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#00FF00", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-move", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    // Second layer (index 1) can move down
+    const downBtns = toolbar.querySelectorAll<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Move layer down"]');
+    const enabledDownBtn = Array.from(downBtns).find((b) => !b.disabled);
+    expect(enabledDownBtn).not.toBeUndefined();
+    enabledDownBtn!.click();
+    expect(detail).not.toBeNull();
+    expect(detail!.direction).toBe("down");
+  });
+
+  it("color picker emits toolbar:layer-color event", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-color", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    const colorPicker = toolbar.querySelector<HTMLInputElement>(".toolbar-layer-color");
+    expect(colorPicker).not.toBeNull();
+    Object.defineProperty(colorPicker!, "value", { value: "#0000FF", writable: true });
+    colorPicker!.dispatchEvent(new Event("input"));
+    expect(detail).toEqual({ id: "ov1", fill: "#0000FF" });
+  });
+
+  it("layer list clears when synced with empty overlays", () => {
+    // First add some overlays
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    expect(toolbar.querySelectorAll(".toolbar-layer-row").length).toBe(1);
+
+    // Now clear
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [] }, bubbles: false }),
+    );
+    expect(toolbar.querySelectorAll(".toolbar-layer-row").length).toBe(0);
+    const empty = toolbar.querySelector(".toolbar-overlay-list .toolbar-empty-text");
+    expect(empty?.textContent).toBe("No overlays yet");
+  });
+});
+
+describe("Starfield tab", () => {
+  let toolbar: HTMLElement;
+
+  function switchToStarfieldTab(): void {
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[4].click(); // Starfield
+  }
+
+  beforeEach(() => {
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    toolbar = createLeftbar();
+    document.body.appendChild(toolbar);
+    switchToStarfieldTab();
+  });
+
+  it("shows add starfield button", () => {
+    const addBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Add starfield overlay"]');
+    expect(addBtn).not.toBeNull();
+    expect(addBtn!.textContent).toContain("Add starfield");
+  });
+
+  it("shows layer count info", () => {
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toContain("0 / 10 starfields");
+  });
+
+  it("shows empty text when no starfields", () => {
+    const empty = toolbar.querySelector(".toolbar-empty-text");
+    expect(empty?.textContent).toBe("Add a starfield to begin");
+  });
+
+  it("clicking add button emits toolbar:add-starfield event", () => {
+    let emitted = false;
+    toolbar.addEventListener("toolbar:add-starfield", () => { emitted = true; });
+    const addBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Add starfield overlay"]')!;
+    addBtn.click();
+    expect(emitted).toBe(true);
+  });
+
+  it("has distribution dropdown with correct options", () => {
+    const select = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Star distribution pattern"]');
+    expect(select).not.toBeNull();
+    const options = Array.from(select!.options).map((o) => o.value);
+    expect(options).toContain("ring");
+    expect(options).toContain("staggered-grid");
+    expect(options).toContain("grid");
+    expect(options).toContain("line");
+    expect(options).toContain("arc");
+  });
+
+  it("syncs layers and shows starfield in layer list", () => {
+    const starfield: Overlay = {
+      id: "sf1", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    const rows = toolbar.querySelectorAll(".toolbar-layer-row");
+    expect(rows.length).toBe(1);
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toContain("1 / 10 starfields");
+  });
+
+  it("syncs controls to selected starfield", () => {
+    const starfield: Overlay = {
+      id: "sf2", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "staggered-grid", starCount: 50,
+      starCols: 6,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    // Props section should now be visible with values from the overlay
+    const distSelect = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Star distribution pattern"]');
+    expect(distSelect).not.toBeNull();
+    expect(distSelect!.value).toBe("staggered-grid");
+  });
+
+  it("emits starfield-update when distribution changes", () => {
+    const starfield: Overlay = {
+      id: "sf3", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const distSelect = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Star distribution pattern"]')!;
+    distSelect.value = "grid";
+    distSelect.dispatchEvent(new Event("change"));
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starDistribution).toBe("grid");
+  });
+
+  it("emits starfield-update when star count is incremented", () => {
+    const starfield: Overlay = {
+      id: "sf4", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const plusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase star count"]')!;
+    plusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starCount).toBe(13);
+  });
+
+  it("emits starfield-update when star count is decremented", () => {
+    const starfield: Overlay = {
+      id: "sf5", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const minusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease star count"]')!;
+    minusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starCount).toBe(11);
+  });
+
+  it("emits starfield-update when points are changed", () => {
+    const starfield: Overlay = {
+      id: "sf6", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const plusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase star points"]')!;
+    plusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starPoints).toBe(6);
+  });
+
+  it("emits starfield-update when point length slider changes", () => {
+    const starfield: Overlay = {
+      id: "sf7", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const slider = toolbar.querySelector<HTMLInputElement>('input[aria-label="Star point length"]')!;
+    slider.value = "50";
+    slider.dispatchEvent(new Event("input"));
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starPointLength).toBe(0.5);
+  });
+
+  it("emits starfield-update when size slider changes", () => {
+    const starfield: Overlay = {
+      id: "sf8", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const slider = toolbar.querySelector<HTMLInputElement>('input[aria-label="Star size"]')!;
+    slider.value = "70";
+    slider.dispatchEvent(new Event("input"));
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starSize).toBe(70);
+  });
+
+  it("emits starfield-update when color changes", () => {
+    const starfield: Overlay = {
+      id: "sf9", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const colorPicker = toolbar.querySelector<HTMLInputElement>('input[aria-label="Star fill color"]')!;
+    colorPicker.value = "#FF0000";
+    colorPicker.dispatchEvent(new Event("input"));
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).fill).toBe("#ff0000");
+  });
+
+  it("emits starfield-update when rotate checkbox is toggled", () => {
+    const starfield: Overlay = {
+      id: "sf10", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const checkbox = toolbar.querySelector<HTMLInputElement>('input[aria-label="Rotate stars with position"]')!;
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event("change"));
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starRotateWithPosition).toBe(true);
+  });
+
+  it("emits starfield-update when column count changes", () => {
+    const starfield: Overlay = {
+      id: "sf11", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "staggered-grid", starCount: 50,
+      starCols: 6,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const plusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase column count"]')!;
+    plusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starCols).toBe(7);
+  });
+
+  it("clears selection when selected starfield is removed", () => {
+    const starfield: Overlay = {
+      id: "sf-remove", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    // Click the layer row to select it
+    const row = toolbar.querySelector(".toolbar-layer-row") as HTMLElement;
+    row?.click();
+    // Now remove it
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [] }, bubbles: false }),
+    );
+    const empty = toolbar.querySelector(".toolbar-empty-text");
+    expect(empty?.textContent).toBe("Add a starfield to begin");
+  });
+
+  it("decreases column count with minus button", () => {
+    const starfield: Overlay = {
+      id: "sf-col-minus", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "grid", starCount: 9,
+      starCols: 5,
+      starPoints: 5, starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const minusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease column count"]')!;
+    minusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starCols).toBe(4);
+  });
+
+  it("decreases star points with minus button", () => {
+    const starfield: Overlay = {
+      id: "sf-pts-minus", type: "starfield",
+      x: 50, y: 50, w: 40, h: 40,
+      rotation: 0, fill: "#FFD700", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      starDistribution: "ring", starCount: 12,
+      starPoints: 6,
+      starPointLength: 0.38, starSize: 50,
+    };
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays: [starfield] }, bubbles: false }),
+    );
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:starfield-update", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+    const minusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease star points"]')!;
+    minusBtn.click();
+    expect(detail).not.toBeNull();
+    expect((detail!.props as Record<string, unknown>).starPoints).toBe(5);
+  });
+
+  it("does not emit events when no starfield is selected", () => {
+    // No starfield synced — controls exist but have no selected overlay
+    let emitted = false;
+    toolbar.addEventListener("toolbar:starfield-update", () => { emitted = true; });
+    // Try clicking count buttons (they should no-op because getSelected() returns undefined)
+    const plusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase star count"]')!;
+    plusBtn.click();
+    expect(emitted).toBe(false);
+    const minusBtn = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease star count"]')!;
+    minusBtn.click();
+    expect(emitted).toBe(false);
+    const colsPlus = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase column count"]')!;
+    colsPlus.click();
+    expect(emitted).toBe(false);
+    const colsMinus = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease column count"]')!;
+    colsMinus.click();
+    expect(emitted).toBe(false);
+    const pointsPlus = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Increase star points"]')!;
+    pointsPlus.click();
+    expect(emitted).toBe(false);
+    const pointsMinus = toolbar.querySelector<HTMLButtonElement>('button[aria-label="Decrease star points"]')!;
+    pointsMinus.click();
+    expect(emitted).toBe(false);
+  });
+});
+
+describe("Symbols tab - layer management", () => {
+  let toolbar: HTMLElement;
+
+  beforeEach(() => {
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    toolbar = createLeftbar();
+    document.body.appendChild(toolbar);
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[5].click(); // Symbols
+  });
+
+  it("shows symbol layer count indicator", () => {
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toBe("0 / 99 layers");
+  });
+
+  it("shows empty active symbols text", () => {
+    const empty = toolbar.querySelector(".toolbar-overlay-list .toolbar-empty-text");
+    expect(empty?.textContent).toBe("No symbols placed");
+  });
+
+  it("renders symbol layer rows when sync-layers dispatched", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "sym1", type: "symbol", symbolId: "sol_de_mayo", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const rows = toolbar.querySelectorAll(".toolbar-layer-row");
+    expect(rows.length).toBe(1);
+    const countEl = toolbar.querySelector(".toolbar-layer-count");
+    expect(countEl?.textContent).toBe("1 / 99 layers");
+  });
+
+  it("does not include non-symbol overlays in symbol layer list", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "ov1", type: "rectangle", x: 50, y: 50, w: 30, h: 20,
+        rotation: 0, fill: "#FF0000", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+      {
+        id: "sym1", type: "symbol", symbolId: "sol_de_mayo", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const rows = toolbar.querySelectorAll(".toolbar-layer-row");
+    expect(rows.length).toBe(1);
+  });
+
+  it("symbol layer has a color picker", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "sym1", type: "symbol", symbolId: "sol_de_mayo", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+    const colorPicker = toolbar.querySelector(".toolbar-layer-color");
+    expect(colorPicker).not.toBeNull();
+  });
+
+  it("symbol layer delete button emits toolbar:layer-remove", () => {
+    const overlays: Overlay[] = [
+      {
+        id: "sym1", type: "symbol", symbolId: "sol_de_mayo", x: 50, y: 50, w: 20, h: 20,
+        rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+      },
+    ];
+    toolbar.dispatchEvent(
+      new CustomEvent("toolbar:sync-layers", { detail: { overlays }, bubbles: false }),
+    );
+
+    let detail: Record<string, unknown> | null = null;
+    toolbar.addEventListener("toolbar:layer-remove", ((e: CustomEvent) => {
+      detail = e.detail as Record<string, unknown>;
+    }) as EventListener);
+
+    const delBtn = toolbar.querySelector<HTMLButtonElement>('.toolbar-layer-btn[aria-label="Delete layer"]');
+    expect(delBtn).not.toBeNull();
+    delBtn!.click();
+    expect(detail).toEqual({ id: "sym1" });
   });
 });
 
@@ -573,7 +1342,7 @@ describe("Symbols tab - no results", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[4].click(); // Symbols
+    tabs[5].click(); // Symbols
   });
 
   it("shows no symbols found when search yields no results", () => {
@@ -583,6 +1352,119 @@ describe("Symbols tab - no results", () => {
     const empty = toolbar.querySelectorAll(".toolbar-empty-text");
     const noResults = Array.from(empty).find((e) => e.textContent === "No symbols found");
     expect(noResults).not.toBeUndefined();
+  });
+});
+
+describe("Symbols tab - dynamic symbol loading", () => {
+  let toolbar: HTMLElement;
+
+  beforeEach(() => {
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    toolbar = createLeftbar();
+    document.body.appendChild(toolbar);
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[5].click(); // Symbols
+  });
+
+  it("symbols:loaded event adds new symbols and rebuilds tabs", () => {
+    const newSymbols = [
+      { id: "test_loaded_1", name: "Loaded Symbol", category: "TestCat", svg: "<g/>" },
+    ];
+    toolbar.dispatchEvent(new CustomEvent("symbols:loaded", { detail: { symbols: newSymbols } }));
+
+    // The new category tab should now exist
+    const catBtns = toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-cat-btn");
+    const catTexts = Array.from(catBtns).map((b) => b.textContent);
+    expect(catTexts).toContain("TestCat");
+
+    // Click the new category tab and verify the symbol appears
+    const testCatBtn = Array.from(catBtns).find((b) => b.textContent === "TestCat")!;
+    testCatBtn.click();
+    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+    expect(items.length).toBe(1);
+  });
+});
+
+describe("Symbols tab - lazy loading with IntersectionObserver", () => {
+  let observeCallback: IntersectionObserverCallback;
+  let observedElements: Element[];
+
+  beforeEach(async () => {
+    vi.resetModules();
+    observedElements = [];
+
+    // Mock IntersectionObserver as a class before importing leftbar
+    class MockIO {
+      constructor(cb: IntersectionObserverCallback) {
+        observeCallback = cb;
+      }
+      observe(el: Element) { observedElements.push(el); }
+      unobserve() { /* noop */ }
+      disconnect() { /* noop */ }
+    }
+    vi.stubGlobal("IntersectionObserver", MockIO);
+
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(min-width: 1280px)",
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+  });
+
+  afterEach(() => {
+    vi.doUnmock("@/symbols");
+    vi.unstubAllGlobals();
+    vi.resetModules();
+  });
+
+  it("renders symbols in batches and creates sentinel for more", async () => {
+    // Generate 40 symbols in one category to exceed BATCH_SIZE (30)
+    const manySymbols = Array.from({ length: 40 }, (_, i) => ({
+      id: `lazy_sym_${i}`,
+      name: `Lazy ${i}`,
+      category: "LazyCategory",
+      svg: "<g/>",
+    }));
+
+    vi.doMock("@/symbols", () => ({ BUILTIN_SYMBOLS: manySymbols }));
+
+    const { createLeftbar: createLeftbarLazy } = await import("@/ui/leftbar");
+    document.documentElement.className = "dark";
+    document.body.innerHTML = "";
+    const toolbar = createLeftbarLazy();
+    document.body.appendChild(toolbar);
+
+    // Click Symbols tab
+    const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
+      'nav[aria-label="Toolbar tabs"] button',
+    );
+    tabs[5].click();
+
+    // Should have rendered only the first batch (30) plus a sentinel
+    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+    expect(items.length).toBe(30);
+    expect(observedElements.length).toBe(1); // sentinel observed
+
+    // Simulate the sentinel becoming visible
+    observeCallback(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver,
+    );
+
+    // Remaining 10 should now render
+    const itemsAfter = toolbar.querySelectorAll(".toolbar-symbol-item");
+    expect(itemsAfter.length).toBe(40);
   });
 });
 
@@ -711,7 +1593,7 @@ describe("Symbols panel - symbolPreview fallthrough", () => {
     vi.doMock("@/symbols", () => ({
       BUILTIN_SYMBOLS: [
         ...realSymbols,
-        { id: "no_path_no_gen", name: "No Path No Gen", category: "Geometric" },
+        { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" },
       ],
     }));
 
@@ -738,11 +1620,13 @@ describe("Symbols panel - symbolPreview fallthrough", () => {
     const tabs = toolbar.querySelectorAll<HTMLButtonElement>(
       'nav[aria-label="Toolbar tabs"] button',
     );
-    tabs[4].click(); // Symbols
+    tabs[5].click(); // Symbols
 
-    // 11 symbols: 10 built-in + 1 injected with no path/generator
+    // Default category is Celestial; injected symbol is also in Celestial
     const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(11);
+    const celestialCount = [...realSymbols, { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" }]
+      .filter((s) => s.category === "Celestial").length;
+    expect(items.length).toBe(celestialCount);
 
     vi.doUnmock("@/symbols");
     vi.resetModules();
@@ -867,7 +1751,7 @@ describe("Ratio display mode toggle", () => {
 
   it("mode persists after re-sorting", () => {
     modeBtn().click(); // W:H mode
-    const select = toolbar.querySelector<HTMLSelectElement>(".toolbar-sort-select")!;
+    const select = toolbar.querySelector<HTMLSelectElement>('select[aria-label="Sort aspect ratios"]')!;
     select.value = "commonality";
     select.dispatchEvent(new Event("change"));
     // Most common ratio 2:3 (H=2,W=3) → W/H = 3:2

@@ -73,9 +73,7 @@ function iconButton(
   btn.type = "button";
   btn.title = label;
   btn.setAttribute("aria-label", label);
-  btn.className =
-    "topbar-btn flex items-center justify-center h-8 w-8 rounded-md " +
-    "transition-colors cursor-pointer";
+  btn.className = "btn btn-ghost btn-sm btn-square";
   btn.innerHTML = icon;
   if (onClick) btn.addEventListener("click", onClick);
   return btn;
@@ -101,6 +99,7 @@ function createThemeToggle(): HTMLButtonElement {
     const isDark = html.classList.contains("dark");
     html.classList.toggle("dark", !isDark);
     html.classList.toggle("light", isDark);
+    html.setAttribute("data-theme", isDark ? "flagmaker-light" : "flagmaker-dark");
     syncIcon();
   });
 
@@ -148,10 +147,7 @@ function showExportError(format: string): void {
   _exportToast = document.createElement("div");
   _exportToast.textContent = msg;
   _exportToast.setAttribute("aria-hidden", "true");
-  _exportToast.style.cssText =
-    "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);" +
-    "background:#c0392b;color:#fff;padding:8px 16px;border-radius:6px;" +
-    "font-size:13px;z-index:110;pointer-events:none;white-space:nowrap;";
+  _exportToast.className = "alert alert-error alert-horizontal fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] pointer-events-none w-auto text-sm";
   document.body.appendChild(_exportToast);
   _exportToastTimer = window.setTimeout(() => {
     _exportToast?.remove();
@@ -199,7 +195,7 @@ function createExportSizeSelect(): HTMLSelectElement {
   const select = document.createElement("select");
   select.title = "Export size";
   select.setAttribute("aria-label", "Export size");
-  select.className = "toolbar-sort-select h-8 text-sm";
+  select.className = "select select-sm select-ghost";
 
   for (const size of cfg.sizes) {
     const opt = document.createElement("option");
@@ -219,45 +215,35 @@ function createExportSizeSelect(): HTMLSelectElement {
 /* ── Export Dropdown ── */
 
 function createExportButton(): HTMLElement {
-  const wrapper = document.createElement("div");
-  wrapper.className = "relative";
+  const wrapper = document.createElement("details");
+  wrapper.className = "dropdown dropdown-end";
 
   // Trigger button
-  const btn = document.createElement("button");
-  btn.type = "button";
+  const btn = document.createElement("summary");
   btn.title = "Export";
   btn.setAttribute("aria-label", "Export flag");
-  btn.setAttribute("aria-haspopup", "menu");
-  btn.setAttribute("aria-expanded", "false");
   btn.setAttribute("aria-describedby", "export-live-status");
-  btn.className =
-    "topbar-btn flex items-center gap-1 h-8 px-2.5 rounded-md " +
-    "text-sm transition-colors cursor-pointer";
+  btn.className = "btn btn-ghost btn-sm";
   btn.innerHTML =
     `${Icons.download}<span class="hidden xl:inline">Export</span>${Icons.chevronDown}`;
 
   // Dropdown menu
-  const menu = document.createElement("div");
-  menu.className =
-    "hidden absolute right-0 top-full mt-1 py-1 rounded-md shadow-lg min-w-28";
-  menu.style.backgroundColor = "var(--topbar-bg)";
-  menu.style.border = "1px solid var(--divider)";
-  menu.style.zIndex = "100";
+  const menu = document.createElement("ul");
+  menu.className = "dropdown-content menu bg-base-300 rounded-box z-[100] w-40 p-2 shadow-lg";
   menu.setAttribute("role", "menu");
 
-  function menuItem(label: string, onClick: () => void): HTMLButtonElement {
+  function menuItem(label: string, onClick: () => void): HTMLLIElement {
+    const li = document.createElement("li");
     const item = document.createElement("button");
     item.type = "button";
-    item.className =
-      "dropdown-item w-full text-left px-3 py-1.5 text-sm " +
-      "transition-colors cursor-pointer";
     item.textContent = label;
     item.setAttribute("role", "menuitem");
     item.addEventListener("click", () => {
-      close();
+      wrapper.removeAttribute("open");
       onClick();
     });
-    return item;
+    li.appendChild(item);
+    return li;
   }
 
   menu.append(
@@ -291,28 +277,6 @@ function createExportButton(): HTMLElement {
     }),
   );
 
-  function close(): void {
-    menu.classList.add("hidden");
-    btn.setAttribute("aria-expanded", "false");
-  }
-
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const isOpen = !menu.classList.contains("hidden");
-    if (isOpen) {
-      close();
-    } else {
-      menu.classList.remove("hidden");
-      btn.setAttribute("aria-expanded", "true");
-    }
-  });
-
-  document.addEventListener("click", (e) => {
-    if (e.target instanceof Node && !wrapper.contains(e.target)) {
-      close();
-    }
-  });
-
   wrapper.append(btn, menu);
   return wrapper;
 }
@@ -321,49 +285,38 @@ function createExportButton(): HTMLElement {
 
 export function createTopbar(): HTMLElement {
   const header = document.createElement("header");
-  header.className = "flex items-center h-11 px-3 shrink-0";
-  header.style.backgroundColor = "var(--topbar-bg)";
-  header.style.borderBottom = "1px solid var(--divider)";
+  header.className = "navbar bg-base-300 min-h-11 h-11 px-3 shrink-0";
   header.style.backdropFilter = "blur(8px)";
   header.style.gridColumn = "1 / -1";
   header.style.zIndex = "60";
 
   // ── Left: logo + title ──
   const left = document.createElement("div");
-  left.className = "flex items-center gap-2";
+  left.className = "navbar-start gap-2";
 
   const logo = document.createElement("span");
-  logo.className = "flex items-center";
-  logo.style.color = "var(--accent)";
+  logo.className = "flex items-center text-primary";
   logo.innerHTML = Icons.flag;
 
   const title = document.createElement("span");
-  title.className = "text-sm font-semibold hidden sm:inline";
-  title.style.color = "var(--text-primary)";
+  title.className = "text-sm font-semibold hidden sm:inline text-base-content";
   title.textContent = "Flag Maker";
 
   const version = document.createElement("span");
-  version.className = "text-[10px] hidden sm:inline";
-  version.style.color = "var(--text-secondary)";
-  version.style.opacity = "0.6";
+  version.className = "text-[10px] hidden sm:inline text-secondary opacity-60";
   version.textContent = `v${APP_VERSION}`;
 
   left.append(logo, title, version);
 
-  // ── Spacer ──
-  const spacer = document.createElement("div");
-  spacer.className = "flex-1";
-
   // ── Right: action buttons ──
   const right = document.createElement("div");
-  right.className = "flex items-center gap-1";
+  right.className = "navbar-end gap-1";
 
   const themeBtn = createThemeToggle();
 
   // Subtle divider between theme toggle and action buttons
   const divider = document.createElement("div");
-  divider.className = "w-px h-4 mx-1";
-  divider.style.backgroundColor = "var(--divider)";
+  divider.className = "divider divider-horizontal mx-0 w-px h-4";
 
   const resetBtn = iconButton(Icons.reset, "Reset flag", () => {
     resetBtn.dispatchEvent(new CustomEvent("topbar:reset", { bubbles: true }));
@@ -384,6 +337,6 @@ export function createTopbar(): HTMLElement {
   const liveRegion = ensureExportLiveRegion();
   header.appendChild(liveRegion);
 
-  header.append(left, spacer, right);
+  header.append(left, right);
   return header;
 }

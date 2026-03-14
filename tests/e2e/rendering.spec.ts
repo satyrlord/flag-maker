@@ -34,8 +34,8 @@ const ROTATED_OVERLAYS_CONFIG = {
       opacity: 1,
     },
     {
-      id: "rot-star",
-      type: "star",
+      id: "rot-tri",
+      type: "custom",
       x: 25,
       y: 75,
       w: 18,
@@ -45,11 +45,12 @@ const ROTATED_OVERLAYS_CONFIG = {
       stroke: "#0000",
       strokeWidth: 0,
       opacity: 1,
+      path: "M 50 30 L 30 70 L 70 70 Z",
     },
     {
       id: "rot-symbol",
       type: "symbol",
-      symbolId: "greek_cross",
+      symbolId: "sol_de_mayo",
       x: 75,
       y: 75,
       w: 20,
@@ -82,7 +83,7 @@ test.describe("Flag rendering", () => {
   test("renders a rectangle overlay in the main SVG", async ({ page }) => {
     await page.getByRole("button", { name: "Overlays", exact: true }).click();
     await page.getByRole("button", { name: "Add Rectangle overlay" }).click();
-    await expect(page.locator("svg.flag-svg > rect")).toHaveCount(4);
+    await expect(page.locator("svg.flag-svg > rect")).toHaveCount(3);
   });
 
   test("renders a circle overlay as an ellipse", async ({ page }) => {
@@ -91,27 +92,34 @@ test.describe("Flag rendering", () => {
     await expect(page.locator("svg.flag-svg > ellipse")).toHaveCount(1);
   });
 
-  test("renders a star overlay as a path", async ({ page }) => {
+  test("renders a triangle overlay as a path", async ({ page }) => {
     await page.getByRole("button", { name: "Overlays", exact: true }).click();
-    await page.getByRole("button", { name: "Add Star overlay" }).click();
+    await page.getByRole("button", { name: "Add Triangle overlay" }).click();
     await expect(page.locator("svg.flag-svg > path")).toHaveCount(1);
   });
 
   test("renders a generated symbol overlay inside a nested SVG", async ({ page }) => {
-    await page.getByRole("button", { name: "Symbols", exact: true }).click();
-    await page.getByRole("button", { name: "Add Star (5‑point)" }).click();
+    await page.locator("#root").evaluate((root) => {
+      root.dispatchEvent(
+        new CustomEvent("toolbar:symbol", {
+          detail: { symbolId: "star_five_pointed" },
+          bubbles: true,
+        }),
+      );
+    });
     await expect(page.locator("svg.flag-svg > svg")).toHaveCount(1);
     await expect(page.locator("svg.flag-svg > svg path")).toHaveCount(1);
   });
 
-  test("renders a path-backed symbol overlay inside a nested SVG", async ({ page }) => {
+  test("renders an svg-backed symbol overlay inside a nested SVG", async ({ page }) => {
     await page.getByRole("button", { name: "Symbols", exact: true }).click();
-    await page.getByRole("button", { name: "Add Greek Cross" }).click();
-    await expect(page.locator("svg.flag-svg > svg path")).toHaveCount(1);
+    await page.getByRole("button", { name: "Add Sol de Mayo" }).click();
+    await expect(page.locator("svg.flag-svg > svg")).toHaveCount(1);
   });
 
   test("renders custom and symbol overlays from templates", async ({ page }) => {
     await page.getByRole("button", { name: "Templates", exact: true }).click();
+    await page.getByRole("button", { name: "National" }).click();
     await page.getByRole("button", { name: "Apply South Africa template" }).click();
     await expect(page.locator("svg.flag-svg > path")).toHaveCount(1);
 
@@ -134,6 +142,21 @@ test.describe("Flag rendering", () => {
     await expect(page.locator("svg.flag-svg > path[transform]")).toHaveCount(1);
     await expect(page.locator("svg.flag-svg > svg[transform]")).toHaveCount(1);
     await expect(page.locator("svg.flag-svg > rect[stroke]")).toHaveCount(1);
+  });
+
+  test("preserves grid overlay when adding an overlay while grid is active", async ({ page }) => {
+    // Activate grid
+    const gridBtn = page.getByRole("button", { name: "Toggle pixel grid" });
+    await gridBtn.click();
+    await expect(page.locator(".grid-overlay")).toBeAttached();
+
+    // Add an overlay while grid is visible (triggers redraw with active grid)
+    await page.getByRole("button", { name: "Overlays", exact: true }).click();
+    await page.getByRole("button", { name: "Add Rectangle overlay" }).click();
+
+    // Both overlay and grid should be present
+    await expect(page.locator("svg.flag-svg > rect")).toHaveCount(3);
+    await expect(page.locator(".grid-overlay")).toBeAttached();
   });
 
   test("renders a registered symbol that provides raw SVG markup", async ({ page }) => {

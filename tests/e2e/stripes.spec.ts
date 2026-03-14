@@ -7,30 +7,37 @@ test.describe("Stripes panel interactions", () => {
     await page.getByRole("button", { name: "Stripes", exact: true }).click();
   });
 
-  test("stripe count starts at 3", async ({ page }) => {
+  test("stripe count starts at 2 for the default Per Pale template", async ({ page }) => {
     const label = page.locator(".toolbar-count-label");
-    await expect(label).toHaveText("3");
+    await expect(label).toHaveText("2");
+  });
+
+  test("vertical orientation is active for the default Per Pale template", async ({ page }) => {
+    const vBtn = page.locator(".toolbar-orient-btn", { hasText: "Vertical" });
+    const hBtn = page.locator(".toolbar-orient-btn", { hasText: "Horizontal" });
+    await expect(vBtn).toHaveClass(/active/);
+    await expect(hBtn).not.toHaveClass(/active/);
   });
 
   test("clicking + increments stripe count", async ({ page }) => {
     const plus = page.getByRole("button", { name: "Increase stripe count" });
     await plus.click();
     const label = page.locator(".toolbar-count-label");
-    await expect(label).toHaveText("4");
+    await expect(label).toHaveText("3");
   });
 
   test("clicking - decrements stripe count", async ({ page }) => {
     const minus = page.getByRole("button", { name: "Decrease stripe count" });
     await minus.click();
     const label = page.locator(".toolbar-count-label");
-    await expect(label).toHaveText("2");
+    await expect(label).toHaveText("1");
   });
 
   test("color pickers match stripe count after increment", async ({ page }) => {
     const plus = page.getByRole("button", { name: "Increase stripe count" });
     await plus.click();
     const pickers = page.locator(".toolbar-color-picker");
-    await expect(pickers).toHaveCount(4);
+    await expect(pickers).toHaveCount(3);
   });
 
   test("switching orientation toggles active button", async ({ page }) => {
@@ -51,7 +58,7 @@ test.describe("Stripe color interactions", () => {
 
   test("color pickers exist and are interactive", async ({ page }) => {
     const pickers = page.locator(".toolbar-color-picker");
-    await expect(pickers).toHaveCount(3);
+    await expect(pickers).toHaveCount(2);
     const first = pickers.first();
     // Trigger input event by setting value
     await first.evaluate((el: HTMLInputElement) => {
@@ -59,5 +66,12 @@ test.describe("Stripe color interactions", () => {
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
     await expect(first).toHaveValue("#ff0000");
+  });
+
+  test("adding a stripe uses the configured stripe palette instead of overlay fill", async ({ page }) => {
+    await page.getByRole("button", { name: "Increase stripe count" }).click();
+    const pickers = page.locator(".toolbar-color-picker");
+    await expect(pickers).toHaveCount(3);
+    await expect(pickers.nth(2)).toHaveValue("#002395");
   });
 });

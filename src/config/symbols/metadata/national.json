@@ -1,0 +1,130 @@
+[
+  {
+    "id": "us_naval_jack",
+    "name": "US Naval Jack",
+    "category": "National Symbols",
+    "svgFile": "us_naval_jack.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Jack_of_the_United_States.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "brazil_flag_globe",
+    "name": "Brazil Flag Globe",
+    "category": "National Symbols",
+    "svgFile": "brazil_flag_globe.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Brazil_flag_stars.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "nepal_moon",
+    "name": "Nepal Moon",
+    "category": "National Symbols",
+    "svgFile": "nepal_moon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "nepal_sun",
+    "name": "Nepal Sun",
+    "category": "National Symbols",
+    "svgFile": "nepal_sun.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "union_jack",
+    "name": "Union Jack (Flag of the United Kingdom)",
+    "category": "National Symbols",
+    "svgFile": "union_jack.svg",
+    "source": "Public domain — flag of the United Kingdom (Crown Copyright)",
+    "license": "Public domain"
+  },
+  {
+    "id": "albania_emblem",
+    "name": "Albania Coat of Arms (Double-Headed Eagle)",
+    "category": "National Symbols",
+    "svgFile": "albania_emblem.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Albania.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "anguilla_emblem",
+    "name": "Anguilla Coat of Arms",
+    "category": "National Symbols",
+    "svgFile": "anguilla_emblem.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Anguilla.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "saudi_shahada",
+    "name": "Saudi Shahada",
+    "category": "National Symbols",
+    "svgFile": "saudi_shahada.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Shahada.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "algeria_crescent_star",
+    "name": "Algerian Crescent and Star",
+    "category": "National Symbols",
+    "svgFile": "algeria_crescent_star.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Algeria.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "azerbaijan_crescent_star",
+    "name": "Azerbaijani Crescent and Star",
+    "category": "National Symbols",
+    "svgFile": "azerbaijan_crescent_star.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Azerbaijan.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "antigua_rising_sun",
+    "name": "Antigua Rising Sun",
+    "category": "National Symbols",
+    "svgFile": "antigua_rising_sun.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Antigua_and_Barbuda.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "barbados_trident",
+    "name": "Barbados Trident",
+    "category": "National Symbols",
+    "svgFile": "barbados_trident.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Barbados.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "angola_flag_emblem",
+    "name": "Angola Flag Emblem (Machete and Gear)",
+    "category": "National Symbols",
+    "svgFile": "angola_flag_emblem.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Angola.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "belarus_ornament",
+    "name": "Belarus Ornamental Pattern",
+    "category": "National Symbols",
+    "svgFile": "belarus_ornament.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Belarus.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "american_samoa_eagle",
+    "name": "American Samoa Eagle",
+    "category": "National Symbols",
+    "svgFile": "american_samoa_eagle.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_American_Samoa.svg",
+    "license": "Public domain"
+  },
+  {
+    "id": "andorra_emblem",
+    "name": "Andorra National Emblem",
+    "category": "National Symbols",
+    "svgFile": "andorra_emblem.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coat_of_arms_of_Andorra.svg",
+    "license": "Check file page on Wikimedia Commons"
+  }
+]

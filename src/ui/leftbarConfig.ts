@@ -1,5 +1,5 @@
-import type { TemplateCfg } from "../templates";
-import { UI_OVERLAY_TYPE_IDS } from "../types";
+import { RENDERABLE_OVERLAY_TYPE_IDS } from "../overlayTypeConfig";
+import { parseRatio } from "../ratio";
 
 export interface LeftbarConfig {
   ratios: Array<{
@@ -13,6 +13,10 @@ export interface LeftbarConfig {
     commonality: number;
   }>;
   defaultRatio: string;
+  defaultOrientation: string;
+  defaultOverlayFill: string;
+  layerGroupOrder: string[];
+  supportedOverlayTypes: string[];
   stripes: {
     defaultCount: number;
     minCount: number;
@@ -22,18 +26,30 @@ export interface LeftbarConfig {
   overlayTypes: Array<{
     id: string;
     label: string;
-  }>;
-  templates: Array<{
-    id: string;
-    name: string;
-    group: string;
+    shortLabel: string;
   }>;
   templateGroups: string[];
+  layerGroups: Record<string, {
+    minLayers: number;
+    maxLayers: number;
+  }>;
+  starfield: {
+    distributions: Array<{ id: string; label: string }>;
+    defaultDistribution: string;
+    defaultStarCount: number;
+    defaultStarPoints: number;
+    defaultStarPointLength: number;
+    defaultStarSize: number;
+    defaultFill: string;
+    minStarCount: number;
+    maxStarCount: number;
+    minStarPoints: number;
+    maxStarPoints: number;
+  };
 }
 
 export function validateLeftbarConfig(
   cfg: LeftbarConfig,
-  templateFactories: Record<string, () => TemplateCfg>,
 ): void {
   if (cfg.ratios.length === 0) {
     throw new Error("leftbar-config: ratios must not be empty");
@@ -45,6 +61,12 @@ export function validateLeftbarConfig(
   }
   if (!ratioLabels.has(cfg.defaultRatio)) {
     throw new Error(`leftbar-config: defaultRatio "${cfg.defaultRatio}" is not defined`);
+  }
+
+  try {
+    parseRatio(cfg.defaultRatio);
+  } catch {
+    throw new Error(`leftbar-config: defaultRatio "${cfg.defaultRatio}" must be "N:M" with positive numbers`);
   }
 
   for (const ratio of cfg.ratios) {
@@ -67,11 +89,32 @@ export function validateLeftbarConfig(
   if (overlayIds.size !== cfg.overlayTypes.length) {
     throw new Error("leftbar-config: overlay type IDs must be unique");
   }
-  const invalidOverlayIds = cfg.overlayTypes
-    .map((type) => type.id)
-    .filter((id) => !UI_OVERLAY_TYPE_IDS.has(id));
-  if (invalidOverlayIds.length > 0) {
-    throw new Error(`leftbar-config: unknown overlay type IDs: ${invalidOverlayIds.join(", ")}`);
+
+  if (!Array.isArray(cfg.supportedOverlayTypes) || cfg.supportedOverlayTypes.length === 0) {
+    throw new Error("leftbar-config: supportedOverlayTypes must not be empty");
+  }
+
+  const supportedOverlayTypes = new Set(cfg.supportedOverlayTypes);
+  if (supportedOverlayTypes.size !== cfg.supportedOverlayTypes.length) {
+    throw new Error("leftbar-config: supportedOverlayTypes must be unique");
+  }
+
+  const missingRenderableTypes = [...RENDERABLE_OVERLAY_TYPE_IDS]
+    .filter((id) => !supportedOverlayTypes.has(id));
+  if (missingRenderableTypes.length > 0) {
+    throw new Error(
+      `leftbar-config: supportedOverlayTypes must include ${missingRenderableTypes.join(", ")}`,
+    );
+  }
+
+  const unsupportedTypes = cfg.overlayTypes
+    .map((t) => t.id)
+    .filter((id) => !supportedOverlayTypes.has(id));
+  if (unsupportedTypes.length > 0) {
+    throw new Error(
+      `leftbar-config: unsupported overlay types: ${unsupportedTypes.join(", ")}. ` +
+      `Supported: ${[...supportedOverlayTypes].join(", ")}`,
+    );
   }
 
   const templateGroups = new Set(cfg.templateGroups);
@@ -79,23 +122,33 @@ export function validateLeftbarConfig(
     throw new Error("leftbar-config: templateGroups must be unique");
   }
 
-  const missingFactories = cfg.templates
-    .map((template) => template.id)
-    .filter((id) => !templateFactories[id]);
-  if (missingFactories.length > 0) {
-    throw new Error(`leftbar-config: missing template factories for: ${missingFactories.join(", ")}`);
-  }
-
-  const undeclaredGroups = cfg.templates
-    .map((template) => template.group)
-    .filter((group) => !templateGroups.has(group));
-  if (undeclaredGroups.length > 0) {
-    throw new Error(`leftbar-config: template groups missing from templateGroups: ${[...new Set(undeclaredGroups)].join(", ")}`);
-  }
-
-  for (const group of cfg.templateGroups) {
-    if (!cfg.templates.some((template) => template.group === group)) {
-      throw new Error(`leftbar-config: template group "${group}" has no templates`);
+  const requiredGroups = ["stripes", "overlays", "starfields", "symbols"];
+  for (const gid of requiredGroups) {
+    const lg = cfg.layerGroups[gid];
+    if (!lg) {
+      throw new Error(`leftbar-config: layerGroups must include "${gid}"`);
     }
+    if (lg.minLayers < 0 || lg.maxLayers < lg.minLayers) {
+      throw new Error(`leftbar-config: layerGroups.${gid} has invalid min/max`);
+    }
+  }
+
+  const validOrientations = ["horizontal", "vertical"];
+  if (!validOrientations.includes(cfg.defaultOrientation)) {
+    throw new Error(`leftbar-config: defaultOrientation "${cfg.defaultOrientation}" must be "horizontal" or "vertical"`);
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(cfg.defaultOverlayFill)) {
+    throw new Error(`leftbar-config: defaultOverlayFill "${cfg.defaultOverlayFill}" must be a 6-digit hex color`);
+  }
+
+  const requiredGroupOrder = ["stripes", "overlays", "starfields", "symbols"];
+  if (
+    cfg.layerGroupOrder.length !== requiredGroupOrder.length ||
+    !requiredGroupOrder.every((g) => cfg.layerGroupOrder.includes(g))
+  ) {
+    throw new Error(
+      `leftbar-config: layerGroupOrder must contain exactly ${requiredGroupOrder.join(", ")}`,
+    );
   }
 }

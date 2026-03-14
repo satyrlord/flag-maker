@@ -1,0 +1,30 @@
+[
+  {
+    "id": "england",
+    "name": "England"
+  },
+  {
+    "id": "scotland",
+    "name": "Scotland"
+  },
+  {
+    "id": "wales",
+    "name": "Wales"
+  },
+  {
+    "id": "northern_ireland",
+    "name": "Northern Ireland"
+  },
+  {
+    "id": "catalunya",
+    "name": "Catalunya"
+  },
+  {
+    "id": "euskadi",
+    "name": "Euskadi"
+  },
+  {
+    "id": "bavaria",
+    "name": "Bavaria"
+  }
+]

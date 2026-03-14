@@ -1,0 +1,59 @@
+{
+  "afghanistan": {
+    "imagePath": "template-previews/afghanistan.jpg"
+  },
+  "albania": {
+    "imagePath": "template-previews/albania.jpg"
+  },
+  "algeria": {
+    "imagePath": "template-previews/algeria.jpg"
+  },
+  "andorra": {
+    "imagePath": "template-previews/andorra.jpg"
+  },
+  "angola": {
+    "imagePath": "template-previews/angola.jpg"
+  },
+  "anguilla": {
+    "imagePath": "template-previews/anguilla.jpg"
+  },
+  "argentina": {
+    "imagePath": "template-previews/argentina.jpg"
+  },
+  "armenia": {
+    "imagePath": "template-previews/armenia.jpg"
+  },
+  "austria": {
+    "imagePath": "template-previews/austria.jpg"
+  },
+  "azerbaijan": {
+    "imagePath": "template-previews/azerbaijan.jpg"
+  },
+  "bahamas": {
+    "imagePath": "template-previews/bahamas.jpg"
+  },
+  "bangladesh": {
+    "imagePath": "template-previews/bangladesh.jpg"
+  },
+  "barbados": {
+    "imagePath": "template-previews/barbados.jpg"
+  },
+  "belgium": {
+    "imagePath": "template-previews/belgium.jpg"
+  },
+  "belize": {
+    "imagePath": "template-previews/belize.jpg"
+  },
+  "benin": {
+    "imagePath": "template-previews/benin.jpg"
+  },
+  "bolivia": {
+    "imagePath": "template-previews/bolivia.jpg"
+  },
+  "botswana": {
+    "imagePath": "template-previews/botswana.jpg"
+  },
+  "bulgaria": {
+    "imagePath": "template-previews/bulgaria.jpg"
+  }
+}

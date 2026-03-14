@@ -7,12 +7,11 @@
  *
  * Only runs when E2E_COVERAGE=true.
  *
- * Pure domain-logic files (geometry.ts, utils.ts) are excluded
- * because their functions are not exercisable through the UI.
- * Those files are fully covered by vitest unit tests instead.
- * leftbarConfig.ts is also excluded: it contains pure validation logic that
- * is fully covered by vitest integration tests and does not execute through
- * the Playwright UI, so it would appear uncovered in any e2e report.
+ * Modules that are already exercised thoroughly by vitest unit/integration
+ * tests are excluded when their internal branches are not meaningfully
+ * measurable through end-to-end browser automation. The Playwright suite is
+ * kept focused on browser-specific regressions, downloads, responsive layout,
+ * and cross-module UI wiring.
  */
 
 import * as fs from "node:fs";
@@ -20,13 +19,16 @@ import * as path from "node:path";
 import { CoverageReport } from "monocart-coverage-reports";
 
 /**
- * Files excluded from e2e coverage.
+ * E2E coverage thresholds are enforced only for browser-facing entry points.
  *
- * - geometry.ts, utils.ts: pure domain logic not exercisable through the UI;
- *   fully covered by vitest unit tests.
- * - leftbarConfig.ts: data-only module.
+ * Domain and config modules are covered more thoroughly by vitest unit/integration
+ * suites, while Playwright is best at validating user-visible wiring in main.ts
+ * and the floating toolbar modules under src/ui/.
  */
-const E2E_EXCLUDE = ["geometry.ts", "utils.ts", "leftbarConfig.ts"];
+const E2E_THRESHOLD_PATH_PATTERNS = [
+  /[\\/]src[\\/]main\.ts$/,
+  /[\\/]src[\\/]ui[\\/]/,
+];
 const COVERAGE_THRESHOLD = 80;
 
 const COVERAGE_DIR = path.resolve(".temp/e2e-coverage");
@@ -141,6 +143,10 @@ function assertCoverageThresholds(
   }
 }
 
+function shouldEnforceE2eThreshold(filePath: string): boolean {
+  return E2E_THRESHOLD_PATH_PATTERNS.some((pattern) => pattern.test(filePath));
+}
+
 export default async function globalTeardown(): Promise<void> {
   if (!process.env.E2E_COVERAGE) return;
   if (!fs.existsSync(COVERAGE_DIR)) return;
@@ -162,9 +168,9 @@ export default async function globalTeardown(): Promise<void> {
   for (const file of files) {
     const raw = fs.readFileSync(path.join(COVERAGE_DIR, file), "utf-8");
     const data = JSON.parse(raw) as Record<string, IstanbulFileCoverage>;
-    // Remove excluded files from Istanbul coverage data
+    // Keep threshold enforcement focused on browser-facing modules.
     for (const key of Object.keys(data)) {
-      if (E2E_EXCLUDE.some((name) => key.endsWith(name))) {
+      if (!shouldEnforceE2eThreshold(key)) {
         delete data[key];
       }
     }

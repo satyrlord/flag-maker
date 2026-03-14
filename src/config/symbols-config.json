@@ -1,0 +1,17 @@
+{
+  "metadataFiles": [
+    "symbols/metadata/celestial.json",
+    "symbols/metadata/cultural.json",
+    "symbols/metadata/religious.json",
+    "symbols/metadata/heraldic.json",
+    "symbols/metadata/plants.json",
+    "symbols/metadata/animals.json",
+    "symbols/metadata/weapons.json",
+    "symbols/metadata/political.json",
+    "symbols/metadata/geometric.json",
+    "symbols/metadata/national.json",
+    "symbols/metadata/national-symbols.json"
+  ],
+  "svgDirectory": "symbols/svg",
+  "outputFile": "symbols-catalog.generated.json"
+}

@@ -1,62 +1,217 @@
 {
   "ratios": [
-    { "label": "1:1", "ratio": [1, 1], "commonality": 2 },
-    { "label": "13:15", "ratio": [13, 15], "commonality": 1 },
-    { "label": "6:7", "ratio": [6, 7], "commonality": 1 },
-    { "label": "4:5", "ratio": [4, 5], "commonality": 1 },
-    { "label": "28:37", "ratio": [28, 37], "commonality": 1 },
-    { "label": "3:4", "ratio": [3, 4], "commonality": 4 },
-    { "label": "8:11", "ratio": [8, 11], "commonality": 2 },
-    { "label": "5:7", "ratio": [5, 7], "commonality": 1 },
-    { "label": "7:10", "ratio": [7, 10], "commonality": 2 },
-    { "label": "15:22", "ratio": [15, 22], "commonality": 1 },
-    { "label": "18:25", "ratio": [18, 25], "commonality": 1 },
-    { "label": "2:3", "ratio": [2, 3], "commonality": 84 },
-    { "label": "16:25", "ratio": [16, 25], "commonality": 1 },
-    { "label": "7:11", "ratio": [7, 11], "commonality": 1 },
-    { "label": "5:8", "ratio": [5, 8], "commonality": 5 },
-    { "label": "3:5", "ratio": [3, 5], "commonality": 20 },
-    { "label": "11:18", "ratio": [11, 18], "commonality": 1 },
-    { "label": "4:7", "ratio": [4, 7], "commonality": 2 },
-    { "label": "1:2", "ratio": [1, 2], "commonality": 55 },
-    { "label": "10:19", "ratio": [10, 19], "commonality": 4 },
-    { "label": "11:28", "ratio": [11, 28], "commonality": 1 },
-    { "label": "4:3", "ratio": [4, 3], "commonality": 1 }
+    {
+      "label": "1:1",
+      "ratio": [1, 1],
+      "commonality": 2
+    },
+    {
+      "label": "13:15",
+      "ratio": [13, 15],
+      "commonality": 1
+    },
+    {
+      "label": "6:7",
+      "ratio": [6, 7],
+      "commonality": 1
+    },
+    {
+      "label": "4:5",
+      "ratio": [4, 5],
+      "commonality": 1
+    },
+    {
+      "label": "28:37",
+      "ratio": [28, 37],
+      "commonality": 1
+    },
+    {
+      "label": "3:4",
+      "ratio": [3, 4],
+      "commonality": 4
+    },
+    {
+      "label": "8:11",
+      "ratio": [8, 11],
+      "commonality": 2
+    },
+    {
+      "label": "5:7",
+      "ratio": [5, 7],
+      "commonality": 1
+    },
+    {
+      "label": "7:10",
+      "ratio": [7, 10],
+      "commonality": 2
+    },
+    {
+      "label": "15:22",
+      "ratio": [15, 22],
+      "commonality": 1
+    },
+    {
+      "label": "18:25",
+      "ratio": [18, 25],
+      "commonality": 1
+    },
+    {
+      "label": "2:3",
+      "ratio": [2, 3],
+      "commonality": 84
+    },
+    {
+      "label": "16:25",
+      "ratio": [16, 25],
+      "commonality": 1
+    },
+    {
+      "label": "7:11",
+      "ratio": [7, 11],
+      "commonality": 1
+    },
+    {
+      "label": "5:8",
+      "ratio": [5, 8],
+      "commonality": 5
+    },
+    {
+      "label": "3:5",
+      "ratio": [3, 5],
+      "commonality": 20
+    },
+    {
+      "label": "11:18",
+      "ratio": [11, 18],
+      "commonality": 1
+    },
+    {
+      "label": "4:7",
+      "ratio": [4, 7],
+      "commonality": 2
+    },
+    {
+      "label": "1:2",
+      "ratio": [1, 2],
+      "commonality": 55
+    },
+    {
+      "label": "10:19",
+      "ratio": [10, 19],
+      "commonality": 4
+    },
+    {
+      "label": "11:28",
+      "ratio": [11, 28],
+      "commonality": 1
+    },
+    {
+      "label": "4:3",
+      "ratio": [4, 3],
+      "commonality": 1
+    }
   ],
   "defaultRatio": "2:3",
+  "defaultOrientation": "horizontal",
+  "defaultOverlayFill": "#000000",
+  "layerGroupOrder": ["stripes", "overlays", "starfields", "symbols"],
+  "supportedOverlayTypes": [
+    "rectangle",
+    "circle",
+    "triangle",
+    "custom",
+    "symbol",
+    "starfield"
+  ],
   "stripes": {
     "defaultCount": 3,
     "minCount": 1,
     "maxCount": 14,
     "defaultColors": [
-      "#CE1126", "#FFFFFF", "#002395", "#FFD500", "#000000",
-      "#009246", "#CE2B37", "#B22234", "#3C3B6E", "#0038A8",
-      "#FCD116", "#00A3DD", "#F7D618", "#CC0001"
+      "#CE1126",
+      "#FFFFFF",
+      "#002395",
+      "#FFD500",
+      "#000000",
+      "#009246",
+      "#CE2B37",
+      "#B22234",
+      "#3C3B6E",
+      "#0038A8",
+      "#FCD116",
+      "#00A3DD",
+      "#F7D618",
+      "#CC0001"
     ]
   },
   "overlayTypes": [
-    { "id": "rectangle", "label": "Rectangle" },
-    { "id": "circle", "label": "Circle" },
-    { "id": "star", "label": "Star" }
+    {
+      "id": "rectangle",
+      "label": "Rectangle",
+      "shortLabel": "Rect"
+    },
+    {
+      "id": "circle",
+      "label": "Circle",
+      "shortLabel": "Circle"
+    },
+    {
+      "id": "triangle",
+      "label": "Triangle",
+      "shortLabel": "Tri"
+    }
   ],
-  "templates": [
-    { "id": "perPale", "name": "Per Pale", "group": "Division" },
-    { "id": "perFess", "name": "Per Fess", "group": "Division" },
-    { "id": "triV", "name": "Tricolor V", "group": "Division" },
-    { "id": "triH", "name": "Tricolor H", "group": "Division" },
-    { "id": "quartered", "name": "Quartered", "group": "Division" },
-    { "id": "perBend", "name": "Per Bend", "group": "Division" },
-    { "id": "perBendSin", "name": "Per Bend Sin.", "group": "Division" },
-    { "id": "saltire", "name": "Saltire", "group": "Division" },
-    { "id": "chevron", "name": "Chevron", "group": "Division" },
-    { "id": "centCross", "name": "Centered Cross", "group": "Division" },
-    { "id": "nordic", "name": "Nordic Cross", "group": "Division" },
-    { "id": "us", "name": "USA", "group": "National" },
-    { "id": "iceland", "name": "Iceland", "group": "National" },
-    { "id": "uruguay", "name": "Uruguay", "group": "National" },
-    { "id": "drc", "name": "DR Congo", "group": "National" },
-    { "id": "uk", "name": "United Kingdom", "group": "National" },
-    { "id": "sa", "name": "South Africa", "group": "National" }
-  ],
-  "templateGroups": ["Division", "National"]
+  "templateGroups": ["Division", "National", "State Level"],
+  "starfield": {
+    "distributions": [
+      {
+        "id": "ring",
+        "label": "Ring (EU-style)"
+      },
+      {
+        "id": "grid",
+        "label": "Grid"
+      },
+      {
+        "id": "staggered-grid",
+        "label": "Staggered Grid (US-style)"
+      },
+      {
+        "id": "line",
+        "label": "Line"
+      },
+      {
+        "id": "arc",
+        "label": "Arc"
+      }
+    ],
+    "defaultDistribution": "ring",
+    "defaultStarCount": 12,
+    "defaultStarPoints": 5,
+    "defaultStarPointLength": 0.38,
+    "defaultStarSize": 50,
+    "defaultFill": "#FFD700",
+    "minStarCount": 2,
+    "maxStarCount": 100,
+    "minStarPoints": 3,
+    "maxStarPoints": 20
+  },
+  "layerGroups": {
+    "stripes": {
+      "minLayers": 1,
+      "maxLayers": 14
+    },
+    "overlays": {
+      "minLayers": 0,
+      "maxLayers": 99
+    },
+    "starfields": {
+      "minLayers": 0,
+      "maxLayers": 10
+    },
+    "symbols": {
+      "minLayers": 0,
+      "maxLayers": 99
+    }
+  }
 }
