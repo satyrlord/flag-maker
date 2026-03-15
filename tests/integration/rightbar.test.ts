@@ -91,6 +91,48 @@ describe("createRightbar", () => {
     document.body.removeChild(element);
   });
 
+  it("dragging from bar background starts drag", () => {
+    const { element } = createRightbar(3);
+    document.body.appendChild(element);
+
+    // Dispatch pointerdown directly on the bar element
+    element.dispatchEvent(new PointerEvent("pointerdown", {
+      clientX: 100, clientY: 200, bubbles: true,
+    }));
+    expect(element.classList.contains("rightbar-dragging")).toBe(true);
+
+    element.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+    expect(element.classList.contains("rightbar-dragging")).toBe(false);
+
+    document.body.removeChild(element);
+  });
+
+  it("does not start drag when clicking a button", () => {
+    const { element } = createRightbar(3);
+    document.body.appendChild(element);
+
+    const gridBtn = element.querySelector("[aria-label='Toggle pixel grid']") as HTMLElement;
+    gridBtn.dispatchEvent(new PointerEvent("pointerdown", {
+      clientX: 100, clientY: 200, bubbles: true,
+    }));
+    expect(element.classList.contains("rightbar-dragging")).toBe(false);
+
+    document.body.removeChild(element);
+  });
+
+  it("does not start drag when clicking layer summary", () => {
+    const { element } = createRightbar(3);
+    document.body.appendChild(element);
+
+    const summary = element.querySelector(".rightbar-layer-summary") as HTMLElement;
+    summary.dispatchEvent(new PointerEvent("pointerdown", {
+      clientX: 100, clientY: 200, bubbles: true,
+    }));
+    expect(element.classList.contains("rightbar-dragging")).toBe(false);
+
+    document.body.removeChild(element);
+  });
+
   it("ignores pointer move when not dragging", () => {
     const { element } = createRightbar(3);
     document.body.appendChild(element);
@@ -111,14 +153,14 @@ describe("createRightbar", () => {
     const { element } = createRightbar(3);
     document.body.appendChild(element);
 
-    const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
     const setPointerCapture = vi.fn();
     const releasePointerCapture = vi.fn();
-    Object.assign(handle as object, {
+    Object.assign(element as object, {
       setPointerCapture,
       releasePointerCapture,
     });
 
+    const handle = element.querySelector(".rightbar-drag-handle") as HTMLButtonElement;
     handle.dispatchEvent(new PointerEvent("pointerdown", {
       clientX: 100,
       clientY: 200,

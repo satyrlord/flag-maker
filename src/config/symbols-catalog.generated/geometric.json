@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "generatedAt": "2026-03-15T09:53:49.611Z",
+    "generatedBy": "tools/build-symbol-catalog.ts"
+  },
+  "category": "Geometric",
+  "slug": "geometric",
+  "symbols": [
+    {
+      "id": "trigram_geon",
+      "name": "Trigram Geon (Heaven)",
+      "category": "Geometric",
+      "viewBox": "0 0 140 100",
+      "svg": "<path stroke=\"#000\" stroke-width=\"20\" d=\"M10,20h120M10,50h120M10,80h120\"/>",
+      "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Geon.svg",
+      "license": "Check file page on Wikimedia Commons"
+    },
+    {
+      "id": "trigram_gon",
+      "name": "Trigram Gon (Earth)",
+      "category": "Geometric",
+      "viewBox": "0 0 140 100",
+      "svg": "<path stroke=\"#000\" stroke-width=\"20\" d=\"M10,20h55m10,0h55M10,50h55m10,0h55M10,80h55m10,0h55\"/>",
+      "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Gon.svg",
+      "license": "Check file page on Wikimedia Commons"
+    },
+    {
+      "id": "trigram_ri",
+      "name": "Trigram Ri (Fire)",
+      "category": "Geometric",
+      "viewBox": "0 0 140 100",
+      "svg": "<path stroke=\"#000\" stroke-width=\"20\" d=\"M10,20h120M10,50h55m10,0h55M10,80h120\"/>",
+      "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Ri.svg",
+      "license": "Check file page on Wikimedia Commons"
+    },
+    {
+      "id": "trigram_gam",
+      "name": "Trigram Gam (Water)",
+      "category": "Geometric",
+      "viewBox": "0 0 140 100",
+      "svg": "<path stroke=\"#000\" stroke-width=\"20\" d=\"M10,20h55m10,0h55M10,50h120M10,80h55m10,0h55\"/>",
+      "source": "https://commons.wikimedia.org/wiki/File:Palgwae_Gam.svg",
+      "license": "Check file page on Wikimedia Commons"
+    }
+  ]
+}

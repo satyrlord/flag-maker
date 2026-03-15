@@ -3,12 +3,23 @@
    ────────────────────────────────────────────── */
 
 import type { SymbolDef } from "./types";
-import { BUILTIN_SYMBOLS } from "./symbols";
 
 const XML_COMMENT_PATTERN = /<!--[\s\S]*?-->/g;
 const SCRIPT_ELEMENT_PATTERN = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
 const EVENT_HANDLER_ATTR_PATTERN = /\s+on[a-z][a-z0-9]*\s*=\s*(?:"[^"]*"|'[^']*')/gi;
 const JAVASCRIPT_HREF_PATTERN = /\s*\b(href|xlink:href)\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi;
+const XLINK_HREF_PATTERN = /\bxlink:href(?=\s*=)/gi;
+
+/**
+ * Replace deprecated SVG 1.1 `xlink:href` attributes with plain `href`.
+ * SVG 2 dropped the XLink namespace; modern browsers already support bare
+ * `href` on `<use>`, `<image>`, etc. Symbols imported from older Wikimedia
+ * sources still carry `xlink:href`, so this normalization must be applied
+ * before injecting them into the document or comparing reference IDs.
+ */
+export function normalizeXlinkHref(svg: string): string {
+  return svg.replace(XLINK_HREF_PATTERN, "href");
+}
 const METADATA_BLOCK_PATTERN = /<metadata\b[^>]*>[\s\S]*?<\/metadata>/gi;
 const EMPTY_DEFS_BLOCK_PATTERN = /<defs\b[^>]*>(?:\s|&nbsp;|<!--[\s\S]*?-->)*<\/defs>/gi;
 const EMPTY_DEFS_SELF_CLOSING_PATTERN = /<defs\b[^>]*\/>/gi;
@@ -168,7 +179,7 @@ function normalizeInlineStyle(styleValue: string): string {
 }
 
 export function sanitizeImportedSvgMarkup(svg: string): string {
-  const cleanedSvg = normalizeOrphanDefsBlock(svg)
+  const strippedSvg = normalizeOrphanDefsBlock(svg)
     .replace(XML_COMMENT_PATTERN, "")
     .replace(SCRIPT_ELEMENT_PATTERN, "")
     .replace(EVENT_HANDLER_ATTR_PATTERN, "")
@@ -176,6 +187,7 @@ export function sanitizeImportedSvgMarkup(svg: string): string {
     .replace(METADATA_BLOCK_PATTERN, "")
     .replace(EMPTY_DEFS_BLOCK_PATTERN, "")
     .replace(EMPTY_DEFS_SELF_CLOSING_PATTERN, "");
+  const cleanedSvg = normalizeXlinkHref(strippedSvg);
 
   const normalizedSvg = shouldNormalizeImportedSvgColors(cleanedSvg)
     ? cleanedSvg
@@ -242,6 +254,15 @@ export async function loadSymbolsJson(base: string): Promise<{
   }
 }
 
-export function getAllSymbols(remoteSymbols: SymbolDef[]): SymbolDef[] {
-  return dedupeSymbolsById([...BUILTIN_SYMBOLS, ...remoteSymbols]);
+/**
+ * Merge remote (user-loaded) symbols with built-in symbols into a single
+ * deduplicated list. Remote symbols take precedence: when the same id appears
+ * in both sources, the remote entry wins. Builtins are placed first in the
+ * spread so remote entries overwrite them during deduplication.
+ *
+ * @param remoteSymbols - Symbols fetched from symbols.json at runtime.
+ * @param builtinSymbols - Compiled-in symbols; defaults to an empty array.
+ */
+export function getAllSymbols(remoteSymbols: SymbolDef[], builtinSymbols: SymbolDef[] = []): SymbolDef[] {
+  return dedupeSymbolsById([...builtinSymbols, ...remoteSymbols]);
 }

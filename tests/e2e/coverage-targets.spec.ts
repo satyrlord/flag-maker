@@ -139,25 +139,52 @@ test.describe("Targeted browser coverage", () => {
           overlays: [
             { type: "rectangle", x: 50, y: 50, w: 30, h: 20, rotation: 30, fill: "#ff0000" },
             { type: "custom", path: "M10 10 L90 10 L50 90 Z", fill: "#00ff00" },
-            { type: "symbol", symbolId: "svg-symbol", x: 20, y: 20, w: 15, h: 15, fill: "#ffffff" },
-            { type: "symbol", symbolId: "path-symbol", x: 50, y: 50, w: 15, h: 15, fill: "#ffffff" },
+            { type: "symbol", symbolId: "svg-symbol", x: 20, y: 20, w: 15, h: 15, rotation: 15, fill: "#ffffff" },
+            { type: "symbol", symbolId: "path-symbol", x: 50, y: 50, w: 15, h: 15, rotation: 25, fill: "#ffffff" },
             { type: "symbol", symbolId: "gen-symbol", x: 80, y: 80, w: 15, h: 15, fill: "#ffffff" },
           ],
         },
         [
-          { id: "svg-symbol", name: "SVG", category: "Test", viewBox: "0 0 100 100", svg: "<circle cx='50' cy='50' r='40' />" },
-          { id: "path-symbol", name: "Path", category: "Test", viewBox: "0 0 100 100", path: "M10 10 L90 10 L50 90 Z" },
+          {
+            id: "svg-symbol",
+            name: "SVG",
+            category: "Test",
+            viewBox: "0 0 100 100",
+            svg: "<circle cx='50' cy='50' r='40' fill='currentColor' />",
+          },
+          {
+            id: "path-symbol",
+            name: "Path",
+            category: "Test",
+            viewBox: "0 0 100 100",
+            path: "M10 10 L90 10 L50 90 Z",
+            fillRule: "evenodd",
+          },
           { id: "gen-symbol", name: "Generated", category: "Test", generator: "star5" },
         ],
       );
 
-      return { headerWithoutIcon, thumbnailMarkup };
+      const probe = document.createElement("div");
+      probe.innerHTML = thumbnailMarkup;
+      const svgSymbolWrapper = probe.querySelector("circle")?.closest("svg");
+      const pathSymbol = probe.querySelector("path[d='M10 10 L90 10 L50 90 Z'][fill='#ffffff']");
+
+      return {
+        headerWithoutIcon,
+        thumbnailMarkup,
+        svgSymbolStyle: svgSymbolWrapper?.getAttribute("style") ?? "",
+        svgSymbolTransform: svgSymbolWrapper?.getAttribute("transform") ?? "",
+        pathFillRule: pathSymbol?.getAttribute("fill-rule") ?? null,
+      };
     });
 
     expect(thumbnailResults.headerWithoutIcon).not.toContain("toolbar-panel-icon");
     expect(thumbnailResults.thumbnailMarkup).toContain("rotate(30");
     expect(thumbnailResults.thumbnailMarkup).toContain("M10 10 L90 10 L50 90 Z");
     expect(thumbnailResults.thumbnailMarkup.match(/<svg/g)?.length ?? 0).toBeGreaterThan(3);
+    expect(thumbnailResults.svgSymbolStyle).toContain("color: rgb(255, 255, 255)");
+    expect(thumbnailResults.svgSymbolTransform).toContain("rotate(15");
+    expect(thumbnailResults.pathFillRule).toBe("evenodd");
 
     await page.evaluate(() => {
       const hooks = (window as Window & {
@@ -432,6 +459,31 @@ test.describe("Targeted browser coverage", () => {
 
     const snapshot = await getDesignSnapshot(page);
     expect(snapshot.overlays.some((overlay) => overlay.type === "symbol")).toBe(true);
+  });
+
+  test("symbols:loaded refreshes the live symbol categories and grid", async ({ page }) => {
+    await gotoWithHooks(page);
+    await page.getByRole("button", { name: "Symbols", exact: true }).click();
+
+    await page.locator("aside.toolbar").evaluate((aside) => {
+      aside.dispatchEvent(new CustomEvent("symbols:loaded", {
+        detail: {
+          symbols: [{
+            id: "runtime-probe-symbol",
+            name: "Runtime Probe",
+            category: "Runtime Test",
+            viewBox: "0 0 100 100",
+            path: "M10 10 L90 10 L50 90 Z",
+          }],
+        },
+        bubbles: false,
+      }));
+    });
+
+    const runtimeCategory = page.locator(".toolbar-cat-btn", { hasText: "Runtime Test" });
+    await expect(runtimeCategory).toBeVisible();
+    await runtimeCategory.click();
+    await expect(page.locator(".toolbar-symbol-item")).toHaveCount(1);
   });
 
   test("rotating a selected overlay with the grid active snaps the angle", async ({ page }) => {

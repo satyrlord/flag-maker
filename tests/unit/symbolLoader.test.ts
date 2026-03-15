@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getAllSymbols, loadSymbolsJson, sanitizeImportedSvgMarkup } from "@/symbolLoader";
-import { BUILTIN_SYMBOLS } from "@/symbols";
+import { loadBuiltinSymbols } from "@/symbols";
 
 describe("sanitizeImportedSvgMarkup", () => {
   it("removes metadata, comments, and empty defs from imported markup", () => {
@@ -39,7 +39,7 @@ describe("sanitizeImportedSvgMarkup", () => {
     ].join("");
 
     expect(sanitizeImportedSvgMarkup(importedSvg)).toBe(
-      '<defs><path id="helper" d="M1 1H9" fill="#abcdef"/></defs><path d="M0 0H10" fill="#123456"/><use xlink:href="#helper" fill="#abcdef"/>',
+      '<defs><path id="helper" d="M1 1H9" fill="#abcdef"/></defs><path d="M0 0H10" fill="#123456"/><use href="#helper" fill="#abcdef"/>',
     );
   });
 
@@ -187,6 +187,14 @@ describe("sanitizeImportedSvgMarkup", () => {
     );
   });
 
+  it("rewrites legacy xlink:href references to href", () => {
+    const importedSvg = '<defs><path id="crest" d="M0 0Z" /></defs><use xlink:href="#crest" fill="#abcdef" />';
+
+    expect(sanitizeImportedSvgMarkup(importedSvg)).toBe(
+      '<defs><path id="crest" d="M0 0Z" /></defs><use href="#crest" fill="currentColor" />',
+    );
+  });
+
   it("strips all three security threats when combined", () => {
     const importedSvg = [
       '<rect fill="#abcdef" onclick="steal()"/>',
@@ -225,26 +233,29 @@ describe("sanitizeImportedSvgMarkup", () => {
 });
 
 describe("getAllSymbols", () => {
-  it("returns builtins when no remote symbols", () => {
-    const result = getAllSymbols([]);
-    expect(result).toEqual(BUILTIN_SYMBOLS);
+  it("returns provided builtins when no remote symbols are present", async () => {
+    const builtinSymbols = await loadBuiltinSymbols();
+    const result = getAllSymbols([], builtinSymbols);
+    expect(result).toEqual(builtinSymbols);
   });
 
-  it("merges remote symbols after builtins", () => {
+  it("merges remote symbols after builtins", async () => {
+    const builtinSymbols = await loadBuiltinSymbols();
     const remote = [{ id: "test", name: "Test", category: "Custom", path: "M0 0Z" }];
-    const result = getAllSymbols(remote);
-    expect(result.length).toBe(BUILTIN_SYMBOLS.length + 1);
+    const result = getAllSymbols(remote, builtinSymbols);
+    expect(result.length).toBe(builtinSymbols.length + 1);
     expect(result[result.length - 1].id).toBe("test");
   });
 
-  it("deduplicates overlapping ids and keeps the remote symbol definition", () => {
+  it("deduplicates overlapping ids and keeps the remote symbol definition", async () => {
+    const builtinSymbols = await loadBuiltinSymbols();
     const remote = [{
       id: "tryzub",
       name: "Remote Tryzub",
       category: "Custom",
       path: "M1 1Z",
     }];
-    const result = getAllSymbols(remote);
+    const result = getAllSymbols(remote, builtinSymbols);
     expect(result.filter((symbol) => symbol.id === "tryzub")).toHaveLength(1);
     expect(result.find((symbol) => symbol.id === "tryzub")?.name).toBe("Remote Tryzub");
   });

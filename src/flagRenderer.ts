@@ -8,8 +8,7 @@ import type { FlagDesign, Overlay, SymbolDef } from "./types";
 import { overlayLayerGroup } from "./types";
 import { VIEW_W, computeViewH, computeStripeRects, DEFAULT_RATIO } from "./geometry";
 import { starPath } from "./utils";
-import { BUILTIN_SYMBOLS } from "./symbols";
-import { normalizeImportedSymbol } from "./symbolLoader";
+import { normalizeImportedSymbol, normalizeXlinkHref } from "./symbolLoader";
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -18,11 +17,26 @@ const RING_RADIUS_RATIO = 0.8;
 /** Stars are sized so their diameter fits ~2.5 times across the available cell. */
 const STAR_GAP_RATIO = 2.5;
 
+function normalizeBuiltinSymbol(def: SymbolDef): SymbolDef {
+  if (typeof def.svg !== "string" || !def.svg.includes("xlink:href")) {
+    return def;
+  }
+
+  return {
+    ...def,
+    svg: normalizeXlinkHref(def.svg),
+  };
+}
+
 /* ── Symbol Registry ── */
 
-const symbolRegistry = new Map<string, SymbolDef>(
-  BUILTIN_SYMBOLS.map((s) => [s.id, s]),
-);
+const symbolRegistry = new Map<string, SymbolDef>();
+
+export function registerBuiltinSymbols(defs: SymbolDef[]): void {
+  for (const def of defs) {
+    symbolRegistry.set(def.id, normalizeBuiltinSymbol(def));
+  }
+}
 
 export function registerSymbols(defs: SymbolDef[]): void {
   for (const def of defs) {

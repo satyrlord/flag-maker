@@ -2,9 +2,137 @@
   {
     "id": "albania_eagle",
     "name": "Albanian Double-Headed Eagle",
-    "category": "National Symbols",
+    "category": "Animals",
     "svgFile": "albania_eagle.svg",
     "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Albania.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "ulster_banner_flag",
+    "name": "Ulster Banner",
+    "category": "National Symbols",
+    "svgFile": "ulster_banner_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Northern_Ireland_(1953%E2%80%931972).svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "wales_flag",
+    "name": "Welsh Dragon",
+    "category": "Animals",
+    "svgFile": "welsh_dragon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Wales.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "bavaria_lozengy_flag",
+    "name": "Flag of Bavaria (lozengy)",
+    "category": "National Symbols",
+    "svgFile": "bavaria_lozengy_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Bavaria_(lozengy).svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "guernsey_flag",
+    "name": "Flag of Guernsey",
+    "category": "National Symbols",
+    "svgFile": "guernsey_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Guernsey.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "sardinia_flag",
+    "name": "Flag of Sardinia",
+    "category": "National Symbols",
+    "svgFile": "sardinia_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Sardinia.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "corsica_flag",
+    "name": "Flag of Corsica",
+    "category": "National Symbols",
+    "svgFile": "corsica_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Corsica.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "venice_flag",
+    "name": "Flag of the Republic of Venice",
+    "category": "National Symbols",
+    "svgFile": "venice_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Republic_of_Venice.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "jersey_flag",
+    "name": "Flag of Jersey",
+    "category": "National Symbols",
+    "svgFile": "jersey_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Jersey.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "isle_of_man_flag",
+    "name": "Flag of the Isle of Man",
+    "category": "National Symbols",
+    "svgFile": "isle_of_man_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Isle_of_Mann.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "berlin_flag",
+    "name": "Flag of Berlin",
+    "category": "National Symbols",
+    "svgFile": "berlin_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Berlin.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "brandenburg_flag",
+    "name": "Flag of Brandenburg",
+    "category": "National Symbols",
+    "svgFile": "brandenburg_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Brandenburg.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "hamburg_flag",
+    "name": "Flag of Hamburg",
+    "category": "National Symbols",
+    "svgFile": "hamburg_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Hamburg.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "lower_saxony_flag",
+    "name": "Flag of Lower Saxony",
+    "category": "National Symbols",
+    "svgFile": "lower_saxony_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lower_Saxony.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "rhineland_palatinate_flag",
+    "name": "Flag of Rhineland-Palatinate",
+    "category": "National Symbols",
+    "svgFile": "rhineland_palatinate_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Rhineland-Palatinate.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "saarland_flag",
+    "name": "Flag of Saarland",
+    "category": "National Symbols",
+    "svgFile": "saarland_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saarland.svg",
+    "license": "Check file page on Wikimedia Commons"
+  },
+  {
+    "id": "saxony_anhalt_flag",
+    "name": "Flag of Saxony-Anhalt",
+    "category": "National Symbols",
+    "svgFile": "saxony_anhalt_flag.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Saxony-Anhalt_(state).svg",
     "license": "Check file page on Wikimedia Commons"
   }
 ]

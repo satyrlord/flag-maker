@@ -50,6 +50,7 @@ test.describe("Templates panel", () => {
 
   test("done templates use static image previews while unfinished ones stay vectorial", async ({ page }) => {
     await page.getByRole("button", { name: "National" }).click();
+    await expect(page.getByRole("button", { name: "Apply France template" })).toBeVisible();
 
     const nationalItems = page.locator(".toolbar-template-item");
     const itemCount = await nationalItems.count();
@@ -117,5 +118,26 @@ test.describe("Template interactions", () => {
 
     const emblem = page.locator("svg.flag-svg > svg").first();
     await expect(emblem).toBeVisible();
+  });
+
+  test("applying the Andorra template renders a complex emblem signature", async ({ page }) => {
+    await page.getByRole("button", { name: "National" }).click();
+    await page.getByRole("button", { name: "Apply Andorra template" }).click();
+
+    const metrics = await page.locator("svg.flag-svg").evaluate((root) => ({
+      pathCount: root.querySelectorAll("path").length,
+      useCount: root.querySelectorAll("use").length,
+      viewBox: root.getAttribute("viewBox"),
+    }));
+
+    expect(metrics.viewBox).toBeTruthy();
+    // The Andorra coat of arms is a complex heraldic SVG: the path threshold
+    // (100) reflects the minimum number of <path> elements expected in the
+    // emblem inner markup, and the use threshold (10) reflects the <use>
+    // elements that reference shared defs within it. These bounds are
+    // intentionally loose so the test survives minor SVG optimizations while
+    // still confirming the full emblem was injected (not an empty placeholder).
+    expect(metrics.pathCount).toBeGreaterThanOrEqual(100);
+    expect(metrics.useCount).toBeGreaterThanOrEqual(10);
   });
 });

@@ -30,9 +30,9 @@ faithful reproductions and a more capable flag-making experience.
 - **Styling:** Tailwind CSS v4 (via `@tailwindcss/postcss` plugin + autoprefixer)
 - **UI approach:** No framework; direct DOM manipulation with ES modules
 - **Path alias:** `@/` -> `src/` (configured in both `vite.config.ts` and `tsconfig.json`)
-- **Assets:** SVG emblems in `public/emblems/`, symbol catalog in `public/symbols.json`
-- **Tooling:** Node/TypeScript (`tools/fetch-emblems.ts`) for Wikimedia emblem fetching,
-  Node/TypeScript (`tools/fetch-symbols.ts`) for curated flag symbol fetching,
+- **Assets:** runtime symbol catalog in `public/symbols.json`, built-in symbol sources in `src/config/symbols/`
+- **Tooling:** Node/TypeScript (`tools/build-symbol-catalog.ts`) for built-in symbol catalog generation,
+  Node/TypeScript (`tools/build-template-previews.ts`) for template preview generation,
   Node (`tools/svg2symbols.mjs`) for SVG-to-symbol conversion
 
 ---
@@ -207,8 +207,11 @@ npm run test:e2e:coverage  # playwright with Istanbul coverage collection
 npx vitest run tests/unit/flagRenderer.test.ts
 
 # Tooling
-npm run fetch-emblems   # download SVG emblems from Wikimedia to public/emblems/
-npm run fetch-symbols   # fetch curated symbols, merge into src/config/symbols-config.json
+npm run build:symbols             # generate built-in runtime catalog from src/config/symbols/
+                                  # (replaces the old fetch-emblems/fetch-symbols scripts;
+                                  #  run svg2symbols.mjs first to convert raw SVGs)
+npm run build:template-previews   # render template preview JPGs + manifest
+npm run prune:runtime-symbols     # filter public/symbols.json to template-enabled symbols
 ```
 
 **Fixed ports -- never change these:**
@@ -256,10 +259,10 @@ These practices apply to all agents working in this repository:
 | `src/ui/botbar.ts` | Zoom level floating bar (botbar) |
 | `src/ui/rightbar.ts` | Dynamic tools floating bar (rightbar) |
 | `src/index.css` | Tailwind CSS import |
-| `public/symbols.json` | Generated symbol/emblem catalog |
-| `public/emblems/` | Raw SVG emblem source files |
-| `tools/fetch-emblems.ts` | Wikimedia Commons emblem downloader |
-| `tools/fetch-symbols.ts` | Curated flag symbol fetcher |
+| `public/symbols.json` | Optional runtime symbol/emblem catalog |
+| `public/emblems/` | Repository-managed runtime SVG source/cache assets |
+| `tools/build-symbol-catalog.ts` | Built-in symbol catalog generator |
+| `tools/build-template-previews.ts` | Template preview image generator |
 | `tools/svg2symbols.mjs` | SVG -> symbols.json converter (SVGO + recolor) |
 
 ---

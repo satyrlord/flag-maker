@@ -32,18 +32,19 @@ export interface BoundingBoxRect {
   rotation: number;
 }
 
-export interface HandleEvent {
-  handleId: HandleId;
-  /** Pointer clientX/clientY at start. */
-  startClientX: number;
-  startClientY: number;
-}
-
+/** Drag handle square side length in pixels. */
 const HANDLE_SIZE = 8;
+/** Distance from the selection frame edge to the rotation ring, in pixels.
+ *  Set to 2x the handle size so the ring clears the corner handles. */
 const ROTATION_RING_OFFSET = 16;
+/** CSS color for the selection frame border and rotation connector line. */
 const BORDER_COLOR = "var(--color-primary)";
+/** CSS color for the interior fill of resize and move handles. */
 const HANDLE_FILL = "var(--color-primary-content)";
+/** CSS color for the border stroke of resize and move handles. */
 const HANDLE_STROKE = "var(--color-primary)";
+/** Rotation ring handle diameter in pixels; slightly larger than HANDLE_SIZE
+ *  so it is visually distinct from the resize handles. */
 const ROTATION_RING_SIZE = 10;
 
 /**

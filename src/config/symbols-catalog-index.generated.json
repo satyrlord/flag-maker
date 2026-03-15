@@ -1,0 +1,410 @@
+{
+  "_meta": {
+    "generatedAt": "2026-03-15T09:53:49.611Z",
+    "generatedBy": "tools/build-symbol-catalog.ts"
+  },
+  "categories": [
+    {
+      "name": "Animals",
+      "slug": "animals",
+      "files": [
+        "symbols-catalog.generated/animals.json"
+      ],
+      "count": 3,
+      "ids": [
+        "dragon_heraldic",
+        "albania_eagle",
+        "wales_flag"
+      ]
+    },
+    {
+      "name": "Celestial",
+      "slug": "celestial",
+      "files": [
+        "symbols-catalog.generated/celestial.json"
+      ],
+      "count": 5,
+      "ids": [
+        "sol_de_mayo",
+        "sun_philippines",
+        "star_morocco",
+        "star_ethiopia",
+        "star_five_pointed"
+      ]
+    },
+    {
+      "name": "Cultural",
+      "slug": "cultural",
+      "files": [
+        "symbols-catalog.generated/cultural.json"
+      ],
+      "count": 2,
+      "ids": [
+        "ashoka_chakra",
+        "taeguk"
+      ]
+    },
+    {
+      "name": "Geometric",
+      "slug": "geometric",
+      "files": [
+        "symbols-catalog.generated/geometric.json"
+      ],
+      "count": 4,
+      "ids": [
+        "trigram_geon",
+        "trigram_gon",
+        "trigram_ri",
+        "trigram_gam"
+      ]
+    },
+    {
+      "name": "National Symbols",
+      "slug": "national-symbols",
+      "files": [
+        "symbols-catalog.generated/national-symbols-1.json",
+        "symbols-catalog.generated/national-symbols-2.json",
+        "symbols-catalog.generated/national-symbols-3.json",
+        "symbols-catalog.generated/national-symbols-4.json",
+        "symbols-catalog.generated/national-symbols-5.json"
+      ],
+      "count": 31,
+      "ids": [
+        "us_naval_jack",
+        "brazil_flag_globe",
+        "nepal_moon",
+        "nepal_sun",
+        "union_jack",
+        "albania_emblem",
+        "anguilla_emblem",
+        "saudi_shahada",
+        "algeria_crescent_star",
+        "azerbaijan_crescent_star",
+        "antigua_rising_sun",
+        "barbados_trident",
+        "angola_flag_emblem",
+        "belarus_ornament",
+        "american_samoa_eagle",
+        "andorra_emblem",
+        "ulster_banner_flag",
+        "bavaria_lozengy_flag",
+        "guernsey_flag",
+        "sardinia_flag",
+        "corsica_flag",
+        "venice_flag",
+        "jersey_flag",
+        "isle_of_man_flag",
+        "berlin_flag",
+        "brandenburg_flag",
+        "hamburg_flag",
+        "lower_saxony_flag",
+        "rhineland_palatinate_flag",
+        "saarland_flag",
+        "saxony_anhalt_flag"
+      ]
+    },
+    {
+      "name": "Plants",
+      "slug": "plants",
+      "files": [
+        "symbols-catalog.generated/plants.json"
+      ],
+      "count": 3,
+      "ids": [
+        "olive_branch",
+        "maple_leaf",
+        "cedar_lebanon"
+      ]
+    }
+  ],
+  "symbols": [
+    {
+      "id": "dragon_heraldic",
+      "name": "Dragon (Heraldic)",
+      "category": "Animals",
+      "slug": "animals"
+    },
+    {
+      "id": "albania_eagle",
+      "name": "Albanian Double-Headed Eagle",
+      "category": "Animals",
+      "slug": "animals"
+    },
+    {
+      "id": "wales_flag",
+      "name": "Welsh Dragon",
+      "category": "Animals",
+      "slug": "animals"
+    },
+    {
+      "id": "sol_de_mayo",
+      "name": "Sol de Mayo",
+      "category": "Celestial",
+      "slug": "celestial"
+    },
+    {
+      "id": "sun_philippines",
+      "name": "Sun (Philippines)",
+      "category": "Celestial",
+      "slug": "celestial"
+    },
+    {
+      "id": "star_morocco",
+      "name": "Pentacle (Morocco)",
+      "category": "Celestial",
+      "slug": "celestial"
+    },
+    {
+      "id": "star_ethiopia",
+      "name": "Star (Ethiopia)",
+      "category": "Celestial",
+      "slug": "celestial"
+    },
+    {
+      "id": "star_five_pointed",
+      "name": "Star (Five-pointed)",
+      "category": "Celestial",
+      "slug": "celestial"
+    },
+    {
+      "id": "ashoka_chakra",
+      "name": "Ashoka Chakra",
+      "category": "Cultural",
+      "slug": "cultural"
+    },
+    {
+      "id": "taeguk",
+      "name": "Taeguk (Yin-Yang)",
+      "category": "Cultural",
+      "slug": "cultural"
+    },
+    {
+      "id": "trigram_geon",
+      "name": "Trigram Geon (Heaven)",
+      "category": "Geometric",
+      "slug": "geometric"
+    },
+    {
+      "id": "trigram_gon",
+      "name": "Trigram Gon (Earth)",
+      "category": "Geometric",
+      "slug": "geometric"
+    },
+    {
+      "id": "trigram_ri",
+      "name": "Trigram Ri (Fire)",
+      "category": "Geometric",
+      "slug": "geometric"
+    },
+    {
+      "id": "trigram_gam",
+      "name": "Trigram Gam (Water)",
+      "category": "Geometric",
+      "slug": "geometric"
+    },
+    {
+      "id": "us_naval_jack",
+      "name": "US Naval Jack",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "brazil_flag_globe",
+      "name": "Brazil Flag Globe",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "nepal_moon",
+      "name": "Nepal Moon",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "nepal_sun",
+      "name": "Nepal Sun",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "union_jack",
+      "name": "Union Jack (Flag of the United Kingdom)",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "albania_emblem",
+      "name": "Albania Coat of Arms (Double-Headed Eagle)",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "anguilla_emblem",
+      "name": "Anguilla Coat of Arms",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "saudi_shahada",
+      "name": "Saudi Shahada",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "algeria_crescent_star",
+      "name": "Algerian Crescent and Star",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "azerbaijan_crescent_star",
+      "name": "Azerbaijani Crescent and Star",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "antigua_rising_sun",
+      "name": "Antigua Rising Sun",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "barbados_trident",
+      "name": "Barbados Trident",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "angola_flag_emblem",
+      "name": "Angola Flag Emblem (Machete and Gear)",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "belarus_ornament",
+      "name": "Belarus Ornamental Pattern",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "american_samoa_eagle",
+      "name": "American Samoa Eagle",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "andorra_emblem",
+      "name": "Andorra National Emblem",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "ulster_banner_flag",
+      "name": "Ulster Banner",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "bavaria_lozengy_flag",
+      "name": "Flag of Bavaria (lozengy)",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "guernsey_flag",
+      "name": "Flag of Guernsey",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "sardinia_flag",
+      "name": "Flag of Sardinia",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "corsica_flag",
+      "name": "Flag of Corsica",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "venice_flag",
+      "name": "Flag of the Republic of Venice",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "jersey_flag",
+      "name": "Flag of Jersey",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "isle_of_man_flag",
+      "name": "Flag of the Isle of Man",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "berlin_flag",
+      "name": "Flag of Berlin",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "brandenburg_flag",
+      "name": "Flag of Brandenburg",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "hamburg_flag",
+      "name": "Flag of Hamburg",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "lower_saxony_flag",
+      "name": "Flag of Lower Saxony",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "rhineland_palatinate_flag",
+      "name": "Flag of Rhineland-Palatinate",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "saarland_flag",
+      "name": "Flag of Saarland",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "saxony_anhalt_flag",
+      "name": "Flag of Saxony-Anhalt",
+      "category": "National Symbols",
+      "slug": "national-symbols"
+    },
+    {
+      "id": "olive_branch",
+      "name": "Olive Branch",
+      "category": "Plants",
+      "slug": "plants"
+    },
+    {
+      "id": "maple_leaf",
+      "name": "Maple Leaf (Canada)",
+      "category": "Plants",
+      "slug": "plants"
+    },
+    {
+      "id": "cedar_lebanon",
+      "name": "Cedar (Lebanon)",
+      "category": "Plants",
+      "slug": "plants"
+    }
+  ]
+}

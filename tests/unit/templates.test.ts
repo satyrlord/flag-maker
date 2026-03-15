@@ -23,6 +23,28 @@ import {
   templateCatalunya,
   templateEuskadi,
   templateBavaria,
+  templateAland,
+  templateGuernsey,
+  templateSardinia,
+  templateCorsica,
+  templateGenoa,
+  templateVenice,
+  templateFaroeIslands,
+  templateGreenland,
+  templateBadenWurttemberg,
+  templateBerlin,
+  templateBrandenburg,
+  templateBremen,
+  templateHesse,
+  templateHamburg,
+  templateIsleOfMan,
+  templateJersey,
+  templateLowerSaxony,
+  templateNorthRhineWestphalia,
+  templateRhinelandPalatinate,
+  templateSaarland,
+  templateSaxonyAnhalt,
+  templateSchleswigHolstein,
   nationalFlagTemplate,
   NATIONAL_FLAG_CONFIGS,
   buildOverlay,
@@ -113,6 +135,8 @@ describe("Division templates", () => {
     assertValidTemplate(cfg);
     expect(cfg.overlays).toHaveLength(2);
     expect(cfg.overlays.every((o) => o.type === "rectangle")).toBe(true);
+    expect(cfg.overlays[0].h).toBe(18);
+    expect(cfg.overlays[1].w).toBeCloseTo((18 * 2) / 3, 5);
   });
 
   it("templateNordicCross has 2 rectangle overlays", () => {
@@ -220,6 +244,26 @@ describe("State-level templates", () => {
     expect(stateLevelFlagTemplate("england")).toBeTypeOf("function");
     expect(stateLevelFlagTemplate("scotland")).toBeTypeOf("function");
     expect(stateLevelFlagTemplate("wales")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("aland")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("guernsey")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("jersey")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("sardinia")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("corsica")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("genoa")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("venice")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("baden_wurttemberg")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("berlin")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("brandenburg")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("bremen")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("hamburg")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("hesse")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("isle_of_man")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("lower_saxony")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("north_rhine_westphalia")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("rhineland_palatinate")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("saarland")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("saxony_anhalt")).toBeTypeOf("function");
+    expect(stateLevelFlagTemplate("schleswig_holstein")).toBeTypeOf("function");
     expect(stateLevelFlagTemplate("missing_state_flag")).toBeNull();
   });
 
@@ -232,6 +276,28 @@ describe("State-level templates", () => {
       templateCatalunya,
       templateEuskadi,
       templateBavaria,
+      templateAland,
+      templateGuernsey,
+      templateJersey,
+      templateSardinia,
+      templateCorsica,
+      templateGenoa,
+      templateVenice,
+      templateFaroeIslands,
+      templateGreenland,
+      templateBadenWurttemberg,
+      templateBerlin,
+      templateBrandenburg,
+      templateBremen,
+      templateHamburg,
+      templateHesse,
+      templateIsleOfMan,
+      templateLowerSaxony,
+      templateNorthRhineWestphalia,
+      templateRhinelandPalatinate,
+      templateSaarland,
+      templateSaxonyAnhalt,
+      templateSchleswigHolstein,
     ];
 
     for (const create of factories) {
@@ -239,14 +305,18 @@ describe("State-level templates", () => {
     }
   });
 
-  it("England and Northern Ireland use centered or saltire crosses with two overlays", () => {
+  it("England uses a centered cross and Northern Ireland uses the Ulster Banner symbol", () => {
     const england = templateEngland();
     const northernIreland = templateNorthernIreland();
 
     expect(england.overlays).toHaveLength(2);
     expect(england.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
-    expect(northernIreland.overlays).toHaveLength(2);
-    expect(northernIreland.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(england.overlays[0].h).toBe(20);
+    expect(england.overlays[1].w).toBeCloseTo((20 * 3) / 5, 5);
+    expect(northernIreland.ratio).toEqual([1, 2]);
+    expect(northernIreland.overlays).toHaveLength(1);
+    expect(northernIreland.overlays[0].type).toBe("symbol");
+    expect(northernIreland.overlays[0].symbolId).toBe("ulster_banner_flag");
   });
 
   it("Wales, Catalunya, Euskadi, and Bavaria preserve their defining structures", () => {
@@ -255,9 +325,15 @@ describe("State-level templates", () => {
     const euskadi = templateEuskadi();
     const bavaria = templateBavaria();
 
+    expect(wales.sections).toBe(2);
+    expect(wales.colors).toEqual(["#FFFFFF", "#00A651"]);
     expect(wales.overlays).toHaveLength(1);
     expect(wales.overlays[0].type).toBe("symbol");
-    expect(wales.overlays[0].symbolId).toBe("dragon_heraldic");
+    expect(wales.overlays[0].symbolId).toBe("wales_flag");
+    expect(wales.overlays[0].y).toBe(49);
+    expect(wales.overlays[0].w).toBe(56);
+    expect(wales.overlays[0].h).toBe(62);
+    expect(wales.overlays[0].fill).toBe("#D21034");
 
     expect(catalunya.sections).toBe(9);
     expect(catalunya.colors).toHaveLength(9);
@@ -265,9 +341,155 @@ describe("State-level templates", () => {
     expect(euskadi.ratio).toEqual([14, 25]);
     expect(euskadi.overlays).toHaveLength(4);
     expect(euskadi.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(euskadi.overlays[0].h).toBeCloseTo(43 / 280 * 100, 5);
+    expect(euskadi.overlays[2].h).toBeCloseTo(43 / 280 * 100, 5);
+    expect(euskadi.overlays[3].w).toBe(8.6);
 
-    expect(bavaria.overlays).toHaveLength(33);
-    expect(bavaria.overlays.every((overlay) => overlay.type === "custom")).toBe(true);
+    expect(bavaria.ratio).toEqual([3, 5]);
+    expect(bavaria.overlays).toHaveLength(1);
+    expect(bavaria.overlays[0].type).toBe("symbol");
+    expect(bavaria.overlays[0].symbolId).toBe("bavaria_lozengy_flag");
+    expect(bavaria.overlays[0].w).toBe(100);
+    expect(bavaria.overlays[0].h).toBe(100);
+  });
+
+  it("Aland, Guernsey, Faroe Islands, and Greenland preserve their defining geometry", () => {
+    const aland = templateAland();
+    const guernsey = templateGuernsey();
+    const faroeIslands = templateFaroeIslands();
+    const greenland = templateGreenland();
+
+    expect(aland.ratio).toEqual([17, 26]);
+    expect(aland.overlays).toHaveLength(4);
+    expect(aland.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(aland.overlays[0].fill).toBe("#FFD300");
+    expect(aland.overlays[2].fill).toBe("#DA0E15");
+
+    expect(guernsey.ratio).toEqual([2, 3]);
+    expect(guernsey.overlays).toHaveLength(1);
+    expect(guernsey.overlays[0].type).toBe("symbol");
+    expect(guernsey.overlays[0].symbolId).toBe("guernsey_flag");
+    expect(guernsey.overlays[0].w).toBe(100);
+    expect(guernsey.overlays[0].h).toBe(100);
+
+    expect(faroeIslands.ratio).toEqual([8, 11]);
+    expect(faroeIslands.overlays).toHaveLength(4);
+    expect(faroeIslands.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(faroeIslands.overlays[0].fill).toBe("#005EB8");
+    expect(faroeIslands.overlays[2].fill).toBe("#EF3340");
+
+    expect(greenland.ratio).toEqual([2, 3]);
+    expect(greenland.sections).toBe(2);
+    expect(greenland.colors).toEqual(["#FFFFFF", "#C8102E"]);
+    expect(greenland.overlays).toHaveLength(2);
+    expect(greenland.overlays.every((overlay) => overlay.type === "custom")).toBe(true);
+  });
+
+  it("Sardinia, Corsica, Genoa, and Venice use the intended official constructions", () => {
+    const sardinia = templateSardinia();
+    const corsica = templateCorsica();
+    const genoa = templateGenoa();
+    const venice = templateVenice();
+
+    expect(sardinia.ratio).toEqual([2, 3]);
+    expect(sardinia.overlays).toHaveLength(1);
+    expect(sardinia.overlays[0].type).toBe("symbol");
+    expect(sardinia.overlays[0].symbolId).toBe("sardinia_flag");
+
+    expect(corsica.ratio).toEqual([3, 5]);
+    expect(corsica.overlays).toHaveLength(1);
+    expect(corsica.overlays[0].type).toBe("symbol");
+    expect(corsica.overlays[0].symbolId).toBe("corsica_flag");
+
+    expect(genoa.ratio).toEqual([2, 3]);
+    expect(genoa.overlays).toHaveLength(2);
+    expect(genoa.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(genoa.overlays[0].h).toBe(20);
+    expect(genoa.overlays[1].w).toBeCloseTo((20 * 2) / 3, 5);
+
+    expect(venice.ratio).toEqual([13, 25]);
+    expect(venice.overlays).toHaveLength(1);
+    expect(venice.overlays[0].type).toBe("symbol");
+    expect(venice.overlays[0].symbolId).toBe("venice_flag");
+  });
+
+  it("Jersey, Isle of Man, and the remaining reviewed state flags use full-flag symbol artwork", () => {
+    const jersey = templateJersey();
+    const isleOfMan = templateIsleOfMan();
+    const berlin = templateBerlin();
+    const brandenburg = templateBrandenburg();
+    const hamburg = templateHamburg();
+    const lowerSaxony = templateLowerSaxony();
+    const rhinelandPalatinate = templateRhinelandPalatinate();
+    const saarland = templateSaarland();
+    const saxonyAnhalt = templateSaxonyAnhalt();
+
+    expect(jersey.ratio).toEqual([3, 5]);
+    expect(jersey.overlays[0].type).toBe("symbol");
+    expect(jersey.overlays[0].symbolId).toBe("jersey_flag");
+
+    expect(isleOfMan.ratio).toEqual([1, 2]);
+    expect(isleOfMan.overlays[0].symbolId).toBe("isle_of_man_flag");
+
+    expect(berlin.ratio).toEqual([3, 5]);
+    expect(berlin.overlays[0].symbolId).toBe("berlin_flag");
+
+    expect(brandenburg.ratio).toEqual([3, 5]);
+    expect(brandenburg.overlays[0].symbolId).toBe("brandenburg_flag");
+
+    expect(hamburg.ratio).toEqual([2, 3]);
+    expect(hamburg.overlays[0].symbolId).toBe("hamburg_flag");
+
+    expect(lowerSaxony.ratio).toEqual([15, 23]);
+    expect(lowerSaxony.overlays[0].symbolId).toBe("lower_saxony_flag");
+
+    expect(rhinelandPalatinate.ratio).toEqual([2, 3]);
+    expect(rhinelandPalatinate.overlays[0].symbolId).toBe("rhineland_palatinate_flag");
+
+    expect(saarland.ratio).toEqual([3, 5]);
+    expect(saarland.overlays[0].symbolId).toBe("saarland_flag");
+
+    expect(saxonyAnhalt.ratio).toEqual([3, 5]);
+    expect(saxonyAnhalt.overlays[0].symbolId).toBe("saxony_anhalt_flag");
+  });
+
+  it("Baden-Wurttemberg, Bremen, Hesse, North Rhine-Westphalia, and Schleswig-Holstein use the expected civil-flag geometry", () => {
+    const badenWurttemberg = templateBadenWurttemberg();
+    const bremen = templateBremen();
+    const hesse = templateHesse();
+    const northRhineWestphalia = templateNorthRhineWestphalia();
+    const schleswigHolstein = templateSchleswigHolstein();
+
+    expect(badenWurttemberg.ratio).toEqual([3, 5]);
+    expect(badenWurttemberg.sections).toBe(2);
+    expect(badenWurttemberg.colors).toEqual(["#000000", "#F9C700"]);
+    expect(badenWurttemberg.overlays).toHaveLength(0);
+
+    expect(bremen.ratio).toEqual([2, 3]);
+    expect(bremen.sections).toBe(8);
+    expect(bremen.colors).toEqual(["#DD0000", "#FFFFFF", "#DD0000", "#FFFFFF", "#DD0000", "#FFFFFF", "#DD0000", "#FFFFFF"]);
+    expect(bremen.overlays).toHaveLength(8);
+    expect(bremen.overlays.every((overlay) => overlay.type === "rectangle")).toBe(true);
+    expect(bremen.overlays.every((overlay) => Math.abs(overlay.w - 12.5 * 2 / 3) < 1e-9)).toBe(true);
+    expect(bremen.overlays.every((overlay) => overlay.h === 12.5)).toBe(true);
+    expect(bremen.overlays.every((overlay) => Math.abs(overlay.x - 12.5) < 1e-9)).toBe(true);
+    expect(bremen.overlays[0].fill).toBe("#FFFFFF");
+    expect(bremen.overlays[1].fill).toBe("#DD0000");
+
+    expect(hesse.ratio).toEqual([3, 5]);
+    expect(hesse.sections).toBe(2);
+    expect(hesse.colors).toEqual(["#E10000", "#FFFFFF"]);
+    expect(hesse.overlays).toHaveLength(0);
+
+    expect(northRhineWestphalia.ratio).toEqual([3, 5]);
+    expect(northRhineWestphalia.sections).toBe(3);
+    expect(northRhineWestphalia.colors).toEqual(["#009136", "#FFFFFF", "#E3001B"]);
+    expect(northRhineWestphalia.overlays).toHaveLength(0);
+
+    expect(schleswigHolstein.ratio).toEqual([3, 5]);
+    expect(schleswigHolstein.sections).toBe(3);
+    expect(schleswigHolstein.colors).toEqual(["#0039AD", "#FFFFFF", "#D61810"]);
+    expect(schleswigHolstein.overlays).toHaveLength(0);
   });
 });
 

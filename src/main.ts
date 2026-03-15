@@ -11,16 +11,16 @@ import { createBoundingBox } from "./ui/boundingBox";
 import type { HandleId } from "./ui/boundingBox";
 import { createGridSvg } from "./ui/gridOverlay";
 import type { GridSize } from "./ui/gridConfig";
-import { renderFlag, registerSymbols } from "./flagRenderer";
+import { renderFlag, registerBuiltinSymbols, registerSymbols } from "./flagRenderer";
 import { VIEW_W } from "./geometry";
 import { rectOverlay, circleOverlay, polyOverlay, starfieldOverlay } from "./overlays";
 import { uid } from "./utils";
 import type { FlagDesign, Overlay, Orientation, SymbolDef } from "./types";
-import { LAYER_GROUP_CONSTRAINTS, overlayLayerGroup } from "./types";
+import { LAYER_GROUP_CONSTRAINTS, overlayLayerGroup, collectSymbolIds } from "./types";
 import type { TemplateCfg } from "./templates";
 import { ALL_TEMPLATE_FACTORIES, TEMPLATE_GROUPED_CONFIGS } from "./templateCatalog";
 import { loadSymbolsJson } from "./symbolLoader";
-import { loadBuiltinSymbols } from "./symbols";
+import { ensureBuiltinSymbolsByIds } from "./symbols";
 import { extendStripeColors } from "./stripeColors";
 import leftbarConfig from "./config/leftbar-config.json";
 
@@ -144,6 +144,21 @@ if (testHooksSearch.has("e2e-hooks")) {
     }),
     getSelectedOverlayId: () => selectedOverlayId,
     runMainCoverageProbe: () => {
+      buildDesignFromTemplate({
+        ratio: [1, 2],
+        sections: 2,
+        colors: ["#000000", "#ffffff"],
+        overlays: [],
+      } as TemplateCfg);
+      buildDesignFromTemplate({
+        orientation: "vertical",
+        ratio: [2, 3],
+        sections: 2,
+        weights: [2, 1],
+        colors: ["#111111", "#eeeeee"],
+        overlays: [],
+      } as TemplateCfg);
+
       const probeOverlay: Overlay = {
         id: "probe-overlay",
         type: "rectangle",
@@ -226,7 +241,6 @@ if (testHooksSearch.has("e2e-hooks")) {
         bubbles: true,
       }));
       root.dispatchEvent(new CustomEvent("rightbar:center-h", { bubbles: true }));
-      root.dispatchEvent(new CustomEvent("rightbar:center-v", { bubbles: true }));
       bb.frame.dispatchEvent(new PointerEvent("pointermove", {
         bubbles: true,
         pointerId: 1,
@@ -282,6 +296,7 @@ if (testHooksSearch.has("e2e-hooks")) {
       }));
 
       selectOverlay(null);
+      root.dispatchEvent(new CustomEvent("rightbar:center-v", { bubbles: true }));
       design.overlays = [];
       redraw();
       return true;
@@ -391,12 +406,19 @@ function mergeSymbols(nextSymbols: SymbolDef[]): SymbolDef[] {
   return [...uniqueById.values()];
 }
 
+async function ensureBuiltinSymbolsForOverlays(overlays: Overlay[]): Promise<void> {
+  const builtinSymbols = await ensureBuiltinSymbolsByIds(collectSymbolIds(overlays));
+  if (builtinSymbols.length === 0) {
+    return;
+  }
+  loadedSymbols = mergeSymbols(builtinSymbols);
+  registerBuiltinSymbols(builtinSymbols);
+  publishLoadedSymbols(loadedSymbols);
+}
+
 async function initializeSymbols(): Promise<void> {
   try {
-    const builtinSymbols = await loadBuiltinSymbols();
-    loadedSymbols = mergeSymbols(builtinSymbols);
-    registerSymbols(builtinSymbols);
-    publishLoadedSymbols(loadedSymbols);
+    await ensureBuiltinSymbolsForOverlays(design.overlays);
   } catch (error) {
     console.error("Failed to load built-in symbols", error);
   }
@@ -532,32 +554,38 @@ root.addEventListener("toolbar:add-overlay", (e) => {
 });
 
 root.addEventListener("toolbar:template", (e) => {
-  selectOverlay(null);
   const { config } = (e as CustomEvent<{ id: string; config: TemplateCfg }>).detail;
-  applyTemplateConfig(config);
-  redraw();
-  syncLayers();
-  syncStripeControls();
+  void (async () => {
+    selectOverlay(null);
+    await ensureBuiltinSymbolsForOverlays(config.overlays);
+    applyTemplateConfig(config);
+    redraw();
+    syncLayers();
+    syncStripeControls();
+  })().catch((err) => console.error("Failed to apply template", err));
 });
 
 root.addEventListener("toolbar:symbol", (e) => {
   const { symbolId } = (e as CustomEvent<{ symbolId: string }>).detail;
   const symbolCount = design.overlays.filter((o) => overlayLayerGroup(o) === "symbols").length;
   if (symbolCount >= LAYER_GROUP_CONSTRAINTS.symbols.maxLayers) return;
-  const ov: Overlay = {
-    id: uid(),
-    type: "symbol",
-    symbolId,
-    x: 50, y: 50, w: 20, h: 20,
-    rotation: 0,
-    fill: leftbarConfig.defaultOverlayFill,
-    stroke: "#0000",
-    strokeWidth: 0,
-    opacity: 1,
-  };
-  design.overlays.push(ov);
-  redraw();
-  syncLayers();
+  void (async () => {
+    await ensureBuiltinSymbolsForOverlays([{ type: "symbol", symbolId } as Overlay]);
+    const ov: Overlay = {
+      id: uid(),
+      type: "symbol",
+      symbolId,
+      x: 50, y: 50, w: 20, h: 20,
+      rotation: 0,
+      fill: leftbarConfig.defaultOverlayFill,
+      stroke: "#0000",
+      strokeWidth: 0,
+      opacity: 1,
+    };
+    design.overlays.push(ov);
+    redraw();
+    syncLayers();
+  })().catch((err) => console.error("Failed to add symbol", err));
 });
 
 root.addEventListener("toolbar:add-starfield", () => {

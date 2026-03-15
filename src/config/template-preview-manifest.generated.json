@@ -55,5 +55,101 @@
   },
   "bulgaria": {
     "imagePath": "template-previews/bulgaria.jpg"
+  },
+  "england": {
+    "imagePath": "template-previews/england.jpg"
+  },
+  "scotland": {
+    "imagePath": "template-previews/scotland.jpg"
+  },
+  "wales": {
+    "imagePath": "template-previews/wales.jpg"
+  },
+  "northern_ireland": {
+    "imagePath": "template-previews/northern_ireland.jpg"
+  },
+  "catalunya": {
+    "imagePath": "template-previews/catalunya.jpg"
+  },
+  "euskadi": {
+    "imagePath": "template-previews/euskadi.jpg"
+  },
+  "bavaria": {
+    "imagePath": "template-previews/bavaria.jpg"
+  },
+  "aland": {
+    "imagePath": "template-previews/aland.jpg"
+  },
+  "guernsey": {
+    "imagePath": "template-previews/guernsey.jpg"
+  },
+  "sardinia": {
+    "imagePath": "template-previews/sardinia.jpg"
+  },
+  "corsica": {
+    "imagePath": "template-previews/corsica.jpg"
+  },
+  "genoa": {
+    "imagePath": "template-previews/genoa.jpg"
+  },
+  "venice": {
+    "imagePath": "template-previews/venice.jpg"
+  },
+  "faroe_islands": {
+    "imagePath": "template-previews/faroe_islands.jpg"
+  },
+  "greenland": {
+    "imagePath": "template-previews/greenland.jpg"
+  },
+  "baden_wurttemberg": {
+    "imagePath": "template-previews/baden_wurttemberg.jpg"
+  },
+  "bremen": {
+    "imagePath": "template-previews/bremen.jpg"
+  },
+  "hesse": {
+    "imagePath": "template-previews/hesse.jpg"
+  },
+  "north_rhine_westphalia": {
+    "imagePath": "template-previews/north_rhine_westphalia.jpg"
+  },
+  "schleswig_holstein": {
+    "imagePath": "template-previews/schleswig_holstein.jpg"
+  },
+  "berlin": {
+    "imagePath": "template-previews/berlin.jpg"
+  },
+  "brandenburg": {
+    "imagePath": "template-previews/brandenburg.jpg"
+  },
+  "hamburg": {
+    "imagePath": "template-previews/hamburg.jpg"
+  },
+  "lower_saxony": {
+    "imagePath": "template-previews/lower_saxony.jpg"
+  },
+  "mecklenburg_vorpommern": {
+    "imagePath": "template-previews/mecklenburg_vorpommern.jpg"
+  },
+  "rhineland_palatinate": {
+    "imagePath": "template-previews/rhineland_palatinate.jpg"
+  },
+  "saarland": {
+    "imagePath": "template-previews/saarland.jpg"
+  },
+  "saxony": {
+    "imagePath": "template-previews/saxony.jpg"
+  },
+  "saxony_anhalt": {
+    "imagePath": "template-previews/saxony_anhalt.jpg"
+  },
+  "thuringia": {
+    "imagePath": "template-previews/thuringia.jpg"
+  },
+  "jersey": {
+    "imagePath": "template-previews/jersey.jpg"
+  },
+  "isle_of_man": {
+    "imagePath": "template-previews/isle_of_man.jpg"
   }
 }

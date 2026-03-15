@@ -41,12 +41,54 @@ interface GeneratedSymbolCatalog {
   symbols: SymbolRuntimeEntry[];
 }
 
+interface GeneratedSymbolCatalogCategory {
+  name: string;
+  slug: string;
+  files: string[];
+  count: number;
+  ids: string[];
+}
+
+interface GeneratedSymbolCatalogIndexEntry {
+  id: string;
+  name: string;
+  category: string;
+  slug: string;
+}
+
+interface GeneratedSymbolCatalogIndex {
+  _meta: {
+    generatedAt: string;
+    generatedBy: string;
+  };
+  categories: GeneratedSymbolCatalogCategory[];
+  symbols: GeneratedSymbolCatalogIndexEntry[];
+}
+
+interface GeneratedSymbolCatalogShard {
+  _meta: {
+    generatedAt: string;
+    generatedBy: string;
+  };
+  category: string;
+  slug: string;
+  symbols: SymbolRuntimeEntry[];
+}
+
 interface ExtractedSvg {
   viewBox: string;
   inner: string;
 }
 
 const CONFIG_PATH = path.resolve("src/config/symbols-config.json");
+// 225 KB per shard balances network round-trip overhead against individual file
+// size. Shards above this threshold are split to avoid large blocking payloads
+// on slow connections; below it, chunking overhead outweighs the benefit.
+// The threshold applies per shard and is estimated by summing JSON.stringify(symbol).length
+// for each individual symbol; it does not include JSON array brackets or separators,
+// so the actual payload will be slightly larger. This is an initial heuristic;
+// tune the value against real-world performance metrics if needed.
+const TARGET_SHARD_SIZE_BYTES = 225_000;
 
 async function main(): Promise<void> {
   const rawConfig = await fs.readFile(CONFIG_PATH, "utf8");
@@ -102,15 +144,102 @@ async function main(): Promise<void> {
   }
 
   const outputPath = path.resolve(configDir, config.outputFile);
+  const outputDirectory = path.dirname(outputPath);
+  const outputBaseName = path.basename(outputPath, ".json");
+  const shardDirectoryName = outputBaseName;
+  const shardDirectoryPath = path.join(outputDirectory, shardDirectoryName);
+  const indexBaseName = outputBaseName.endsWith(".generated")
+    ? outputBaseName.slice(0, -".generated".length)
+    : outputBaseName;
+  const indexFileName = `${indexBaseName}-index.generated.json`;
+  const indexPath = path.join(outputDirectory, indexFileName);
+  const generatedAt = new Date().toISOString();
+  const generatedBy = "tools/build-symbol-catalog.ts";
+
   const generatedCatalog: GeneratedSymbolCatalog = {
     _meta: {
-      generatedAt: new Date().toISOString(),
-      generatedBy: "tools/build-symbol-catalog.ts",
+      generatedAt,
+      generatedBy,
     },
     symbols: runtimeEntries,
   };
+
+  const categoryGroups = new Map<string, SymbolRuntimeEntry[]>();
+  for (const entry of runtimeEntries) {
+    const existing = categoryGroups.get(entry.category);
+    if (existing) {
+      existing.push(entry);
+      continue;
+    }
+    categoryGroups.set(entry.category, [entry]);
+  }
+
+  const usedSlugs = new Map<string, string>();
+  const categoryDescriptors = [...categoryGroups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([category, symbols]) => {
+      const slug = slugifyCategory(category);
+      const previousCategory = usedSlugs.get(slug);
+      if (previousCategory && previousCategory !== category) {
+        throw new Error(`Category slug collision: "${category}" conflicts with "${previousCategory}" as "${slug}"`);
+      }
+      usedSlugs.set(slug, category);
+      const shardGroups = partitionCategorySymbols(symbols, TARGET_SHARD_SIZE_BYTES);
+      return {
+        category,
+        slug,
+        files: shardGroups.map((_, index) => `${shardDirectoryName}/${formatShardFileName(slug, index, shardGroups.length)}`),
+        shards: shardGroups,
+        symbols,
+      };
+    });
+
+  const generatedIndex: GeneratedSymbolCatalogIndex = {
+    _meta: {
+      generatedAt,
+      generatedBy,
+    },
+    categories: categoryDescriptors.map(({ category, slug, files, symbols }) => ({
+      name: category,
+      slug,
+      files,
+      count: symbols.length,
+      ids: symbols.map((symbol) => symbol.id),
+    })),
+    symbols: categoryDescriptors.flatMap(({ category, slug, symbols }) =>
+      symbols.map((symbol) => ({
+        id: symbol.id,
+        name: symbol.name,
+        category,
+        slug,
+      })),
+    ),
+  };
+
+  await fs.rm(shardDirectoryPath, { recursive: true, force: true });
+  await fs.mkdir(shardDirectoryPath, { recursive: true });
+
   await fs.writeFile(outputPath, `${JSON.stringify(generatedCatalog, null, 2)}\n`, "utf8");
+  await fs.writeFile(indexPath, `${JSON.stringify(generatedIndex, null, 2)}\n`, "utf8");
+
+  await Promise.all(categoryDescriptors.flatMap(({ category, slug, files, shards }) =>
+    shards.map(async (symbols, index) => {
+      const shardPath = path.join(outputDirectory, files[index]);
+      const shard: GeneratedSymbolCatalogShard = {
+        _meta: {
+          generatedAt,
+          generatedBy,
+        },
+        category,
+        slug,
+        symbols,
+      };
+      await fs.writeFile(shardPath, `${JSON.stringify(shard, null, 2)}\n`, "utf8");
+    }),
+  ));
+
   console.log(`Wrote ${runtimeEntries.length} symbols to ${path.relative(process.cwd(), outputPath)}`);
+  console.log(`Wrote ${categoryDescriptors.reduce((count, descriptor) => count + descriptor.files.length, 0)} symbol shards to ${path.relative(process.cwd(), shardDirectoryPath)}`);
 }
 
 function validateConfig(config: SymbolCatalogConfig): void {
@@ -139,6 +268,49 @@ function validateSourceEntry(entry: SymbolSourceEntry, metadataPath: string): vo
       `Symbol ${entry.id} in ${metadataPath} must define exactly one of svgFile, path, or generator; found ${found}`,
     );
   }
+}
+
+function slugifyCategory(category: string): string {
+  const slug = category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!slug) {
+    throw new Error(`Could not derive a category slug from "${category}"`);
+  }
+  return slug;
+}
+
+function formatShardFileName(slug: string, index: number, totalShards: number): string {
+  // Single-shard categories use just the slug; multi-shard use 1-based numbering.
+  return totalShards === 1 ? `${slug}.json` : `${slug}-${index + 1}.json`;
+}
+
+function estimateSymbolSize(symbol: SymbolRuntimeEntry): number {
+  return JSON.stringify(symbol).length;
+}
+
+function partitionCategorySymbols(symbols: SymbolRuntimeEntry[], targetSize: number): SymbolRuntimeEntry[][] {
+  const shards: SymbolRuntimeEntry[][] = [];
+  let currentShard: SymbolRuntimeEntry[] = [];
+  let currentSize = 0;
+
+  for (const symbol of symbols) {
+    const nextSize = estimateSymbolSize(symbol);
+    if (currentShard.length > 0 && currentSize + nextSize > targetSize) {
+      shards.push(currentShard);
+      currentShard = [];
+      currentSize = 0;
+    }
+    currentShard.push(symbol);
+    currentSize += nextSize;
+  }
+
+  if (currentShard.length > 0) {
+    shards.push(currentShard);
+  }
+
+  return shards;
 }
 
 async function extractSvg(filePath: string): Promise<ExtractedSvg> {

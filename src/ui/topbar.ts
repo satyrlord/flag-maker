@@ -323,7 +323,7 @@ export function createTopbar(): HTMLElement {
   });
 
   const saveBtn = iconButton(Icons.save, "Save project", () => {
-    /* TODO: wire to save */
+    /* Save functionality not yet implemented. */
   });
 
   const exportSizeSelect = createExportSizeSelect();

@@ -162,65 +162,6 @@ function prettifyName(base) {
     .trim()
     .replace(/\b\w/g, m => m.toUpperCase());
 }
-
-/**
- * Robustly extract { viewBox, inner }:
- * - accepts nested <svg> (walks until a real <svg> with content)
- * - if no viewBox, synthesizes from width/height
- */
-function extractViewBoxAndInner_old(svgString) {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "",
-    preserveOrder: true
-  });
-
-  try {
-    const doc = parser.parse(svgString);
-    // find first node named 'svg' (supports nested structure from preserveOrder)
-    const svgNode = findFirstSvgNode(doc);
-    if (!svgNode) return null;
-
-    // svgNode is an object like { svg: [ {attr...}, child1, child2, ... ] }
-    const arr = svgNode.svg;
-    if (!Array.isArray(arr) || !arr.length) return null;
-    const attrs = arr[0] || {};
-    let viewBox = attrs.viewBox || synthesizeViewBox(attrs.width, attrs.height);
-    if (!viewBox) return null;
-
-    // Get the exact inner markup between <svg ...> and </svg> for THIS svg node.
-    // We can’t easily slice the original string for nested nodes,
-    // so rebuild inner from the preserved-order object (excluding attr object).
-    const inner = stringifyInner(arr.slice(1));
-    if (!inner.trim()) return null;
-
-    return { viewBox: String(viewBox), inner: inner.trim() };
-  } catch {
-    // Fallback: last-ditch string slicing for the outermost <svg>
-    const startTag = svgString.match(/<svg\b[^>]*>/i);
-    const endTag = svgString.match(/<\/svg>/i);
-    if (!startTag || !endTag) return null;
-    const startIdx = startTag.index + startTag[0].length;
-    const endIdx = svgString.lastIndexOf("</svg>");
-    const inner = svgString.slice(startIdx, endIdx).trim();
-
-    // try to read a viewBox from the start tag
-    const vbMatch = startTag[0].match(/\bviewBox="([^"]+)"/i);
-    let viewBox = vbMatch ? vbMatch[1] : null;
-    if (!viewBox) {
-      const wMatch = startTag[0].match(/\bwidth="([^"]+)"/i);
-      const hMatch = startTag[0].match(/\bheight="([^"]+)"/i);
-      if (wMatch && hMatch) {
-        const w = (wMatch[1] || "").replace(/[^0-9.\-]/g, "");
-        const h = (hMatch[1] || "").replace(/[^0-9.\-]/g, "");
-        if (w && h) viewBox = `0 0 ${w} ${h}`;
-      }
-    }
-    if (!viewBox) return null;
-    return { viewBox, inner };
-  }
-}
-
 /**
  * Find the best <svg> block (handles nesting) and return { viewBox, inner }.
  * Strategy:
@@ -332,62 +273,6 @@ function findSvgBlocks(s) {
     }
   }
   return res;
-}
-
-function findFirstSvgNode(preserveOrderDoc) {
-  // preserveOrderDoc is an array of nodes like { svg: [ {attr}, ...children ] }, { g: [...] }, { "#text": "..." }, ...
-  const stack = Array.isArray(preserveOrderDoc) ? [...preserveOrderDoc] : [preserveOrderDoc];
-  while (stack.length) {
-    const node = stack.shift();
-    if (!node || typeof node !== "object") continue;
-    if (node.svg) return node;
-    // push children arrays
-    for (const key of Object.keys(node)) {
-      const val = node[key];
-      if (Array.isArray(val)) stack.push(...val);
-    }
-  }
-  return null;
-}
-
-// stringify children back to XML
-function stringifyInner(nodes) {
-  return nodes.map(n => toXml(n)).join("");
-}
-
-function toXml(node) {
-  if (node == null) return "";
-  if (typeof node === "string") return escapeText(node);
-  if (typeof node !== "object") return String(node);
-
-  // text nodes from fast-xml-parser
-  if (node["#text"] != null) return escapeText(String(node["#text"]));
-
-  // element nodes: { tagName: [ {attrs}, ...children ] }
-  const keys = Object.keys(node);
-  if (!keys.length) return "";
-
-  const tag = keys[0];
-  const arr = node[tag];
-  if (!Array.isArray(arr) || !arr.length) return `<${tag}/>`;
-  const attrs = arr[0] && typeof arr[0] === "object" && !Array.isArray(arr[0]) ? arr[0] : {};
-  const children = arr.slice(1);
-
-  const attrsStr = Object.entries(attrs)
-    .filter(([k,v]) => v != null && k !== "#text")
-    .map(([k,v]) => `${k}="${escapeAttr(String(v))}"`)
-    .join(" ");
-
-  const open = attrsStr ? `<${tag} ${attrsStr}>` : `<${tag}>`;
-  if (!children.length) return `${open}</${tag}>`;
-  return `${open}${children.map(c => toXml(c)).join("")}</${tag}>`;
-}
-
-function escapeText(s) {
-  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-function escapeAttr(s) {
-  return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
 }
 
 function synthesizeViewBox(width, height) {

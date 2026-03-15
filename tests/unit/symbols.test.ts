@@ -1,9 +1,26 @@
-import { beforeEach, describe, it, expect, vi } from "vitest";
-import { BUILTIN_SYMBOLS } from "@/symbols";
+import { readFile } from "node:fs/promises";
+
+import { beforeAll, beforeEach, describe, it, expect, vi } from "vitest";
+import {
+  BUILTIN_SYMBOLS,
+  BUILTIN_SYMBOL_CATEGORIES,
+  getLoadedBuiltinSymbols,
+  getBuiltinSymbolCategoryName,
+  loadBuiltinSymbolCatalog,
+  loadBuiltinSymbols,
+  loadBuiltinSymbolsForCategory,
+} from "@/symbols";
 
 describe("BUILTIN_SYMBOLS", () => {
+  // All tests in this block access BUILTIN_SYMBOLS and verify the full 48-symbol
+  // catalog, so beforeAll (load once) is more efficient than beforeEach (reload
+  // per test). Scoped to this describe block -- does not affect other describes.
+  beforeAll(async () => {
+    await loadBuiltinSymbols();
+  });
+
   it("contains the trimmed built-in symbol catalog used by templates", () => {
-    expect(BUILTIN_SYMBOLS.length).toBe(32);
+    expect(BUILTIN_SYMBOLS.length).toBe(48);
   });
 
   it("all symbols have unique ids", () => {
@@ -28,14 +45,7 @@ describe("BUILTIN_SYMBOLS", () => {
 
   it("keeps only categories still used by templates", () => {
     const categories = [...new Set(BUILTIN_SYMBOLS.map((s) => s.category))];
-    expect(categories).toEqual([
-      "Celestial",
-      "Cultural",
-      "Plants",
-      "Animals",
-      "Geometric",
-      "National Symbols",
-    ]);
+    expect(categories).toEqual(BUILTIN_SYMBOL_CATEGORIES);
   });
 
   it("includes all 4 Korean trigrams", () => {
@@ -51,6 +61,101 @@ describe("BUILTIN_SYMBOLS", () => {
     expect(sol).toBeDefined();
     expect(sol!.svg).toBeTruthy();
     expect(sol!.viewBox).toBeTruthy();
+  });
+
+  it("Ulster Banner uses svg markup", () => {
+    const ulsterBanner = BUILTIN_SYMBOLS.find((s) => s.id === "ulster_banner_flag");
+    expect(ulsterBanner).toBeDefined();
+    expect(ulsterBanner!.svg).toBeTruthy();
+    expect(ulsterBanner!.viewBox).toBe("0 0 600 300");
+    expect(ulsterBanner!.svg).toContain('use href="#a"');
+    expect(ulsterBanner!.svg).toContain('transform="matrix(0 .5 -1 0 450 0)"');
+    expect(ulsterBanner!.svg).toContain('M296.663 22.53h6.252');
+  });
+
+  it("includes the corrected and newly added flag symbol artwork", () => {
+    const albania = BUILTIN_SYMBOLS.find((s) => s.id === "albania_eagle");
+    const wales = BUILTIN_SYMBOLS.find((s) => s.id === "wales_flag");
+    const bavaria = BUILTIN_SYMBOLS.find((s) => s.id === "bavaria_lozengy_flag");
+    const berlin = BUILTIN_SYMBOLS.find((s) => s.id === "berlin_flag");
+    const brandenburg = BUILTIN_SYMBOLS.find((s) => s.id === "brandenburg_flag");
+    const guernsey = BUILTIN_SYMBOLS.find((s) => s.id === "guernsey_flag");
+    const hamburg = BUILTIN_SYMBOLS.find((s) => s.id === "hamburg_flag");
+    const isleOfMan = BUILTIN_SYMBOLS.find((s) => s.id === "isle_of_man_flag");
+    const jersey = BUILTIN_SYMBOLS.find((s) => s.id === "jersey_flag");
+    const lowerSaxony = BUILTIN_SYMBOLS.find((s) => s.id === "lower_saxony_flag");
+    const rhinelandPalatinate = BUILTIN_SYMBOLS.find((s) => s.id === "rhineland_palatinate_flag");
+    const saarland = BUILTIN_SYMBOLS.find((s) => s.id === "saarland_flag");
+    const sardinia = BUILTIN_SYMBOLS.find((s) => s.id === "sardinia_flag");
+    const saxonyAnhalt = BUILTIN_SYMBOLS.find((s) => s.id === "saxony_anhalt_flag");
+    const corsica = BUILTIN_SYMBOLS.find((s) => s.id === "corsica_flag");
+    const venice = BUILTIN_SYMBOLS.find((s) => s.id === "venice_flag");
+
+    expect(albania).toBeDefined();
+    expect(albania!.category).toBe("Animals");
+
+    expect(wales).toBeDefined();
+    expect(wales!.category).toBe("Animals");
+    expect(wales!.svg).toBeTruthy();
+    expect(wales!.viewBox).toBe("0 0 800 480");
+    expect(wales!.svg).toContain('stroke="#000"');
+    expect(wales!.svg).not.toContain("#00A651");
+
+    expect(bavaria).toBeDefined();
+    expect(bavaria!.svg).toBeTruthy();
+    expect(bavaria!.viewBox).toBe("0 0 1000 600");
+    expect(bavaria!.svg).toContain('fill="#0098d4"');
+
+    expect(berlin).toBeDefined();
+    expect(berlin!.category).toBe("National Symbols");
+    expect(berlin!.svg).toBeTruthy();
+    expect(berlin!.viewBox).toBe("0 0 12150 7290");
+
+    expect(brandenburg).toBeDefined();
+    expect(brandenburg!.svg).toBeTruthy();
+    expect(brandenburg!.viewBox).toBe("0 0 1000 600");
+
+    expect(guernsey).toBeDefined();
+    expect(guernsey!.svg).toBeTruthy();
+    expect(guernsey!.viewBox).toBe("0 0 36 24");
+    expect(guernsey!.svg).toContain("#f9dd16");
+
+    expect(hamburg).toBeDefined();
+    expect(hamburg!.svg).toBeTruthy();
+    expect(hamburg!.viewBox).toBe("0 0 600 400");
+
+    expect(isleOfMan).toBeDefined();
+    expect(isleOfMan!.svg).toBeTruthy();
+    expect(isleOfMan!.viewBox).toBe("0 0 600 300");
+
+    expect(jersey).toBeDefined();
+    expect(jersey!.svg).toBeTruthy();
+    expect(jersey!.viewBox).toBe("0 0 1000 600");
+
+    expect(lowerSaxony).toBeDefined();
+    expect(lowerSaxony!.svg).toBeTruthy();
+    expect(lowerSaxony!.viewBox).toBe("0 0 1150 750");
+
+    expect(rhinelandPalatinate).toBeDefined();
+    expect(rhinelandPalatinate!.svg).toBeTruthy();
+    expect(rhinelandPalatinate!.viewBox).toBe("0 0 900 600");
+
+    expect(saarland).toBeDefined();
+    expect(saarland!.svg).toBeTruthy();
+    expect(saarland!.viewBox).toBe("0 0 500 300");
+
+    expect(sardinia).toBeDefined();
+    expect(sardinia!.svg).toBeTruthy();
+
+    expect(saxonyAnhalt).toBeDefined();
+    expect(saxonyAnhalt!.svg).toBeTruthy();
+    expect(saxonyAnhalt!.viewBox).toBe("0 0 1333.33 800");
+
+    expect(corsica).toBeDefined();
+    expect(corsica!.svg).toBeTruthy();
+
+    expect(venice).toBeDefined();
+    expect(venice!.svg).toBeTruthy();
   });
 
   it("star_five_pointed is categorized as Celestial and defines its viewport", () => {
@@ -83,13 +188,46 @@ describe("BUILTIN_SYMBOLS", () => {
   });
 });
 
+describe("public runtime symbol catalog", () => {
+  it("keeps curated symbols and excludes known bad heraldic fetch regressions", async () => {
+    const runtimeSymbols = JSON.parse(await readFile("public/symbols.json", "utf8")) as Array<{
+      id: string;
+      svg?: string;
+      viewBox?: string;
+    }>;
+
+    const runtimeIds = runtimeSymbols.map((symbol) => symbol.id);
+    expect(runtimeIds).not.toContain("double_headed_eagle");
+    expect(runtimeIds).not.toContain("eagle_heraldic");
+
+    const tryzub = runtimeSymbols.find((symbol) => symbol.id === "tryzub");
+    expect(tryzub).toBeDefined();
+    expect(tryzub!.viewBox).toBe("-60 12 120 201");
+    expect(tryzub!.svg).toContain('use href="#tryzub-half"');
+    expect(tryzub!.svg).not.toContain("xlink:href");
+    expect(tryzub!.svg).not.toContain("#005BBB");
+
+    const cedar = runtimeSymbols.find((symbol) => symbol.id === "cedar_lebanon");
+    expect(cedar).toBeDefined();
+    expect(cedar!.svg).toContain('fill="currentColor"');
+    expect(cedar!.svg).not.toContain('M0 0h900v600H0z');
+    expect(cedar!.svg).not.toContain('M0 150h900v300H0z');
+
+    const lionRampant = runtimeSymbols.find((symbol) => symbol.id === "lion_rampant") as
+      | { category?: string }
+      | undefined;
+    expect(lionRampant).toBeDefined();
+    expect(lionRampant!.category).toBe("Animals");
+  });
+});
+
 describe("built-in symbol catalog loading", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.resetModules();
   });
 
-  it("returns the preloaded catalog in test mode without fetching", async () => {
+  it("loads the full catalog without fetching", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     const symbols = await import("@/symbols");
 
@@ -97,46 +235,47 @@ describe("built-in symbol catalog loading", () => {
 
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(catalog.symbols).toEqual(symbols.BUILTIN_SYMBOLS);
+    expect(catalog.symbols).toHaveLength(48);
     expect(await symbols.loadBuiltinSymbols()).toEqual(symbols.BUILTIN_SYMBOLS);
   });
 
-  it("fetches and caches the catalog when the preloaded array is empty", async () => {
+  it("loads and caches a single category on demand", async () => {
     const symbols = await import("@/symbols");
-    symbols.BUILTIN_SYMBOLS.length = 0;
 
-    const fetchedCatalog = {
-      _meta: { generatedAt: "2026-03-14T00:00:00.000Z", generatedBy: "test" },
-      symbols: [{ id: "remote_symbol", name: "Remote", category: "Test", path: "M0 0Z" }],
-    };
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(fetchedCatalog),
-    } as Response);
+    expect(symbols.BUILTIN_SYMBOLS).toHaveLength(0);
 
-    const firstLoad = await symbols.loadBuiltinSymbolCatalog();
-    const secondLoad = await symbols.loadBuiltinSymbolCatalog();
+    const firstLoad = await symbols.loadBuiltinSymbolsForCategory("Celestial");
+    const secondLoad = await symbols.loadBuiltinSymbolsForCategory("Celestial");
 
-    expect(firstLoad).toEqual(fetchedCatalog);
-    expect(secondLoad).toEqual(fetchedCatalog);
-    expect(await symbols.loadBuiltinSymbols()).toEqual(fetchedCatalog.symbols);
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy).toHaveBeenCalledWith(expect.stringContaining("symbols-catalog.generated.json"), {
-      cache: "force-cache",
-    });
+    expect(firstLoad).toEqual(secondLoad);
+    expect(firstLoad).toHaveLength(5);
+    expect(firstLoad.every((symbol) => symbol.category === "Celestial")).toBe(true);
+    expect(symbols.getLoadedBuiltinSymbols()).toEqual(firstLoad);
   });
 
-  it("throws when fetching the catalog fails", async () => {
+  it("loads only the categories required for a symbol id set", async () => {
     const symbols = await import("@/symbols");
-    symbols.BUILTIN_SYMBOLS.length = 0;
 
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: false,
-      status: 503,
-      statusText: "Service Unavailable",
-    } as Response);
+    const requestedIds = ["cedar_lebanon", "sol_de_mayo", "star_five_pointed"];
+    const loaded = await symbols.ensureBuiltinSymbolsByIds(requestedIds);
 
-    await expect(symbols.loadBuiltinSymbolCatalog()).rejects.toThrow(
-      "Failed to load built-in symbol catalog: 503 Service Unavailable",
+    expect(loaded.map((symbol) => symbol.id)).toEqual(requestedIds);
+    expect(new Set(symbols.getLoadedBuiltinSymbols().map((symbol) => symbol.category))).toEqual(
+      new Set(["Plants", "Celestial"]),
     );
   });
+
+  it("returns an empty array for an unknown category", async () => {
+    const symbols = await import("@/symbols");
+
+    await expect(symbols.loadBuiltinSymbolsForCategory("Unknown Category")).resolves.toEqual([]);
+  });
+
+  it("maps symbol ids back to their generated category", async () => {
+    expect(getBuiltinSymbolCategoryName("sol_de_mayo")).toBe("Celestial");
+    expect(getBuiltinSymbolCategoryName("cedar_lebanon")).toBe("Plants");
+    expect(getBuiltinSymbolCategoryName("missing_symbol")).toBeUndefined();
+  });
+
 });
+

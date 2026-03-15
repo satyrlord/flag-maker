@@ -1,5 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { renderFlag, registerSymbols, getCurrentSvg, getCurrentRatio, computeStarPositions } from "@/flagRenderer";
+import { beforeAll, describe, it, expect } from "vitest";
+import {
+  renderFlag,
+  registerBuiltinSymbols,
+  registerSymbols,
+  getCurrentSvg,
+  getCurrentRatio,
+  computeStarPositions,
+} from "@/flagRenderer";
+import { loadBuiltinSymbols } from "@/symbols";
 import type { FlagDesign, Overlay } from "@/types";
 
 /* Register test-only symbols so render tests do not depend on built-in config */
@@ -21,6 +29,10 @@ registerSymbols([
     svg: "<circle cx=\"5\" cy=\"5\" r=\"4\" fill=\"#123456\" /><path d=\"M1 1 L9 9\" stroke=\"#abcdef\" stroke-width=\"1\" />",
   },
 ]);
+
+beforeAll(async () => {
+  registerBuiltinSymbols(await loadBuiltinSymbols());
+});
 
 const baseDesign: FlagDesign = {
   orientation: "horizontal",
@@ -384,6 +396,27 @@ describe("registerSymbols", () => {
     });
     const nestedSvgs = el.querySelectorAll("svg > svg");
     expect(nestedSvgs.length).toBe(1);
+  });
+
+  it("normalizes legacy xlink references in built-in svg symbols before rendering", () => {
+    const ov: Overlay = {
+      id: "reg3", type: "symbol",
+      symbolId: "hamburg_flag",
+      x: 50, y: 50, w: 20, h: 20,
+      rotation: 0, fill: "#FFFFFF", stroke: "#0000", strokeWidth: 0, opacity: 1,
+    };
+    const el = renderFlag({
+      ...baseDesign,
+      sections: 1,
+      weights: [1],
+      colors: ["#FFFFFF"],
+      overlays: [ov],
+    });
+
+    const nested = el.querySelector('svg[data-overlay-id="reg3"]');
+    expect(nested).toBeTruthy();
+    expect(nested?.innerHTML).toContain("href=\"#a\"");
+    expect(nested?.innerHTML).not.toContain("xlink:href");
   });
 });
 

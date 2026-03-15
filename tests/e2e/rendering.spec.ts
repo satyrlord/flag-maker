@@ -113,6 +113,7 @@ test.describe("Flag rendering", () => {
 
   test("renders an svg-backed symbol overlay inside a nested SVG", async ({ page }) => {
     await page.getByRole("button", { name: "Symbols", exact: true }).click();
+    await page.getByRole("button", { name: "Celestial", exact: true }).click();
     await page.getByRole("button", { name: "Add Sol de Mayo" }).click();
     await expect(page.locator("svg.flag-svg > svg")).toHaveCount(1);
   });
@@ -125,6 +126,31 @@ test.describe("Flag rendering", () => {
 
     await page.getByRole("button", { name: "Apply Uruguay template" }).click();
     await expect(page.locator("svg.flag-svg > svg")).toHaveCount(1);
+  });
+
+  test("renders a subdivision template that lazy-loads a large emblem shard", async ({ page }) => {
+    await page.getByRole("button", { name: "Templates", exact: true }).click();
+    await page.getByRole("button", { name: "State Level" }).click();
+    await page.getByRole("button", { name: "Apply Saxony-Anhalt template" }).click();
+
+    const metrics = await page.locator("svg.flag-svg").evaluate((root) => {
+      const nestedSvgs = Array.from(root.querySelectorAll("svg"));
+      const nestedLengths = nestedSvgs.map((node) => node.innerHTML.length);
+      return {
+        nestedSvgCount: nestedSvgs.length,
+        maxNestedInnerLength: nestedLengths.length ? Math.max(...nestedLengths) : 0,
+        viewBox: root.getAttribute("viewBox"),
+      };
+    });
+
+    expect(metrics.viewBox).toBeTruthy();
+    expect(metrics.nestedSvgCount).toBeGreaterThanOrEqual(1);
+    // innerHTML length is an indirect proxy for shard loading: a loaded,
+    // non-trivial emblem will produce several KB of markup. The test cannot
+    // directly verify lazy loading timing (the category may have been
+    // pre-loaded by an earlier test), but it confirms the emblem actually
+    // rendered rather than falling back to a placeholder.
+    expect(metrics.maxNestedInnerLength).toBeGreaterThanOrEqual(10000);
   });
 
   test("renders rotated and stroked overlays from a custom template event", async ({ page }) => {

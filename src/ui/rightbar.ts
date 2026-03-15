@@ -35,10 +35,10 @@ export function setRightbarVisible(
 }
 
 /** Grid color mode: cyan, magenta, or off. */
-export type GridColorMode = "cyan" | "magenta" | "off";
+type GridColorMode = "cyan" | "magenta" | "off";
 
 /** Current grid state exposed for main.ts. */
-export interface GridState {
+interface GridState {
   active: boolean;
   colorMode: GridColorMode;
   color: string;
@@ -290,11 +290,19 @@ export function createRightbar(initialStripeCount: number): { element: HTMLEleme
   let offsetX = 0;
   let offsetY = 0;
 
+  function getCanvasBounds(): { minX: number; minY: number; maxX: number; maxY: number } {
+    const canvas = document.querySelector("main.flag-canvas");
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      return { minX: rect.left, minY: rect.top, maxX: rect.right, maxY: rect.bottom };
+    }
+    return { minX: 0, minY: 0, maxX: window.innerWidth, maxY: window.innerHeight };
+  }
+
   function moveBarTo(left: number, top: number): void {
-    const maxX = window.innerWidth - bar.offsetWidth;
-    const maxY = window.innerHeight - bar.offsetHeight;
-    const clampedX = Math.max(0, Math.min(left, maxX));
-    const clampedY = Math.max(0, Math.min(top, maxY));
+    const bounds = getCanvasBounds();
+    const clampedX = Math.max(bounds.minX, Math.min(left, bounds.maxX - bar.offsetWidth));
+    const clampedY = Math.max(bounds.minY, Math.min(top, bounds.maxY - bar.offsetHeight));
 
     bar.style.left = `${clampedX}px`;
     bar.style.top = `${clampedY}px`;
@@ -310,13 +318,20 @@ export function createRightbar(initialStripeCount: number): { element: HTMLEleme
   }
 
   function onPointerDown(e: PointerEvent): void {
+    // Don't start drag when clicking interactive children (buttons, menus),
+    // but always allow drag from the drag handle and its inner icon.
+    const target = e.target as HTMLElement;
+    const isDragHandle = target === dragHandle || target.closest(".rightbar-drag-handle") !== null;
+    if (!isDragHandle && target !== bar && (target.closest("button") || target.closest("[role=\"menu\"]") || target.closest(".rightbar-layer-summary"))) {
+      return;
+    }
     ensureCustomPosition();
     dragging = true;
     const rect = bar.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
     bar.classList.add("rightbar-dragging");
-    dragHandle.setPointerCapture?.(e.pointerId);
+    bar.setPointerCapture?.(e.pointerId);
     e.preventDefault();
   }
 
@@ -332,7 +347,7 @@ export function createRightbar(initialStripeCount: number): { element: HTMLEleme
     if (!e) {
       return;
     }
-    dragHandle.releasePointerCapture?.(e.pointerId);
+    bar.releasePointerCapture?.(e.pointerId);
   }
 
   function onKeyDown(e: KeyboardEvent): void {
@@ -360,11 +375,11 @@ export function createRightbar(initialStripeCount: number): { element: HTMLEleme
     }
   }
 
-  dragHandle.addEventListener("pointerdown", onPointerDown);
-  dragHandle.addEventListener("pointermove", onPointerMove);
-  dragHandle.addEventListener("pointerup", onPointerUp);
-  dragHandle.addEventListener("pointercancel", onPointerUp);
-  dragHandle.addEventListener("lostpointercapture", () => onPointerUp());
+  bar.addEventListener("pointerdown", onPointerDown);
+  bar.addEventListener("pointermove", onPointerMove);
+  bar.addEventListener("pointerup", onPointerUp);
+  bar.addEventListener("pointercancel", onPointerUp);
+  bar.addEventListener("lostpointercapture", () => onPointerUp());
   dragHandle.addEventListener("keydown", onKeyDown);
 
   bar.appendChild(dragHandle);

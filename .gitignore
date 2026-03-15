@@ -12,3 +12,4 @@ coverage/
 .temp/
 # Windows shell error artifact (NUL device redirection)
 nul
+dead-code-report.md

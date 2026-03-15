@@ -6,6 +6,19 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+  /**
+   * Vite's static glob importer. The `pattern` must be a literal string
+   * relative to the file declaring the call (e.g. `"./dir/*.json"`). Vite
+   * resolves all matching files at build time and returns a map from each
+   * matching file path (workspace-rooted, starting with `/`) to a lazy
+   * dynamic-import thunk. If no files match the pattern, an empty record `{}`
+   * is returned. In development, callers should guard against this during
+   * module initialization (e.g. check `Object.keys(loaders).length === 0`)
+   * to detect missing generated assets early. For production builds, ensure
+   * asset generation (e.g. `npm run build:symbols`) runs before the main
+   * build so the glob result is always non-empty.
+   */
+  glob<T = unknown>(pattern: string): Record<string, () => Promise<T>>;
 }
 
 declare module "*?url" {
@@ -60,6 +73,11 @@ declare module "@/config/symbols-config.json" {
 
 declare module "@/config/symbols-catalog.generated.json" {
   const value: import("./symbols").GeneratedSymbolCatalogFile;
+  export default value;
+}
+
+declare module "@/config/symbols-catalog-index.generated.json" {
+  const value: import("./symbols").GeneratedSymbolCatalogIndexFile;
   export default value;
 }
 

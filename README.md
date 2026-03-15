@@ -97,9 +97,8 @@ npm run quality:full
 │  ├─ vite-env.d.ts        # Vite client type declarations (CSS imports, env)
 │  └─ index.css             # Tailwind CSS import
 ├─ tools/
-│  ├─ fetch-emblems.ts       # fetch official emblems from Wikimedia
-│  ├─ fetch-symbols.ts       # fetch curated flag symbols into source metadata + SVG files
 │  ├─ build-symbol-catalog.ts # generate runtime symbol catalog from source metadata
+│  ├─ build-template-previews.ts # render template preview JPGs + manifest
 │  └─ svg2symbols.mjs       # convert a folder of SVGs -> public/symbols.json
 ├─ tailwind.config.js       # Tailwind config (legacy v3 format; v4 uses CSS-based config)
 ├─ postcss.config.js        # Tailwind v4 (using @tailwindcss/postcss)
@@ -141,91 +140,14 @@ in **`public/`**.
 
 ---
 
-## Adding Official Emblems (Three Tools)
+## Managing Symbol Assets
 
-### A) `fetch-emblems.ts` -- download SVG emblems from Wikimedia
+Symbol assets are now maintained as checked-in source files. Built-in symbols
+live under `src/config/symbols/`, and optional runtime-only symbols still live
+in `public/symbols.json` when you want to ship extra emblems outside the built-in
+catalog.
 
-Fetches official **SVG** emblem files (coats of arms) for UN-recognized
-countries, then you can convert them into `symbols.json` with the converter
-(tool C).
-
-#### IMPORTANT: Set a compliant User-Agent
-
-Edit the script header to include a real website/GitHub and email (Wikimedia
-policy):
-
-```typescript
-// inside tools/fetch-emblems.ts
-const CONTACT = "https://your-site-or-github ; email: you@example.com";
-const USER_AGENT = `FlagMakerCollector/1.0 (${CONTACT}) node-fetch`;
-```
-
-If you don't, Wikimedia may return **403 Forbidden**.
-
-#### Run it
-
-```bash
-npm run fetch-emblems
-```
-
-- Downloads raw SVGs into `public/emblems/`.
-- It's polite (rate-limited, retries, backoff) and merges results on subsequent
-  runs.
-- Some countries may fail or have multiple variants; you can add filename
-  overrides later if needed.
-
-> Licensing: many emblems on Commons are public domain or permissive, but
-> **always check each file's page**. The script stores a `source`/`license`
-> hint per entry when you later build `symbols.json`.
-
----
-
-### B) `fetch-symbols.ts` -- download curated flag symbols from Wikimedia
-
-Fetches individual flag symbols (suns, stars, eagles, heraldic charges, plants,
-etc.) from Wikimedia Commons using a curated manifest. These are symbols
-commonly *on* flags, not national coats of arms.
-
-#### User-Agent setup
-
-Same as tool A -- edit the CONTACT header in the script.
-
-#### Usage
-
-```bash
-npm run fetch-symbols
-```
-
-- Updates `src/config/symbols/metadata/*.json` and `src/config/symbols/svg/*.svg` by default.
-- Regenerates `src/config/symbols-catalog.generated.json` automatically after import.
-- Use `--out public/symbols.json` to write a flat runtime JSON file instead.
-- Use `--skip-existing` to skip symbols that are already defined in the source metadata.
-- Downloads are cached in `public/emblems/`; safe to re-run.
-
-#### Adding new symbols to the manifest
-
-Edit the `SYMBOL_MANIFEST` array in `tools/fetch-symbols.ts`. Each entry needs:
-
-```typescript
-{
-  id: "unique_id",
-  name: "Display Name",
-  category: "Celestial",  // or Heraldic, Cultural, Plants, Animals, etc.
-  titles: [
-    "Exact Wikimedia Commons File Title.svg",
-    "Fallback Title.svg",
-  ],
-}
-```
-
-The script tries each title in order, then falls back to a Commons search.
-
-After a successful default run, the app consumes the regenerated
-`src/config/symbols-catalog.generated.json` file automatically.
-
----
-
-### C) `build-symbol-catalog.ts` -- generate built-in runtime symbols
+### A) `build-symbol-catalog.ts` -- generate built-in runtime symbols
 
 Builds `src/config/symbols-catalog.generated.json` from the split source files:
 
@@ -243,7 +165,24 @@ Run this after any manual edit to symbol metadata or SVG source files.
 
 ---
 
-### D) `svg2symbols.mjs` -- convert SVG files -> `public/symbols.json`
+### B) `build-template-previews.ts` -- render template preview thumbnails
+
+Builds `public/template-previews/*.jpg` and updates
+`src/config/template-preview-manifest.generated.json` for every template marked
+`done` in `flags-todo.md`.
+
+Usage:
+
+```bash
+npm run build:template-previews
+```
+
+The preview builder always uses the built-in symbol catalog and will also merge
+entries from `public/symbols.json` when that optional runtime catalog exists.
+
+---
+
+### C) `svg2symbols.mjs` -- convert SVG files -> `public/symbols.json`
 
 Reads a folder of SVGs, **preserves viewBox**, inlines styles, and emits a
 `symbols.json` that your app loads. Can output **authentic colors** or
@@ -374,12 +313,6 @@ The app merges this with built-in symbols.
 - Visit `http://localhost:5173/symbols.json` directly; you should see JSON.
 - It **must be an array**. A top-level object will be ignored.
 - Check the app console: it prints a status ("Loaded N symbols…" or an error).
-
-### Fetcher gets 403 from Wikimedia
-
-- You **must** set a descriptive User-Agent + contact in `fetch-emblems.ts`.
-- Try a smaller subset of countries while testing.
-- Be patient; the script has polite backoff/retries.
 
 ### SVGO plugin errors
 

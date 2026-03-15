@@ -3,12 +3,13 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const builtinSymbols: Array<{ category: string; name: string }> = require("../../src/config/symbols-catalog.generated.json").symbols;
+const builtinSymbolIndex: { categories: Array<{ name: string }> } = require("../../src/config/symbols-catalog-index.generated.json");
 const runtimeSymbols: Array<{ id: string; category: string }> = require("../../public/symbols.json");
 const templateConfigs: Array<{
   overlays?: Array<{ type?: string; symbolId?: string }>;
 }> = require("../../src/config/un-flags.json");
 
-const builtInCategories = [...new Set(builtinSymbols.map((symbol) => symbol.category))];
+const builtInCategories = builtinSymbolIndex.categories.map((category) => category.name);
 const defaultCategory = builtInCategories[0] ?? "";
 const alternateCategory = builtInCategories.find((category) => category !== defaultCategory) ?? defaultCategory;
 const alternateCategorySearchTerm =
@@ -26,7 +27,7 @@ function builtInCount(category: string, query = ""): number {
   }).length;
 }
 
-const enabledRuntimeSymbolIds = new Set<string>(["dragon_heraldic"]);
+const enabledRuntimeSymbolIds = new Set<string>(["wales_flag"]);
 for (const config of templateConfigs) {
   for (const overlay of config.overlays ?? []) {
     if (overlay.type === "symbol" && typeof overlay.symbolId === "string") {

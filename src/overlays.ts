@@ -3,10 +3,7 @@
    ────────────────────────────────────────────── */
 
 import type { Overlay } from "./types";
-import { RENDERABLE_OVERLAY_TYPE_IDS } from "./overlayTypeConfig";
 import { uid } from "./utils";
-
-export const SUPPORTED_OVERLAY_TYPES = RENDERABLE_OVERLAY_TYPE_IDS;
 
 export function rectOverlay({
   xPct, yPct, wPct, hPct, fill,

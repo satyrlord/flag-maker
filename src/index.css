@@ -185,6 +185,10 @@ body {
 }
 
 @media (max-width: 1279px) {
+  .toolbar {
+    overflow: visible;
+  }
+
   .toolbar-strip {
     position: relative;
     z-index: 40;
@@ -722,6 +726,7 @@ body {
   transition: transform 0.15s ease;
   pointer-events: none;
   opacity: 0;
+  cursor: grab;
 }
 
 .rightbar.rightbar-visible {

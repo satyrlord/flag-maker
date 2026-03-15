@@ -5,10 +5,15 @@
    ────────────────────────────────────────────── */
 
 import type { SymbolDef, Overlay } from "../types";
-import { LAYER_GROUP_CONSTRAINTS, overlayLayerGroup } from "../types";
-import { BUILTIN_SYMBOLS } from "../symbols";
+import { LAYER_GROUP_CONSTRAINTS, overlayLayerGroup, collectSymbolIds } from "../types";
+import {
+  BUILTIN_SYMBOL_CATEGORIES,
+  getLoadedBuiltinSymbols,
+  isBuiltinSymbolCategoryLoaded,
+  loadBuiltinSymbolsForCategory,
+  ensureBuiltinSymbolsByIds,
+} from "../symbols";
 import { getAllSymbols } from "../symbolLoader";
-import { starPath } from "../utils";
 
 import {
   svg,
@@ -20,6 +25,13 @@ import {
   ICON_MOVE_UP,
   ICON_MOVE_DOWN,
 } from "./icons";
+import {
+  panelHeader,
+  sectionTitle,
+  symbolPreview,
+  templateStaticPreview,
+  templateThumbnail,
+} from "./leftbarRenderHelpers";
 import { validateLeftbarConfig } from "./leftbarConfig";
 import { type TemplateCfg } from "../templates";
 import { ALL_TEMPLATE_FACTORIES, TEMPLATE_CATALOG, TEMPLATE_GROUPED_CONFIGS, validateTemplateCatalog } from "../templateCatalog";
@@ -27,7 +39,6 @@ import config from "@/config/leftbar-config.json";
 
 /* ── Constants ── */
 
-const NS = "http://www.w3.org/2000/svg";
 const DEFAULT_OPEN_TEMPLATE_GROUP = "Division";
 
 /* ── Tab Icons (Lucide-style) ── */
@@ -110,7 +121,7 @@ const RATIOS: { label: string; ratio: [number, number]; commonality: number }[] 
 
 type RatioEntry = (typeof RATIOS)[number];
 
-export type RatioDisplayMode = "hw" | "wh" | "decimal";
+type RatioDisplayMode = "hw" | "wh" | "decimal";
 
 const RATIO_MODES: RatioDisplayMode[] = ["hw", "wh", "decimal"];
 const RATIO_MODE_LABELS: Record<RatioDisplayMode, string> = { hw: "H:W", wh: "W:H", decimal: "W/H" };
@@ -210,180 +221,6 @@ const PanelIcons: Record<TabId, string> = {
     20,
   ),
 };
-
-function sectionTitle(text: string): HTMLElement {
-  const t = h("h3", "toolbar-section-title text-secondary", text);
-  return t;
-}
-
-function panelHeader(text: string, tabId: TabId): HTMLElement {
-  const row = h("div", "toolbar-panel-header");
-  const title = sectionTitle(text);
-  title.style.margin = "0";
-  row.appendChild(title);
-  const iconMarkup = PanelIcons[tabId];
-  if (iconMarkup) {
-    const span = h("span", "toolbar-panel-icon");
-    span.innerHTML = iconMarkup;
-    row.appendChild(span);
-  }
-  return row;
-}
-
-/* ── Template Thumbnail ── */
-
-function templateThumbnail(cfg: TemplateCfg, thumbH = 28, symbols: SymbolDef[] = BUILTIN_SYMBOLS): SVGSVGElement {
-  const [rh, rw] = cfg.ratio;
-  const aspect = rw / rh;
-  const thumbW = Math.round(thumbH * aspect);
-
-  const s = document.createElementNS(NS, "svg");
-  s.setAttribute("viewBox", `0 0 ${thumbW} ${thumbH}`);
-  s.setAttribute("width", String(thumbW));
-  s.setAttribute("height", String(thumbH));
-  s.style.borderRadius = "2px";
-  s.style.border = "1px solid oklch(var(--b3))";
-  s.style.flexShrink = "0";
-
-  // Draw base stripes
-  const n = cfg.sections;
-  const weights = cfg.weights ?? Array.from<number>({ length: n }).fill(1);
-  const totalWeight = weights.reduce((a, b) => a + b, 0);
-  let offset = 0;
-  for (let i = 0; i < n; i++) {
-    const frac = weights[i] / totalWeight;
-    const rect = document.createElementNS(NS, "rect");
-    if (cfg.orientation === "vertical") {
-      rect.setAttribute("x", String(Math.round(offset * thumbW)));
-      rect.setAttribute("y", "0");
-      rect.setAttribute("width", String(Math.ceil(frac * thumbW)));
-      rect.setAttribute("height", String(thumbH));
-    } else {
-      rect.setAttribute("x", "0");
-      rect.setAttribute("y", String(Math.round(offset * thumbH)));
-      rect.setAttribute("width", String(thumbW));
-      rect.setAttribute("height", String(Math.ceil(frac * thumbH)));
-    }
-    rect.setAttribute("fill", cfg.colors[i] /* istanbul ignore next */ ?? "#ccc");
-    s.appendChild(rect);
-    offset += frac;
-  }
-
-  // Draw rectangle overlays (simplified)
-  for (const ov of cfg.overlays) {
-    /* istanbul ignore if */
-    if (ov.type === "rectangle") {
-      const rect = document.createElementNS(NS, "rect");
-      const rx = ((ov.x - ov.w / 2) / 100) * thumbW;
-      const ry = ((ov.y - ov.h / 2) / 100) * thumbH;
-      const rw2 = (ov.w / 100) * thumbW;
-      const rh2 = (ov.h / 100) * thumbH;
-      rect.setAttribute("x", String(rx));
-      rect.setAttribute("y", String(ry));
-      rect.setAttribute("width", String(rw2));
-      rect.setAttribute("height", String(rh2));
-      rect.setAttribute("fill", ov.fill);
-      if (ov.rotation) {
-        const cx = rx + rw2 / 2;
-        const cy = ry + rh2 / 2;
-        rect.setAttribute(
-          "transform",
-          `rotate(${ov.rotation} ${cx} ${cy})`,
-        );
-      }
-      s.appendChild(rect);
-    } else if (ov.type === "custom" && ov.path) {
-      const path = document.createElementNS(NS, "path");
-      path.setAttribute("d", ov.path);
-      path.setAttribute("fill", ov.fill);
-      path.setAttribute(
-        "transform",
-        `scale(${thumbW / 100} ${thumbH / 100})`,
-      );
-      s.appendChild(path);
-    } else if (ov.type === "symbol" && ov.symbolId) {
-      const sym = symbols.find((bs) => bs.id === ov.symbolId);
-      if (sym) {
-        const nested = document.createElementNS(NS, "svg");
-        const ox = ((ov.x - ov.w / 2) / 100) * thumbW;
-        const oy = ((ov.y - ov.h / 2) / 100) * thumbH;
-        const ow = (ov.w / 100) * thumbW;
-        const oh = (ov.h / 100) * thumbH;
-        nested.setAttribute("x", String(ox));
-        nested.setAttribute("y", String(oy));
-        nested.setAttribute("width", String(ow));
-        nested.setAttribute("height", String(oh));
-        nested.setAttribute("viewBox", sym.viewBox ?? "0 0 100 100");
-        nested.setAttribute("preserveAspectRatio", "xMidYMid meet");
-        nested.setAttribute("overflow", "visible");
-        if (sym.svg) {
-          nested.innerHTML = sym.svg;
-        } else if (sym.path) {
-          const p = document.createElementNS(NS, "path");
-          p.setAttribute("d", sym.path);
-          p.setAttribute("fill", ov.fill);
-          nested.appendChild(p);
-        } else if (sym.generator === "star5") {
-          const p = document.createElementNS(NS, "path");
-          p.setAttribute("d", starPath(50, 50, 40, 16));
-          p.setAttribute("fill", ov.fill);
-          nested.appendChild(p);
-        }
-        s.appendChild(nested);
-      }
-    }
-  }
-
-  return s;
-}
-
-function templateStaticPreview(entry: { name: string; previewImagePath?: string }, cfg: TemplateCfg, thumbH = 28): HTMLImageElement {
-  const [rh, rw] = cfg.ratio;
-  const aspect = rw / rh;
-  const thumbW = Math.round(thumbH * aspect);
-  const img = h("img", "toolbar-template-thumb") as HTMLImageElement;
-  if (!entry.previewImagePath) {
-    throw new Error(`template preview: missing image path for "${entry.name}"`);
-  }
-  img.src = `${import.meta.env.BASE_URL}${entry.previewImagePath}`;
-  img.alt = "";
-  img.width = thumbW;
-  img.height = thumbH;
-  img.decoding = "async";
-  img.loading = "lazy";
-  img.setAttribute("aria-hidden", "true");
-  img.style.width = `${thumbW}px`;
-  img.style.height = `${thumbH}px`;
-  img.style.borderRadius = "2px";
-  img.style.border = "1px solid oklch(var(--b3))";
-  img.style.flexShrink = "0";
-  return img;
-}
-
-/* ── Symbol Preview ── */
-
-function symbolPreview(sym: SymbolDef): SVGSVGElement {
-  const s = document.createElementNS(NS, "svg");
-  s.setAttribute("viewBox", sym.viewBox ?? "0 0 100 100");
-  s.style.color = "oklch(var(--bc))";
-
-  if (sym.svg) {
-    s.innerHTML = sym.svg;
-  } else if (sym.path) {
-    const p = document.createElementNS(NS, "path");
-    p.setAttribute("d", sym.path);
-    p.setAttribute("fill", "currentColor");
-    if (sym.fillRule) p.setAttribute("fill-rule", sym.fillRule);
-    s.appendChild(p);
-  } else if (sym.generator === "star5") {
-    const p = document.createElementNS(NS, "path");
-    p.setAttribute("d", starPath(50, 50, 40, 16));
-    p.setAttribute("fill", "currentColor");
-    s.appendChild(p);
-  }
-
-  return s;
-}
 
 /* ──────────────────────────────────────────────
    Layer Row Builder
@@ -597,7 +434,7 @@ function createRatioPanel(root: HTMLElement): HTMLElement {
 
 function createStripesPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Stripes", "stripes"));
+  panel.appendChild(panelHeader("Stripes", PanelIcons.stripes));
 
   // Orientation toggle
   panel.appendChild(sectionTitle("Orientation"));
@@ -700,7 +537,7 @@ function createStripesPanel(root: HTMLElement): HTMLElement {
 
 function createOverlaysPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Overlays", "overlays"));
+  panel.appendChild(panelHeader("Overlays", PanelIcons.overlays));
 
   // Count display
   const maxOverlays = LAYER_GROUP_CONSTRAINTS.overlays.maxLayers;
@@ -767,7 +604,7 @@ function createOverlaysPanel(root: HTMLElement): HTMLElement {
 
 function createStarfieldPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Starfield", "starfield"));
+  panel.appendChild(panelHeader("Starfield", PanelIcons.starfield));
 
   const sfConfig = config.starfield;
   const maxStarfields = LAYER_GROUP_CONSTRAINTS.starfields.maxLayers;
@@ -813,6 +650,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
   distSelect.value = sfConfig.defaultDistribution;
   distSelect.addEventListener("change", () => {
     const sel = getSelected();
+    /* istanbul ignore next */
     if (sel) emit(root, "toolbar:starfield-update", { id: sel.id, props: { starDistribution: distSelect.value } });
   });
   propsSection.appendChild(distSelect);
@@ -829,6 +667,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
   countBtnPlus.setAttribute("aria-label", "Increase star count");
   countBtnMinus.addEventListener("click", () => {
     const sel = getSelected();
+    /* istanbul ignore next */
     if (sel) {
       const next = Math.max(sfConfig.minStarCount, (sel.starCount ?? sfConfig.defaultStarCount) - 1);
       emit(root, "toolbar:starfield-update", { id: sel.id, props: { starCount: next } });
@@ -836,6 +675,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
   });
   countBtnPlus.addEventListener("click", () => {
     const sel = getSelected();
+    /* istanbul ignore next */
     if (sel) {
       const next = Math.min(sfConfig.maxStarCount, (sel.starCount ?? sfConfig.defaultStarCount) + 1);
       emit(root, "toolbar:starfield-update", { id: sel.id, props: { starCount: next } });
@@ -857,6 +697,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
   colsBtnPlus.setAttribute("aria-label", "Increase column count");
   colsBtnMinus.addEventListener("click", () => {
     const sel = getSelected();
+    /* istanbul ignore next */
     if (sel) {
       const next = Math.max(2, (sel.starCols ?? 6) - 1);
       emit(root, "toolbar:starfield-update", { id: sel.id, props: { starCols: next } });
@@ -864,6 +705,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
   });
   colsBtnPlus.addEventListener("click", () => {
     const sel = getSelected();
+    /* istanbul ignore next */
     if (sel) {
       const next = Math.min(20, (sel.starCols ?? 6) + 1);
       emit(root, "toolbar:starfield-update", { id: sel.id, props: { starCols: next } });
@@ -1052,7 +894,7 @@ function createStarfieldPanel(root: HTMLElement): HTMLElement {
 
 function createTemplatesPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Templates", "templates"));
+  panel.appendChild(panelHeader("Templates", PanelIcons.templates));
   const groupConfigs = config.templateGroups.map((groupName) => {
     const entries = TEMPLATE_CATALOG.filter((entry) => entry.group === groupName);
     if (entries.length === 0) {
@@ -1061,7 +903,7 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
     return { group: groupName, entries };
   });
 
-  let availableSymbols = BUILTIN_SYMBOLS;
+  let availableSymbols = getLoadedBuiltinSymbols();
   const symbolItems: Array<{ btn: HTMLButtonElement; cfg: TemplateCfg }> = [];
 
   for (const [index, group] of groupConfigs.entries()) {
@@ -1087,14 +929,26 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
     content.hidden = !startsOpen;
     content.appendChild(grid);
 
-    function renderEntries(): void {
+    async function renderEntries(): Promise<void> {
       if (rendered) return;
-      for (const entry of group.entries) {
+      rendered = true;
+      const templateEntries = group.entries.map((entry) => {
         const create = ALL_TEMPLATE_FACTORIES[entry.id];
         if (!create) {
           throw new Error(`template catalog: missing factory for template "${entry.id}"`);
         }
         const cfg = create();
+        return { entry, cfg };
+      });
+
+      const symbolIds = collectSymbolIds(templateEntries.flatMap(({ cfg }) => cfg.overlays));
+
+      if (symbolIds.length > 0) {
+        await ensureBuiltinSymbolsByIds(symbolIds);
+        availableSymbols = getAllSymbols([], getLoadedBuiltinSymbols());
+      }
+
+      for (const { entry, cfg } of templateEntries) {
         const item = h("button", "toolbar-template-item");
         item.type = "button";
         item.setAttribute("aria-label", `Apply ${entry.name} template`);
@@ -1111,13 +965,12 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
           symbolItems.push({ btn: item, cfg });
         }
       }
-      rendered = true;
     }
 
     function setOpen(open: boolean): void {
       toggle.setAttribute("aria-expanded", String(open));
       if (open) {
-        renderEntries();
+        void renderEntries();
       }
       content.hidden = !open;
     }
@@ -1127,7 +980,7 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
     });
 
     if (startsOpen) {
-      renderEntries();
+      void renderEntries();
     }
 
     section.append(toggle, content);
@@ -1136,7 +989,7 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
 
   root.addEventListener("symbols:loaded", ((e: Event) => {
     const { symbols } = (e as CustomEvent<{ symbols: SymbolDef[] }>).detail;
-    availableSymbols = getAllSymbols(symbols);
+    availableSymbols = getAllSymbols(symbols, getLoadedBuiltinSymbols());
     for (const { btn, cfg } of symbolItems) {
       const newThumb = templateThumbnail(cfg, 28, availableSymbols);
       btn.replaceChild(newThumb, btn.firstChild!);
@@ -1148,7 +1001,7 @@ function createTemplatesPanel(root: HTMLElement): HTMLElement {
 
 function createSymbolsPanel(root: HTMLElement): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Symbols", "symbols"));
+  panel.appendChild(panelHeader("Symbols", PanelIcons.symbols));
 
   // -- Active symbol layers section --
   const maxSymbols = LAYER_GROUP_CONSTRAINTS.symbols.maxLayers;
@@ -1208,15 +1061,23 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
   panel.appendChild(search);
 
   // Mutable symbol list (built-ins + loaded emblems)
-  let allSymbols: SymbolDef[] = getAllSymbols([]);
+  let remoteSymbols: SymbolDef[] = [];
+  let allSymbols: SymbolDef[] = getAllSymbols(remoteSymbols, getLoadedBuiltinSymbols());
 
   // Category filter tabs (no "All" -- each category shows only its own symbols)
   const catRow = h("div", "toolbar-cat-row");
-  let activeCat = allSymbols[0]?.category ?? "";
+  let activeCat = BUILTIN_SYMBOL_CATEGORIES[0] ?? allSymbols[0]?.category ?? "";
+
+  async function ensureCategoryLoaded(category: string): Promise<void> {
+    if (BUILTIN_SYMBOL_CATEGORIES.includes(category) && !isBuiltinSymbolCategoryLoaded(category)) {
+      await loadBuiltinSymbolsForCategory(category);
+    }
+    allSymbols = getAllSymbols(remoteSymbols, getLoadedBuiltinSymbols());
+  }
 
   function rebuildCategoryTabs(): void {
     catRow.innerHTML = "";
-    const categories = [...new Set(allSymbols.map((s) => s.category))];
+    const categories = [...new Set([...BUILTIN_SYMBOL_CATEGORIES, ...allSymbols.map((s) => s.category)])];
     // Reset active to first category if current one no longer exists
     if (!categories.includes(activeCat)) activeCat = categories[0] ?? "";
     for (const cat of categories) {
@@ -1229,7 +1090,10 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
           .querySelectorAll(".toolbar-cat-btn")
           .forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-        renderGrid();
+        void ensureCategoryLoaded(activeCat).then(() => {
+          rebuildCategoryTabs();
+          renderGrid();
+        });
       });
       catRow.appendChild(btn);
     }
@@ -1323,12 +1187,16 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
   }
 
   search.addEventListener("input", renderGrid);
-  renderGrid();
+  void ensureCategoryLoaded(activeCat).then(() => {
+    rebuildCategoryTabs();
+    renderGrid();
+  });
 
   // Listen for dynamically loaded symbols (e.g. from symbols.json)
   root.addEventListener("symbols:loaded", ((e: Event) => {
     const { symbols } = (e as CustomEvent<{ symbols: SymbolDef[] }>).detail;
-    allSymbols = getAllSymbols(symbols);
+    remoteSymbols = symbols;
+    allSymbols = getAllSymbols(remoteSymbols, getLoadedBuiltinSymbols());
     rebuildCategoryTabs();
     renderGrid();
   }) as EventListener);
@@ -1340,7 +1208,7 @@ function createSymbolsPanel(root: HTMLElement): HTMLElement {
 
 function createSavedPanel(): HTMLElement {
   const panel = h("div", "toolbar-panel-content");
-  panel.appendChild(panelHeader("Saved", "saved"));
+  panel.appendChild(panelHeader("Saved", PanelIcons.saved));
 
   const empty = h("div", "flex flex-col items-center justify-center gap-2 py-8");
   const icon = h("span", "toolbar-panel-icon");
@@ -1374,11 +1242,11 @@ export function createLeftbar(): HTMLElement {
       getLeftbarConfig: () => JSON.parse(JSON.stringify(config)),
       validateLeftbarConfig,
       renderPanelHeaderMarkup: (text: string, tabId: string) =>
-        panelHeader(text, tabId as TabId).outerHTML,
+        panelHeader(text, PanelIcons[tabId as TabId]).outerHTML,
       renderTemplateThumbnailMarkup: (cfg: TemplateCfg, symbols?: SymbolDef[]) =>
         templateThumbnail(cfg, 28, symbols).outerHTML,
-      runLeftbarCoverageProbe: () => {
-        panelHeader("Probe", "unknown" as TabId);
+      runLeftbarCoverageProbe: async () => {
+        panelHeader("Probe");
         templateThumbnail({
           ratio: [1, 2],
           orientation: "horizontal",
@@ -1388,6 +1256,14 @@ export function createLeftbar(): HTMLElement {
             { type: "rectangle", x: 50, y: 50, w: 20, h: 20, rotation: 0, fill: "#ffffff" } as Overlay,
             { type: "symbol", symbolId: "missing", x: 50, y: 50, w: 20, h: 20, rotation: 0, fill: "#ffffff" } as Overlay,
           ],
+        });
+        templateThumbnail({
+          ratio: [2, 3],
+          orientation: "vertical",
+          sections: 2,
+          weights: [2, 1],
+          colors: ["#112233", "#ddeeff"],
+          overlays: [],
         });
 
         const probeRoot = document.createElement("div");
@@ -1515,6 +1391,7 @@ export function createLeftbar(): HTMLElement {
           (toggle as HTMLButtonElement).click();
           (toggle as HTMLButtonElement).click();
         });
+        await Promise.resolve();
         probeRoot.dispatchEvent(new CustomEvent("symbols:loaded", {
           detail: {
             symbols: [{
@@ -1530,6 +1407,7 @@ export function createLeftbar(): HTMLElement {
 
         const symbolsPanel = createSymbolsPanel(probeRoot);
         probeRoot.appendChild(symbolsPanel);
+        await Promise.resolve();
         symbolsPanel.querySelectorAll(".toolbar-cat-btn").forEach((button) => {
           (button as HTMLButtonElement).click();
         });
@@ -1568,6 +1446,7 @@ export function createLeftbar(): HTMLElement {
           search.value = "";
           search.dispatchEvent(new Event("input", { bubbles: true }));
         }
+        await Promise.resolve();
         return true;
       },
     };

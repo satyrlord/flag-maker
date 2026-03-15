@@ -3,13 +3,9 @@
    ────────────────────────────────────────────── */
 
 import leftbarConfig from "./config/leftbar-config.json";
-import { LEFTBAR_OVERLAY_TYPE_IDS } from "./overlayTypeConfig";
 
 export type Orientation = "horizontal" | "vertical";
 export type OverlayType = "rectangle" | "circle" | "custom" | "symbol" | "starfield";
-
-/** Overlay types that can be added by the user via the leftbar UI. */
-export const LEFTBAR_UI_OVERLAY_TYPE_IDS = LEFTBAR_OVERLAY_TYPE_IDS;
 
 /* ── Layer Groups ── */
 
@@ -26,10 +22,6 @@ export interface LayerGroupConstraints {
 
 export const LAYER_GROUP_CONSTRAINTS: Record<LayerGroupId, LayerGroupConstraints> =
   leftbarConfig.layerGroups as Record<LayerGroupId, LayerGroupConstraints>;
-
-/** Rendering order (lowest Z-index first). Derived from config. */
-export const LAYER_GROUP_ORDER: readonly LayerGroupId[] =
-  leftbarConfig.layerGroupOrder as readonly LayerGroupId[];
 
 /** Determine which layer group an overlay belongs to based on its type. */
 export function overlayLayerGroup(ov: Overlay): "overlays" | "starfields" | "symbols" {
@@ -91,4 +83,20 @@ export interface StripeRect {
   w: number;
   h: number;
   fill: string;
+}
+
+/**
+ * Extract deduplicated symbol IDs referenced by an overlay array.
+ * Filters out non-symbol overlays and overlays with missing/empty symbolId.
+ */
+export function collectSymbolIds(overlays: Overlay[]): string[] {
+  return [
+    ...new Set(
+      overlays
+        .filter((overlay): overlay is Overlay & { type: "symbol"; symbolId: string } => (
+          overlay.type === "symbol" && typeof overlay.symbolId === "string" && overlay.symbolId.length > 0
+        ))
+        .map((overlay) => overlay.symbolId),
+    ),
+  ];
 }

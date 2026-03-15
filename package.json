@@ -20,9 +20,7 @@
     "prune:runtime-symbols": "tsx tools/prune-runtime-symbols.ts",
     "build:template-previews": "tsx tools/build-template-previews.ts",
     "quality": "npm run typecheck && npm run lint && npm run lint:md && npm run test:coverage",
-    "quality:full": "npm run quality && npm run test:e2e:coverage",
-    "fetch-emblems": "tsx tools/fetch-emblems.ts",
-    "fetch-symbols": "tsx tools/fetch-symbols.ts"
+    "quality:full": "npm run quality && npm run test:e2e:coverage"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

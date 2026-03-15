@@ -26,5 +26,105 @@
   {
     "id": "bavaria",
     "name": "Bavaria"
+  },
+  {
+    "id": "aland",
+    "name": "Aland"
+  },
+  {
+    "id": "guernsey",
+    "name": "Guernsey"
+  },
+  {
+    "id": "sardinia",
+    "name": "Sardinia"
+  },
+  {
+    "id": "corsica",
+    "name": "Corsica"
+  },
+  {
+    "id": "genoa",
+    "name": "Genoa"
+  },
+  {
+    "id": "venice",
+    "name": "Venice"
+  },
+  {
+    "id": "faroe_islands",
+    "name": "Faroe Islands"
+  },
+  {
+    "id": "greenland",
+    "name": "Greenland"
+  },
+  {
+    "id": "baden_wurttemberg",
+    "name": "Baden-Wurttemberg"
+  },
+  {
+    "id": "bremen",
+    "name": "Bremen"
+  },
+  {
+    "id": "hesse",
+    "name": "Hesse"
+  },
+  {
+    "id": "north_rhine_westphalia",
+    "name": "North Rhine-Westphalia"
+  },
+  {
+    "id": "schleswig_holstein",
+    "name": "Schleswig-Holstein"
+  },
+  {
+    "id": "berlin",
+    "name": "Berlin"
+  },
+  {
+    "id": "brandenburg",
+    "name": "Brandenburg"
+  },
+  {
+    "id": "hamburg",
+    "name": "Hamburg"
+  },
+  {
+    "id": "lower_saxony",
+    "name": "Lower Saxony"
+  },
+  {
+    "id": "mecklenburg_vorpommern",
+    "name": "Mecklenburg-Vorpommern"
+  },
+  {
+    "id": "rhineland_palatinate",
+    "name": "Rhineland-Palatinate"
+  },
+  {
+    "id": "saarland",
+    "name": "Saarland"
+  },
+  {
+    "id": "saxony",
+    "name": "Saxony"
+  },
+  {
+    "id": "saxony_anhalt",
+    "name": "Saxony-Anhalt"
+  },
+  {
+    "id": "thuringia",
+    "name": "Thuringia"
+  },
+  {
+    "id": "jersey",
+    "name": "Jersey"
+  },
+  {
+    "id": "isle_of_man",
+    "name": "Isle of Man"
   }
 ]

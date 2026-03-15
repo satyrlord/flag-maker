@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createLeftbar } from "@/ui/leftbar";
 import type { Overlay } from "@/types";
-import { BUILTIN_SYMBOLS } from "@/symbols";
+import {
+  BUILTIN_SYMBOL_CATEGORIES,
+  BUILTIN_SYMBOLS,
+  getLoadedBuiltinSymbols,
+  loadBuiltinSymbolsForCategory,
+} from "@/symbols";
 import config from "@/config/leftbar-config.json";
 import { validateLeftbarConfig } from "@/ui/leftbarConfig";
 import { ALL_TEMPLATE_FACTORIES, TEMPLATE_GROUPED_CONFIGS, validateTemplateCatalog } from "@/templateCatalog";
@@ -25,6 +30,20 @@ beforeEach(() => {
     })),
   });
 });
+
+async function waitForAssertion(assertion: () => void, attempts = 40): Promise<void> {
+  let lastError: unknown;
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      assertion();
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  }
+  throw lastError;
+}
 
 describe("createLeftbar", () => {
   let toolbar: HTMLElement;
@@ -445,7 +464,7 @@ describe("Templates tab", () => {
     }
   });
 
-  it("lazy loads National templates when expanding the section", () => {
+  it("lazy loads National templates when expanding the section", async () => {
     const nationalToggle = Array.from(toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-template-section-toggle")).find((button) =>
       button.textContent?.includes("National"),
     )!;
@@ -453,25 +472,31 @@ describe("Templates tab", () => {
     nationalToggle.click();
 
     expect(nationalToggle.getAttribute("aria-expanded")).toBe("true");
-    const items = toolbar.querySelectorAll(".toolbar-template-item");
-    expect(items.length).toBe(divisionTemplates + nationalTemplates);
-    expect(toolbar.querySelector('[aria-label="Apply France template"]')).not.toBeNull();
+    await waitForAssertion(() => {
+      const items = toolbar.querySelectorAll(".toolbar-template-item");
+      expect(items.length).toBe(divisionTemplates + nationalTemplates);
+      expect(toolbar.querySelector('[aria-label="Apply France template"]')).not.toBeNull();
+    });
   });
 
-  it("uses static image previews for done templates and SVG previews for unfinished ones", () => {
+  it("uses static image previews for done templates and SVG previews for unfinished ones", async () => {
     const nationalToggle = Array.from(toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-template-section-toggle")).find((button) =>
       button.textContent?.includes("National"),
     )!;
 
     nationalToggle.click();
 
-    const austriaButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply Austria template"]');
-    const franceButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply France template"]');
+    await waitForAssertion(() => {
+      const austriaButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply Austria template"]');
+      const franceButton = toolbar.querySelector<HTMLButtonElement>('[aria-label="Apply France template"]');
 
-    expect(austriaButton?.querySelector("img.toolbar-template-thumb")).not.toBeNull();
-    expect(austriaButton?.querySelector("svg")).toBeNull();
-    expect(franceButton?.querySelector("svg")).not.toBeNull();
-    expect(franceButton?.querySelector("img.toolbar-template-thumb")).toBeNull();
+      expect(austriaButton).not.toBeNull();
+      expect(franceButton).not.toBeNull();
+      expect(austriaButton!.querySelector("img.toolbar-template-thumb")).not.toBeNull();
+      expect(austriaButton!.querySelector("svg")).toBeNull();
+      expect(franceButton!.querySelector("svg")).not.toBeNull();
+      expect(franceButton!.querySelector("img.toolbar-template-thumb")).toBeNull();
+    });
   });
 
   it("clicking a template emits toolbar:template event", () => {
@@ -508,30 +533,51 @@ describe("Symbols tab", () => {
     expect(search!.placeholder).toBe("Search symbols...");
   });
 
-  it("defaults to the first category", () => {
+  it("defaults to the first category after it hydrates", async () => {
+    const firstCategory = BUILTIN_SYMBOL_CATEGORIES[0]!;
+    await loadBuiltinSymbolsForCategory(firstCategory);
+
     const activeCatBtn = toolbar.querySelector<HTMLButtonElement>(".toolbar-cat-btn.active");
     expect(activeCatBtn).not.toBeNull();
-    expect(activeCatBtn!.textContent).toBe(BUILTIN_SYMBOLS[0].category);
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    const expectedCount = BUILTIN_SYMBOLS.filter(
-      (s) => s.category === BUILTIN_SYMBOLS[0].category,
-    ).length;
-    expect(items.length).toBe(expectedCount);
+    expect(activeCatBtn!.textContent).toBe(firstCategory);
+    const expectedCount = getLoadedBuiltinSymbols().filter((s) => s.category === firstCategory).length;
+    await waitForAssertion(() => {
+      expect(toolbar.querySelectorAll(".toolbar-symbol-item").length).toBe(expectedCount);
+    });
   });
 
-  it("filters symbols by search text within category", () => {
+  it("filters symbols by search text within the active category", async () => {
+    const celestialCategory = "Celestial";
+    const celestialBtn = Array.from(toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-cat-btn"))
+      .find((button) => button.textContent === celestialCategory);
+
+    expect(celestialBtn).toBeTruthy();
+    celestialBtn!.click();
+    await loadBuiltinSymbolsForCategory(celestialCategory);
+
+    await waitForAssertion(() => {
+      expect(toolbar.querySelector<HTMLButtonElement>(".toolbar-cat-btn.active")?.textContent).toBe(celestialCategory);
+    });
+
     const search = toolbar.querySelector<HTMLInputElement>('input[type="search"]')!;
     search.value = "sol";
     search.dispatchEvent(new Event("input"));
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(1); // Sol de Mayo
+
+    await waitForAssertion(() => {
+      const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+      expect(items.length).toBe(1);
+    });
   });
 
-  it("clicking a symbol emits toolbar:symbol event", () => {
+  it("clicking a symbol emits toolbar:symbol event", async () => {
     let detail: Record<string, unknown> | null = null;
     toolbar.addEventListener("toolbar:symbol", ((e: CustomEvent) => {
       detail = e.detail as Record<string, unknown>;
     }) as EventListener);
+
+    await waitForAssertion(() => {
+      expect(toolbar.querySelectorAll(".toolbar-symbol-item").length).toBeGreaterThan(0);
+    });
 
     const firstItem = toolbar.querySelector<HTMLButtonElement>(".toolbar-symbol-item")!;
     firstItem.click();
@@ -1369,7 +1415,7 @@ describe("Symbols tab - dynamic symbol loading", () => {
     tabs[5].click(); // Symbols
   });
 
-  it("symbols:loaded event adds new symbols and rebuilds tabs", () => {
+  it("symbols:loaded event adds new symbols and rebuilds tabs", async () => {
     const newSymbols = [
       { id: "test_loaded_1", name: "Loaded Symbol", category: "TestCat", svg: "<g/>" },
     ];
@@ -1383,8 +1429,11 @@ describe("Symbols tab - dynamic symbol loading", () => {
     // Click the new category tab and verify the symbol appears
     const testCatBtn = Array.from(catBtns).find((b) => b.textContent === "TestCat")!;
     testCatBtn.click();
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(1);
+
+    await waitForAssertion(() => {
+      const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+      expect(items.length).toBe(1);
+    });
   });
 });
 
@@ -1437,7 +1486,14 @@ describe("Symbols tab - lazy loading with IntersectionObserver", () => {
       svg: "<g/>",
     }));
 
-    vi.doMock("@/symbols", () => ({ BUILTIN_SYMBOLS: manySymbols }));
+    vi.doMock("@/symbols", () => ({
+      BUILTIN_SYMBOLS: manySymbols,
+      BUILTIN_SYMBOL_CATEGORIES: ["LazyCategory"],
+      getLoadedBuiltinSymbols: () => [...manySymbols],
+      isBuiltinSymbolCategoryLoaded: () => true,
+      loadBuiltinSymbolsForCategory: vi.fn().mockResolvedValue(manySymbols),
+      ensureBuiltinSymbolsByIds: vi.fn().mockResolvedValue([]),
+    }));
 
     const { createLeftbar: createLeftbarLazy } = await import("@/ui/leftbar");
     document.documentElement.className = "dark";
@@ -1451,10 +1507,11 @@ describe("Symbols tab - lazy loading with IntersectionObserver", () => {
     );
     tabs[5].click();
 
-    // Should have rendered only the first batch (30) plus a sentinel
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(items.length).toBe(30);
-    expect(observedElements.length).toBe(1); // sentinel observed
+    await waitForAssertion(() => {
+      const items = toolbar.querySelectorAll(".toolbar-symbol-item");
+      expect(items.length).toBe(30);
+      expect(observedElements.length).toBe(1);
+    });
 
     // Simulate the sentinel becoming visible
     observeCallback(
@@ -1463,8 +1520,10 @@ describe("Symbols tab - lazy loading with IntersectionObserver", () => {
     );
 
     // Remaining 10 should now render
-    const itemsAfter = toolbar.querySelectorAll(".toolbar-symbol-item");
-    expect(itemsAfter.length).toBe(40);
+    await waitForAssertion(() => {
+      const itemsAfter = toolbar.querySelectorAll(".toolbar-symbol-item");
+      expect(itemsAfter.length).toBe(40);
+    });
   });
 });
 
@@ -1586,7 +1645,9 @@ describe("Mobile panel behavior", () => {
 describe("Symbols panel - symbolPreview fallthrough", () => {
   it("symbolPreview renders an empty SVG for a symbol with no path and no generator", async () => {
     // Store real symbols before reset
-    const { BUILTIN_SYMBOLS: realSymbols } = await import("@/symbols");
+    const realSymbolsModule = await import("@/symbols");
+    await realSymbolsModule.loadBuiltinSymbols();
+    const realSymbols = realSymbolsModule.getLoadedBuiltinSymbols();
 
     vi.resetModules();
 
@@ -1595,6 +1656,20 @@ describe("Symbols panel - symbolPreview fallthrough", () => {
         ...realSymbols,
         { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" },
       ],
+      BUILTIN_SYMBOL_CATEGORIES: [
+        "Celestial",
+        ...new Set(realSymbols.map((symbol) => symbol.category).filter((category) => category !== "Celestial")),
+      ],
+      getLoadedBuiltinSymbols: () => ([
+        ...realSymbols,
+        { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" },
+      ]),
+      isBuiltinSymbolCategoryLoaded: () => true,
+      loadBuiltinSymbolsForCategory: vi.fn().mockResolvedValue([
+        ...realSymbols.filter((symbol) => symbol.category === "Celestial"),
+        { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" },
+      ]),
+      ensureBuiltinSymbolsByIds: vi.fn().mockResolvedValue([]),
     }));
 
     Object.defineProperty(window, "matchMedia", {
@@ -1623,10 +1698,12 @@ describe("Symbols panel - symbolPreview fallthrough", () => {
     tabs[5].click(); // Symbols
 
     // Default category is Celestial; injected symbol is also in Celestial
-    const items = toolbar.querySelectorAll(".toolbar-symbol-item");
     const celestialCount = [...realSymbols, { id: "no_path_no_gen", name: "No Path No Gen", category: "Celestial" }]
       .filter((s) => s.category === "Celestial").length;
-    expect(items.length).toBe(celestialCount);
+
+    await waitForAssertion(() => {
+      expect(toolbar.querySelectorAll(".toolbar-symbol-item").length).toBe(celestialCount);
+    });
 
     vi.doUnmock("@/symbols");
     vi.resetModules();

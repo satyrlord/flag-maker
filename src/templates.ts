@@ -114,11 +114,13 @@ export function templatePerSaltire(): TemplateCfg {
 }
 
 export function templateCenteredCross(): TemplateCfg {
+  const ratio: [number, number] = [2, 3];
+  const crossHeightPct = 18;
   return {
-    ratio: [2, 3], sections: 1, colors: [DIVISION_GRAYSCALE.darkest],
+    ratio, sections: 1, colors: [DIVISION_GRAYSCALE.darkest],
     overlays: [
-      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 18, fill: DIVISION_GRAYSCALE.lightest }),
-      rectOverlay({ xPct: 50, yPct: 50, wPct: 18, hPct: 100, fill: DIVISION_GRAYSCALE.lightest }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: crossHeightPct, fill: DIVISION_GRAYSCALE.lightest }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: (crossHeightPct * ratio[0]) / ratio[1], hPct: 100, fill: DIVISION_GRAYSCALE.lightest }),
     ],
   };
 }
@@ -137,7 +139,7 @@ function centeredCrossTemplate(
   ratio: [number, number],
   fieldFill: string,
   crossFill: string,
-  crossWidthPct: number,
+  horizontalCrossHeightPct: number,
 ): TemplateCfg {
   return {
     ratio,
@@ -145,8 +147,8 @@ function centeredCrossTemplate(
     colors: [fieldFill],
     orientation: "horizontal",
     overlays: [
-      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: crossWidthPct, fill: crossFill }),
-      rectOverlay({ xPct: 50, yPct: 50, wPct: crossWidthPct, hPct: 100, fill: crossFill }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: horizontalCrossHeightPct, fill: crossFill }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: (horizontalCrossHeightPct * ratio[0]) / ratio[1], hPct: 100, fill: crossFill }),
     ],
   };
 }
@@ -169,27 +171,63 @@ function saltireTemplate(
   };
 }
 
-function bavarianLozenges(rows: number, cols: number, fill: string): Overlay[] {
-  const overlays: Overlay[] = [];
-  const cellWidth = 100 / cols;
-  const cellHeight = 100 / rows;
-  for (let row = 0; row < rows; row += 1) {
-    const centerY = row * cellHeight + cellHeight / 2;
-    const offsetX = row % 2 === 0 ? cellWidth / 2 : 0;
-    for (let col = 0; col <= cols; col += 1) {
-      if ((row + col) % 2 !== 0) {
-        continue;
-      }
-      const centerX = col * cellWidth + offsetX;
-      overlays.push(polyOverlay([
-        [centerX, centerY - cellHeight / 2],
-        [centerX + cellWidth / 2, centerY],
-        [centerX, centerY + cellHeight / 2],
-        [centerX - cellWidth / 2, centerY],
-      ], fill));
-    }
-  }
-  return overlays;
+function symbolFlagTemplate(
+  ratio: [number, number],
+  symbolId: string,
+): TemplateCfg {
+  return {
+    ratio,
+    sections: 1,
+    colors: ["#FFFFFF"],
+    orientation: "horizontal",
+    overlays: [
+      {
+        id: uid(),
+        type: "symbol",
+        symbolId,
+        x: 50,
+        y: 50,
+        w: 100,
+        h: 100,
+        rotation: 0,
+        fill: "#FFFFFF",
+        stroke: "#0000",
+        strokeWidth: 0,
+        opacity: 1,
+      },
+    ],
+  };
+}
+
+function normalizeViewBoxPoint(
+  x: number,
+  y: number,
+  viewWidth: number,
+  viewHeight: number,
+): [number, number] {
+  return [(x / viewWidth) * 100, (y / viewHeight) * 100];
+}
+
+function normalizedSemicirclePoints(
+  centerX: number,
+  centerY: number,
+  radius: number,
+  startDegrees: number,
+  endDegrees: number,
+  viewWidth: number,
+  viewHeight: number,
+  steps = 32,
+): Array<[number, number]> {
+  return Array.from({ length: steps + 1 }, (_, index) => {
+    const angleDegrees = startDegrees + ((endDegrees - startDegrees) * index) / steps;
+    const angleRadians = (angleDegrees * Math.PI) / 180;
+    return normalizeViewBoxPoint(
+      centerX + radius * Math.cos(angleRadians),
+      centerY + radius * Math.sin(angleRadians),
+      viewWidth,
+      viewHeight,
+    );
+  });
 }
 
 export function templateEngland(): TemplateCfg {
@@ -197,7 +235,7 @@ export function templateEngland(): TemplateCfg {
 }
 
 export function templateScotland(): TemplateCfg {
-  return saltireTemplate([3, 5], "#0065BD", "#FFFFFF", 18);
+  return saltireTemplate([3, 5], "#005EB8", "#FFFFFF", 20);
 }
 
 export function templateWales(): TemplateCfg {
@@ -211,7 +249,7 @@ export function templateWales(): TemplateCfg {
       {
         id: uid(),
         type: "symbol",
-        symbolId: "dragon_heraldic",
+        symbolId: "wales_flag",
         x: 50,
         y: 49,
         w: 56,
@@ -227,7 +265,28 @@ export function templateWales(): TemplateCfg {
 }
 
 export function templateNorthernIreland(): TemplateCfg {
-  return saltireTemplate([3, 5], "#FFFFFF", "#CC0000", 16);
+  return {
+    ratio: [1, 2],
+    sections: 1,
+    colors: ["#FFFFFF"],
+    orientation: "horizontal",
+    overlays: [
+      {
+        id: uid(),
+        type: "symbol",
+        symbolId: "ulster_banner_flag",
+        x: 50,
+        y: 50,
+        w: 100,
+        h: 100,
+        rotation: 0,
+        fill: "#FFFFFF",
+        stroke: "#0000",
+        strokeWidth: 0,
+        opacity: 1,
+      },
+    ],
+  };
 }
 
 export function templateCatalunya(): TemplateCfg {
@@ -242,28 +301,219 @@ export function templateCatalunya(): TemplateCfg {
 
 export function templateEuskadi(): TemplateCfg {
   const ratio: [number, number] = [14, 25];
+  const crossWidthPctOfLength = 8.6;
+  const crossWidthPctOfHeight = (43 / 280) * 100;
   return {
     ratio,
     sections: 1,
     colors: ["#D52B1E"],
     orientation: "horizontal",
     overlays: [
-      makeBandSegment(0, 0, 100, 100, 20, "#009B48", ratio),
-      makeBandSegment(0, 100, 100, 0, 20, "#009B48", ratio),
-      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 14, fill: "#FFFFFF" }),
-      rectOverlay({ xPct: 50, yPct: 50, wPct: 14, hPct: 100, fill: "#FFFFFF" }),
+      makeBandSegment(0, 0, 100, 100, crossWidthPctOfHeight, "#009B48", ratio),
+      makeBandSegment(0, 100, 100, 0, crossWidthPctOfHeight, "#009B48", ratio),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: crossWidthPctOfHeight, fill: "#FFFFFF" }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: crossWidthPctOfLength, hPct: 100, fill: "#FFFFFF" }),
     ],
   };
 }
 
 export function templateBavaria(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "bavaria_lozengy_flag");
+}
+
+export function templateAland(): TemplateCfg {
   return {
-    ratio: [3, 5],
+    ratio: [17, 26],
+    sections: 1,
+    colors: ["#0064AD"],
+    orientation: "horizontal",
+    overlays: [
+      rectOverlay({ xPct: 40.3846153846, yPct: 50, wPct: 19.2307692308, hPct: 100, fill: "#FFD300" }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 29.4117647059, fill: "#FFD300" }),
+      rectOverlay({ xPct: 40.3846153846, yPct: 50, wPct: 7.6923076923, hPct: 100, fill: "#DA0E15" }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 11.7647058824, fill: "#DA0E15" }),
+    ],
+  };
+}
+
+export function templateGuernsey(): TemplateCfg {
+  return symbolFlagTemplate([2, 3], "guernsey_flag");
+}
+
+export function templateSardinia(): TemplateCfg {
+  return symbolFlagTemplate([2, 3], "sardinia_flag");
+}
+
+export function templateCorsica(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "corsica_flag");
+}
+
+export function templateGenoa(): TemplateCfg {
+  return centeredCrossTemplate([2, 3], "#FFFFFF", "#CE1126", 20);
+}
+
+export function templateVenice(): TemplateCfg {
+  return symbolFlagTemplate([13, 25], "venice_flag");
+}
+
+export function templateFaroeIslands(): TemplateCfg {
+  return {
+    ratio: [8, 11],
     sections: 1,
     colors: ["#FFFFFF"],
     orientation: "horizontal",
-    overlays: bavarianLozenges(6, 10, "#75AADB"),
+    overlays: [
+      rectOverlay({ xPct: 36.3636363636, yPct: 50, wPct: 18.1818181818, hPct: 100, fill: "#005EB8" }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 25, fill: "#005EB8" }),
+      rectOverlay({ xPct: 36.3636363636, yPct: 50, wPct: 9.0909090909, hPct: 100, fill: "#EF3340" }),
+      rectOverlay({ xPct: 50, yPct: 50, wPct: 100, hPct: 12.5, fill: "#EF3340" }),
+    ],
   };
+}
+
+export function templateGreenland(): TemplateCfg {
+  const upperSemicircle = normalizedSemicirclePoints(7, 6, 4, 180, 360, 18, 12);
+  const lowerSemicircle = normalizedSemicirclePoints(7, 6, 4, 0, 180, 18, 12);
+
+  return {
+    ratio: [2, 3],
+    sections: 2,
+    colors: ["#FFFFFF", "#C8102E"],
+    orientation: "horizontal",
+    overlays: [
+      polyOverlay(upperSemicircle, "#C8102E"),
+      polyOverlay(lowerSemicircle, "#FFFFFF"),
+    ],
+  };
+}
+
+export function templateBadenWurttemberg(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 2,
+    colors: ["#000000", "#F9C700"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateBremen(): TemplateCfg {
+  const stripeColors = Array.from({ length: 8 }, (_, index) => (index % 2 === 0 ? "#DD0000" : "#FFFFFF"));
+  const hoistColumnWidth = 8.3333333333;
+  const stripeHeight = 12.5;
+
+  return {
+    ratio: [2, 3],
+    sections: 8,
+    colors: stripeColors,
+    orientation: "horizontal",
+    overlays: Array.from({ length: 8 }, (_, index) =>
+      rectOverlay({
+        xPct: hoistColumnWidth + hoistColumnWidth / 2,
+        yPct: stripeHeight / 2 + stripeHeight * index,
+        wPct: hoistColumnWidth,
+        hPct: stripeHeight,
+        fill: index % 2 === 0 ? "#FFFFFF" : "#DD0000",
+      }),
+    ),
+  };
+}
+
+export function templateHesse(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 2,
+    colors: ["#E10000", "#FFFFFF"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateNorthRhineWestphalia(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 3,
+    colors: ["#009136", "#FFFFFF", "#E3001B"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateSchleswigHolstein(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 3,
+    colors: ["#0039AD", "#FFFFFF", "#D61810"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateBerlin(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "berlin_flag");
+}
+
+export function templateBrandenburg(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "brandenburg_flag");
+}
+
+export function templateHamburg(): TemplateCfg {
+  return symbolFlagTemplate([2, 3], "hamburg_flag");
+}
+
+export function templateLowerSaxony(): TemplateCfg {
+  return symbolFlagTemplate([15, 23], "lower_saxony_flag");
+}
+
+export function templateMecklenburgVorpommern(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 5,
+    colors: ["#003893", "#FFFFFF", "#F5E100", "#FFFFFF", "#CC0605"],
+    weights: [4, 3, 1, 3, 4],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateRhinelandPalatinate(): TemplateCfg {
+  return symbolFlagTemplate([2, 3], "rhineland_palatinate_flag");
+}
+
+export function templateSaarland(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "saarland_flag");
+}
+
+export function templateSaxony(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 2,
+    colors: ["#FFFFFF", "#006B3F"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateSaxonyAnhalt(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "saxony_anhalt_flag");
+}
+
+export function templateThuringia(): TemplateCfg {
+  return {
+    ratio: [3, 5],
+    sections: 2,
+    colors: ["#FFFFFF", "#E2001A"],
+    orientation: "horizontal",
+    overlays: [],
+  };
+}
+
+export function templateJersey(): TemplateCfg {
+  return symbolFlagTemplate([3, 5], "jersey_flag");
+}
+
+export function templateIsleOfMan(): TemplateCfg {
+  return symbolFlagTemplate([1, 2], "isle_of_man_flag");
 }
 
 /* ── National Flag Templates ── */
@@ -509,6 +759,31 @@ const STATE_LEVEL_FACTORIES: Record<string, () => TemplateCfg> = {
   catalunya: templateCatalunya,
   euskadi: templateEuskadi,
   bavaria: templateBavaria,
+  aland: templateAland,
+  guernsey: templateGuernsey,
+  faroe_islands: templateFaroeIslands,
+  greenland: templateGreenland,
+  baden_wurttemberg: templateBadenWurttemberg,
+  bremen: templateBremen,
+  hesse: templateHesse,
+  north_rhine_westphalia: templateNorthRhineWestphalia,
+  schleswig_holstein: templateSchleswigHolstein,
+  sardinia: templateSardinia,
+  corsica: templateCorsica,
+  genoa: templateGenoa,
+  venice: templateVenice,
+  berlin: templateBerlin,
+  brandenburg: templateBrandenburg,
+  hamburg: templateHamburg,
+  lower_saxony: templateLowerSaxony,
+  mecklenburg_vorpommern: templateMecklenburgVorpommern,
+  rhineland_palatinate: templateRhinelandPalatinate,
+  saarland: templateSaarland,
+  saxony: templateSaxony,
+  saxony_anhalt: templateSaxonyAnhalt,
+  thuringia: templateThuringia,
+  jersey: templateJersey,
+  isle_of_man: templateIsleOfMan,
 };
 
 export function stateLevelFlagTemplate(id: string): (() => TemplateCfg) | null {
